@@ -24,29 +24,20 @@ public class Level : MonoBehaviour
 
 	private void Start()
 	{
-		var squares = Random.Range(_squaresRange.x, _squaresRange.y + 1);
-
-        Squares = new Square[squares];
-
-        for (var i = 0; i < squares; i++)
-		{
-			var newSquare = Instantiate(_squareTemplate, _squareTemplate.transform.parent).GetComponent<Square>();
-            newSquare.transform.position = Vector3.right * (_squareTemplateRectangle.Width + _squaresDistance) * i;
-
-            newSquare.Initialize(i, this);
-
-            newSquare.gameObject.SetActive(true);
-
-            Squares[i] = newSquare;
-        }
-
-        transform.position = -(Vector3.right * (_squareTemplateRectangle.Width + _squaresDistance) * (squares - 1)) / 2f;
+        GenerateLevel();
     }
 
     private void Update()
     {
         if(_lastSquareClickedDown == null)
 		{
+            if(Input.GetKeyDown(KeyCode.Return))
+			{
+                GenerateLevel();
+
+                return;
+            }
+
             var squareHovered = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero).collider?.GetComponent<Square>();
 
             if (squareHovered != null && squareHovered != _previousHoveredSquare)
@@ -90,5 +81,34 @@ public class Level : MonoBehaviour
 
             _lastSquareClickedDown = null;
         }
+    }
+
+    private void GenerateLevel()
+	{
+        if(Squares != null && Squares.Length != 0)
+		{
+            foreach(var square in Squares)
+			{
+                Destroy(square.gameObject);
+			}
+        }
+
+        var squares = Random.Range(_squaresRange.x, _squaresRange.y + 1);
+
+        Squares = new Square[squares];
+
+        for (var i = 0; i < squares; i++)
+        {
+            var newSquare = Instantiate(_squareTemplate, _squareTemplate.transform.parent).GetComponent<Square>();
+            newSquare.transform.localPosition = Vector3.right * (_squareTemplateRectangle.Width + _squaresDistance) * i;
+
+            newSquare.Initialize(i, this);
+
+            newSquare.gameObject.SetActive(true);
+
+            Squares[i] = newSquare;
+        }
+
+        transform.position = -(Vector3.right * (_squareTemplateRectangle.Width + _squaresDistance) * (squares - 1)) / 2f;
     }
 }

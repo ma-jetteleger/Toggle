@@ -673,7 +673,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _squareTemplate: {fileID: 632175955}
-  _squaresRange: {x: 3, y: 6}
+  _squaresRange: {x: 3, y: 7}
   _squaresDistance: 0.1875
 --- !u!4 &692212898
 Transform:
