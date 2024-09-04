@@ -25,7 +25,7 @@ Done:
 - And their initial "toggle" state is random as well
 - And the number of squares is random within a range
 - And the solution is also random (the number of clicks for the solution is random within a range)
-	? Should the solution include the possibility of clicking the same square more than once?
+	- ? Should the solution include the possibility of clicking the same square more than once?
 
 The level and goal generation is fully random (within some parameters). This is done because I have no idea of any heuristics that indicate whether some aspect or a level's configuration and its goal make it more interesting than another, those will have to wait.
 
