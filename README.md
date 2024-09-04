@@ -1,4 +1,4 @@
-#Toggle
+# Toggle
 
 Toggle is a game about the simplest form of interaction: selecting and activating something. It's a game about rules and interactions, or a game about pressing buttons.
 
