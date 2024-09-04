@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Square : MonoBehaviour
 {
-    public enum TargetScheme
+    public enum TargetingScheme
 	{
         Self,
         Left,
@@ -23,35 +23,52 @@ public class Square : MonoBehaviour
 
     public bool Highlighted { get; set; }
     public bool Toggled { get; set; }
+    public bool SolutionSquare { get; set; }
+    public TargetingScheme TargetScheme { get; set; }
 
     private int _id;
-    private Level _level;
-    private TargetScheme _targetScheme;
+    //private Level _level;
     private Color _normalColor;
     private Color _normalOutlineColor;
     private Rectangle _rectangle;
     private Rectangle _outlineRectangle;
     private SpriteRenderer _targetIndicator;
 
-	public void Initialize(int id, Level level)
+	public void Initialize(int id/*, Level level*/, Square referenceSquare = null)
 	{
+        SolutionSquare = referenceSquare != null;
+
         _rectangle = GetComponent<Rectangle>();
         _normalColor = _rectangle.Color;
 
-        _outlineRectangle = _outline.GetComponent<Rectangle>();
-        _normalOutlineColor = _outlineRectangle.Color;
-
-        _targetIndicator = GetComponentInChildren<SpriteRenderer>(true);
-
         _id = id;
-        _level = level;
+        //_level = level;
 
-        _outline.SetActive(false);
+        gameObject.name = $"{(SolutionSquare ? "Solution" : "")}Square({_id})";
 
-        gameObject.name = $"Square({_id})";
+        if (!SolutionSquare)
+		{
+            _outlineRectangle = _outline.GetComponent<Rectangle>();
+            _normalOutlineColor = _outlineRectangle.Color;
 
-        _targetScheme = (TargetScheme)Random.Range(0, System.Enum.GetValues(typeof(TargetScheme)).Length);
-        _targetIndicator.sprite = _targetSchemeSprites[(int)_targetScheme];
+            _outline.SetActive(false);
+
+            TargetScheme = (TargetingScheme)Random.Range(0, System.Enum.GetValues(typeof(TargetingScheme)).Length);
+
+            _targetIndicator = GetComponentInChildren<SpriteRenderer>(true);
+            _targetIndicator.sprite = _targetSchemeSprites[(int)TargetScheme];
+
+            if (Random.Range(0f, 1f) > 0.5f)
+            {
+                Toggle();
+            }
+        }
+		else
+		{
+            TargetScheme = referenceSquare.TargetScheme;
+
+            Toggle(referenceSquare.Toggled);
+        }
     }
 
     public void OnMouseOverEnter()
@@ -78,37 +95,37 @@ public class Square : MonoBehaviour
         _outlineRectangle.Color = _normalOutlineColor;
     }
 
-    public void ToggleTargets()
+    public void ToggleTargets(Square[] targetArray)
 	{
         var targets = new List<Square>();
 
-		switch (_targetScheme)
+		switch (TargetScheme)
 		{
-			case TargetScheme.Self:
+			case TargetingScheme.Self:
                 targets.Add(this);
                 break;
-			case TargetScheme.Left:
-                if(_id > 0) targets.Add(_level.Squares[_id - 1]);
+			case TargetingScheme.Left:
+                if(_id > 0) targets.Add(targetArray[_id - 1]);
                 break;
-			case TargetScheme.Right:
-                if (_id < _level.Squares.Length - 1) targets.Add(_level.Squares[_id + 1]);
+			case TargetingScheme.Right:
+                if (_id < targetArray.Length - 1) targets.Add(targetArray[_id + 1]);
                 break;
-			case TargetScheme.SelfLeft:
+			case TargetingScheme.SelfLeft:
                 targets.Add(this);
-                if (_id > 0) targets.Add(_level.Squares[_id - 1]);
+                if (_id > 0) targets.Add(targetArray[_id - 1]);
                 break;
-			case TargetScheme.SelfRight:
+			case TargetingScheme.SelfRight:
                 targets.Add(this);
-                if (_id < _level.Squares.Length - 1) targets.Add(_level.Squares[_id + 1]);
+                if (_id < targetArray.Length - 1) targets.Add(targetArray[_id + 1]);
                 break;
-			case TargetScheme.LeftRight:
-                if (_id > 0) targets.Add(_level.Squares[_id - 1]);
-                if (_id < _level.Squares.Length - 1) targets.Add(_level.Squares[_id + 1]);
+			case TargetingScheme.LeftRight:
+                if (_id > 0) targets.Add(targetArray[_id - 1]);
+                if (_id < targetArray.Length - 1) targets.Add(targetArray[_id + 1]);
                 break;
-			case TargetScheme.SelfLeftRight:
+			case TargetingScheme.SelfLeftRight:
                 targets.Add(this);
-                if (_id > 0) targets.Add(_level.Squares[_id - 1]);
-                if (_id < _level.Squares.Length - 1) targets.Add(_level.Squares[_id + 1]);
+                if (_id > 0) targets.Add(targetArray[_id - 1]);
+                if (_id < targetArray.Length - 1) targets.Add(targetArray[_id + 1]);
                 break;
 		}
 
@@ -120,10 +137,19 @@ public class Square : MonoBehaviour
 
 	public void Toggle()
 	{
-        _rectangle.Color = Toggled 
-            ? _normalColor 
-            : _toggledColor;
+        Toggled = !Toggled;
 
-		Toggled = !Toggled;
+        _rectangle.Color = Toggled 
+            ? _toggledColor
+            : _normalColor;
+    }
+
+    public void Toggle(bool toggle)
+    {
+        Toggled = toggle;
+
+        _rectangle.Color = Toggled
+            ? _toggledColor
+            : _normalColor;
     }
 }
