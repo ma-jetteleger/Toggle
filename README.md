@@ -4,7 +4,7 @@ Toggle is a game about the simplest form of interaction: selecting and activatin
 
 This repository contains the code of the game and the process of its development.
 
-How to play:
+## How to play:
 
 The goal of the game is to change the colors of the middle interactive set of squares so they match the color of the ones at the bottom in a specified number of clicks.
 
