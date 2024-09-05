@@ -9,6 +9,8 @@ public class Level : MonoBehaviour
 {
     [SerializeField] private GameObject _squareTemplate = null;
     [SerializeField] private GameObject _solutionSquareTemplate = null;
+    [SerializeField] private Rectangle _rectangle = null;
+    [SerializeField] private Rectangle _solutionRectangle = null;
     [SerializeField] private TextMeshProUGUI _solutionClicksText = null;
     [SerializeField] private Vector2Int _squaresRange = Vector2Int.zero;
     [SerializeField] private int _minClicksForSolution = 0;
@@ -122,7 +124,8 @@ public class Level : MonoBehaviour
         for (var i = 0; i < squares; i++)
         {
             var newSquare = Instantiate(_squareTemplate, _squareTemplate.transform.parent).GetComponent<Square>();
-            newSquare.transform.localPosition = Vector3.right * (_squareTemplateRectangle.Width + _squaresDistance) * i;
+            newSquare.transform.localPosition = -(Vector3.right * (_squareTemplateRectangle.Width + _squaresDistance) * (squares - 1)) / 2f
+                + Vector3.right * (_squareTemplateRectangle.Width + _squaresDistance) * i;
 
             newSquare.Initialize(i);
 
@@ -133,7 +136,8 @@ public class Level : MonoBehaviour
             indices[i] = i;
 
             var newSolutionSquare = Instantiate(_solutionSquareTemplate, _solutionSquareTemplate.transform.parent).GetComponent<Square>();
-            newSolutionSquare.transform.localPosition = Vector3.right * (_solutionSquareTemplateRectangle.Width + _squaresDistance) * i;
+            newSolutionSquare.transform.localPosition = -(Vector3.right * (_solutionSquareTemplateRectangle.Width + _solutionSquaresDistance) * (squares - 1)) / 2f
+                + Vector3.right * (_solutionSquareTemplateRectangle.Width + _solutionSquaresDistance) * i;
 
             newSolutionSquare.Initialize(i, newSquare);
 
@@ -142,11 +146,11 @@ public class Level : MonoBehaviour
             SolutionSquares[i] = newSolutionSquare;
         }
 
-        transform.position = -(Vector3.right * (_squareTemplateRectangle.Width + _squaresDistance) * (squares - 1)) / 2f;
+        _rectangle.Width = (_squareTemplateRectangle.Width + _squaresDistance) * squares + _squaresDistance/* * 2*/;
+        _rectangle.Height = _squareTemplateRectangle.Height + _squaresDistance * 2;
 
-        var solutionY = _solutionParent.position.y;
-
-        _solutionParent.position = new Vector3(-(((_solutionSquareTemplateRectangle.Width + _solutionSquaresDistance) * (squares - 1)) / 2f), solutionY, 0f);
+        _solutionRectangle.Width = (_solutionSquareTemplateRectangle.Width + _solutionSquaresDistance) * squares + _solutionSquaresDistance/* * 2*/;
+        _solutionRectangle.Height = _solutionSquareTemplateRectangle.Height + _solutionSquaresDistance * 2;
 
         _solutionSequence = new int[Random.Range(_minClicksForSolution, squares - _maxClicksBufferForSolution)];
 
