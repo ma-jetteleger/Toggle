@@ -39,5 +39,10 @@ The game is totally unplayable by someone who doesn't know the rules and the goa
 - Big, middle, interactive squares are mapped to smaller, bottom, uninteractive "goal" squares
 
 I'll need to make those affordances perceivable with the help of "knowledge in the world" (the game world, that is), in the form of feedback, feedforward and visual signifiers displayed on the elements of game's interface, or "knowledge in the head", in the form of a tutorial, formalizing the core ideas and mechanisms of the game in the head of the player. A challenge with the tutorial approach is that there is no guarantee that players will actually remember any of it if they come back and play again. Also there's something very much not minimalistic about a written out tutorial. My first attempt at "teaching" the game will therefore be through the design of perceivable minimalistic signifiers.
+
+##
+
+? Should it be possible to beat the level but in more clicks? Giving partial rewards? What are rewards? When the reward is just being able to go to the next level, what could be a "partial reward"? If not, players shouldn't be able to click on more squares after clicks counter == solution clicks) 
+	? Also what if the solution is possble to achieve with fewer clicks? Extra rewards? Should compute the optimal number of clicks to get to the goal and use that as a goal)
 	
 	

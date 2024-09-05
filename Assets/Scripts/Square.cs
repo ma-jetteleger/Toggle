@@ -21,6 +21,7 @@ public class Square : MonoBehaviour
     [SerializeField] private Sprite[] _targetSchemeSprites = null;
     [SerializeField] private Color _toggledColor = Color.black;
 
+    public bool Interactable { get; set; }
     public bool Highlighted { get; set; }
     public bool Toggled { get; set; }
     public bool SolutionSquare { get; set; }
@@ -69,6 +70,8 @@ public class Square : MonoBehaviour
 
             Toggle(referenceSquare.Toggled);
         }
+
+        Interactable = true;
     }
 
     public void OnMouseOverEnter()

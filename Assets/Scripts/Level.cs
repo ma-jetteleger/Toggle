@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using TMPro;
+using DG.Tweening;
 
 public class Level : MonoBehaviour
 {
@@ -12,6 +13,11 @@ public class Level : MonoBehaviour
     [SerializeField] private Rectangle _rectangle = null;
     [SerializeField] private Rectangle _solutionRectangle = null;
     [SerializeField] private TextMeshProUGUI _solutionClicksText = null;
+    [SerializeField] private Rectangle _levelCompletionFeedback = null;
+    [SerializeField] private float _levelCompletionTime = 0f;
+    [SerializeField] private AnimationCurve _levelCompletionCurve = null;
+    [SerializeField] private AnimationCurve _levelCompletionThicknessCurve = null;
+    [SerializeField] private AnimationCurve _levelCompletionAlphaCurve = null;
     [SerializeField] private Vector2Int _squaresRange = Vector2Int.zero;
     [SerializeField] private int _minClicksForSolution = 0;
     [SerializeField] private int _maxClicksBufferForSolution = 0;
@@ -21,12 +27,13 @@ public class Level : MonoBehaviour
     public Square[] Squares { get; set; }
     public Square[] SolutionSquares { get; set; }
     
-    private Transform _solutionParent;
     private Square _previousHoveredSquare;
     private Rectangle _squareTemplateRectangle;
     private Rectangle _solutionSquareTemplateRectangle;
     private Square _lastSquareClickedDown;
     private int[] _solutionSequence;
+    private Vector2 _levelCompletionFeedbackFinalSize;
+    private Color _levelCompletionFeedbackBaseColor;
 
     private void Awake()
 	{
@@ -35,12 +42,15 @@ public class Level : MonoBehaviour
 
         _squareTemplate.SetActive(false);
         _solutionSquareTemplate.SetActive(false);
-
-        _solutionParent = _solutionSquareTemplate.transform.parent;
     }
 
 	private void Start()
 	{
+        _levelCompletionFeedbackFinalSize = new Vector2(Screen.width, Screen.height) / 72.5f;
+        _levelCompletionFeedback.Width = _levelCompletionFeedbackFinalSize.x / 100f;
+        _levelCompletionFeedback.Height = _levelCompletionFeedbackFinalSize.y / 100f;
+        _levelCompletionFeedbackBaseColor = _levelCompletionFeedback.Color;
+
         GenerateLevel();
     }
 
@@ -52,14 +62,21 @@ public class Level : MonoBehaviour
 			{
                 GenerateLevel();
 
+                //OnLevelCompletion();
+
                 return;
             }
 
             var squareHovered = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero).collider?.GetComponent<Square>();
 
-            if (squareHovered != null && !squareHovered.SolutionSquare && squareHovered != _previousHoveredSquare)
+            if (squareHovered != null)
             {
-                if (!squareHovered.Highlighted)
+                if(squareHovered.SolutionSquare || !squareHovered.Interactable)
+				{
+                    squareHovered = null;
+
+                }
+                else if (squareHovered != _previousHoveredSquare && !squareHovered.Highlighted)
                 {
                     squareHovered.OnMouseOverEnter();
                 }
@@ -85,22 +102,24 @@ public class Level : MonoBehaviour
         
         if (Input.GetMouseButtonUp(0) && _lastSquareClickedDown != null)
         {
-            var squareHovered = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero).collider?.GetComponent<Square>();
+            var squareClickedUp = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero).collider?.GetComponent<Square>();
 
-            var sameSquare = squareHovered != null && squareHovered;
+            var sameSquare = squareClickedUp != null && squareClickedUp == _lastSquareClickedDown;
 
             _lastSquareClickedDown.OnMouseClickUp();
 
             if(sameSquare)
 			{
                 _lastSquareClickedDown.ToggleTargets(Squares);
+
+                CheckLevelCompletion();
             }
 
             _lastSquareClickedDown = null;
         }
     }
 
-    private void GenerateLevel()
+    public void GenerateLevel()
 	{
         if(Squares != null && Squares.Length != 0)
 		{
@@ -164,5 +183,90 @@ public class Level : MonoBehaviour
         }
 
         _solutionClicksText.text = $"{_solutionSequence.Length}";
+
+        CheckLevelCompletion();
+    }
+
+    private void CheckLevelCompletion()
+	{
+        var levelComplete = true;
+
+        for(var i = 0; i < Squares.Length; i++)
+		{
+            if(Squares[i].Toggled != SolutionSquares[i].Toggled)
+			{
+                levelComplete = false;
+            }
+		}
+
+        LevelPanel.Instance.UpdateNextLevelButton(levelComplete);
+
+        if(levelComplete)
+		{
+            OnLevelCompletion();
+        }
+	}
+
+    private void OnLevelCompletion()
+	{
+        for (var i = 0; i < Squares.Length; i++)
+        {
+            var square = Squares[i];
+
+            square.Interactable = false;
+
+            if(square.Highlighted)
+			{
+                square.OnMouseOverExit();
+            }
+        }
+
+        var levelCompletionFeedbackWidth = _levelCompletionFeedback.Width;
+        var levelCompletionFeedbackHeight = _levelCompletionFeedback.Height;
+        var levelCompletionFeedbackThicknessBaseValue = _levelCompletionFeedback.Thickness;
+
+        DOTween.To(() => levelCompletionFeedbackWidth, x =>
+        {
+            levelCompletionFeedbackWidth = x;
+
+            _levelCompletionFeedback.Width = levelCompletionFeedbackWidth;
+        },
+        _levelCompletionFeedbackFinalSize.x,
+        _levelCompletionTime).SetEase(_levelCompletionCurve).OnComplete(() =>
+		{
+            _levelCompletionFeedback.Width = _levelCompletionFeedbackFinalSize.x / 100f;
+        });
+
+        DOTween.To(() => levelCompletionFeedbackHeight, x =>
+        {
+            levelCompletionFeedbackHeight = x;
+
+            _levelCompletionFeedback.Height = levelCompletionFeedbackHeight;
+        },
+        _levelCompletionFeedbackFinalSize.y,
+        _levelCompletionTime).SetEase(_levelCompletionCurve).OnComplete(() =>
+        {
+            _levelCompletionFeedback.Height = _levelCompletionFeedbackFinalSize.y / 100f;
+        });
+
+        var time = 0f;
+
+        DOTween.To(() => time, x =>
+        {
+            time = x;
+
+            _levelCompletionFeedback.Thickness = levelCompletionFeedbackThicknessBaseValue * _levelCompletionThicknessCurve.Evaluate(time);
+
+            var color = _levelCompletionFeedback.Color;
+            color.a = _levelCompletionAlphaCurve.Evaluate(time);
+
+            _levelCompletionFeedback.Color = color;
+        },
+        1f,
+        _levelCompletionTime).SetEase(_levelCompletionCurve).OnComplete(() =>
+        {
+            _levelCompletionFeedback.Thickness = levelCompletionFeedbackThicknessBaseValue;
+            _levelCompletionFeedback.Color = _levelCompletionFeedbackBaseColor;
+        });
     }
 }
