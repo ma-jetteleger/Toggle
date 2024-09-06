@@ -40,12 +40,32 @@ The game is totally unplayable by someone who doesn't know the rules and the goa
 
 I'll need to make those affordances perceivable with the help of "knowledge in the world" (the game world, that is), in the form of feedback, feedforward and visual signifiers displayed on the elements of game's interface, or "knowledge in the head", in the form of a tutorial, formalizing the core ideas and mechanisms of the game in the head of the player. A challenge with the tutorial approach is that there is no guarantee that players will actually remember any of it if they come back and play again. Also there's something very much not minimalistic about a written out tutorial. My first attempt at "teaching" the game will therefore be through the design of perceivable minimalistic signifiers.
 
-## 
+## 2024-09-06
 
-? Should it be possible to beat the level but in more clicks? Giving partial rewards? What are rewards? When the reward is just being able to go to the next level, what could be a "partial reward"? If not, players shouldn't be able to click on more squares after clicks counter == solution clicks) 
-	? Also what if the solution is possble to achieve with fewer clicks? Extra rewards? Should compute the optimal number of clicks to get to the goal and use that as a goal)
-	
 Implementing undo and redo features this early in development is kind of bothersome. I'd be more interesting in testing out different algorithms for level generation and even more targeting and toggling mechanics, but I do feel like undoing and redoing is important in these types of puzzles and that advanced mechanics and level balance don't really matter if the basic "feel" for solving puzzles (which includes the possibility of players navigating puzzle solving trajectories/histories) isn't there in the first place
 
-Thought for a MUCH later time: if complex levels seem way to complicated by themselves, maybe a "level" could be a succession of levels that lead up to a very complex one, than the "next level" would start back with a simple array, propose a bunch of simple-to-complex arrays and culminate in a super complex one, rinse and repeat
-	These multiple-array levels could be arranged vertically and scrollable, or in horizontal sequence, connected like in The Witness
+The implementation of these features have made me reflect deeply on their implications in playing with interactive stateful puzzles. Undo and redo actions still have to make sense interactively, even though their effects are a bit disjoint from the game's interface compared to the "regular" actions they revert back. What I mean by that is that "clicking a button and seeing a reaction" is one type of interaction, and "seeing the button un-clicked and the reaction un-done" is different, specifically because the player doesn't "unclick" the button directly. They press the undo button, which enacts the "unclicking" indirectly. More careful considerations must be put in place to make sure that the interactivity stays robust and discoverable through feedback and signifiers in this more "indirect" interaction with the interface of the game.
+
+Additionally, I have implemented what I call "clicks restrictions" in the game's system. Which made me reflect on questions that I already had in my head that surround those restrictions:
+
+- ? Should it be possible to beat the level but in more clicks? 
+	- If yes, should it give partial rewards? 
+		- What are rewards, in this game? Going to the next level? 
+		- When the reward is just being able to go to the next level, what could be a "partial reward"? 
+			- Just the fact that the player knows they haven't beaten the level is the optimal amount of clicks?
+	- If not, players shouldn't be able to click on more squares after clicks counter == solution clicks
+		- Or, at least, players shouldn't be able to progress to the next level (as a reward) if they "busted" the goal amount of clicks to beat a level
+- ? Also what if the player beats the level with fewer clicks than computed? 
+	- Extra rewards? What are those?
+		- Same thing as partial reward? The intrinsic satisfaction that you've "broken" the game?
+	- If we don't want to address this, we should make sure to compute the actual optimal number of clicks to get to the goal instead of the dumb brute force algorithm we have now
+	
+Additionally additionally, a thought for a MUCH later time: if complex levels seem way to complicated by themselves, maybe a "level" could be a succession of levels that lead up to a very complex one, than the "next level" would start back with a simple array, propose a bunch of simple-to-complex arrays and culminate in a super complex one, rinse and repeat.
+
+These multiple-array levels could be arranged vertically and scrollable, or in horizontal sequence, connected like in The Witness, maybe.
+
+(I'm thinking about this because I'm anticipating the "late" levels in the game to either be "not enough" by themselves, presenting the player will too small bites that aren't satisfying as themselves, or conversely I'm anticipating the players to be overwhelmed by very complex levels and not have the proper "micro progression" within a short play session to overcome the later game challenges)
+
+We will definitely revisit this at some point.
+
+Oh and very quickly! Should the click counter count down or up? Should it "leave a trace" (i.e. show the goal amount of clicks) and show what it's actually counting to/from? I'll formulate a todo entry to try and not forget to try different things out for this.
