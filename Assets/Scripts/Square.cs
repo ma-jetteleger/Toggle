@@ -2,6 +2,7 @@ using Shapes;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class Square : MonoBehaviour
 {
@@ -20,6 +21,12 @@ public class Square : MonoBehaviour
     [SerializeField] private Color _clickedOutlineColor = Color.black;
     [SerializeField] private Sprite[] _targetSchemeSprites = null;
     [SerializeField] private Color _toggledColor = Color.black;
+    [SerializeField] private float _shakeTime = 0f;
+    [SerializeField] private float _shakeStrength = 0f;
+    [SerializeField] private int _shakeVibrato = 0;
+    [SerializeField] private float _shakeRandomness = 0f;
+    [SerializeField] private bool _shakeSnapping = false;
+    [SerializeField] private bool _shakeFadeOut = false;
 
     public bool Interactable { get; set; }
     public bool Highlighted { get; set; }
@@ -75,17 +82,23 @@ public class Square : MonoBehaviour
         Interactable = true;
     }
 
-    public void OnMouseOverEnter()
+    public void OnMouseOverEnter(bool showOutline)
     {
-        _outline.SetActive(true);
-
+        if(showOutline && !_outline.activeSelf)
+		{
+            _outline.SetActive(true);
+        }
+        
         Highlighted = true;
     }
 
     public void OnMouseOverExit()
     {
-        _outline.SetActive(false);
-
+        if(_outline.activeSelf)
+		{
+            _outline.SetActive(false);
+        }
+        
         Highlighted = false;
     }
 
@@ -155,5 +168,58 @@ public class Square : MonoBehaviour
         _rectangle.Color = Toggled
             ? _toggledColor
             : _normalColor;
+    }
+
+    public void Shake()
+    {
+        ChangeSortingOrderOfComponents(10);
+
+        transform.DOShakePosition(
+            _shakeTime,
+            _shakeStrength,
+            _shakeVibrato,
+            _shakeRandomness,
+            _shakeSnapping,
+            _shakeFadeOut
+        ).OnComplete(() =>
+		{
+            ChangeSortingOrderOfComponents(-10);
+        });
+
+        var originalColor = _rectangle.Color;
+        var rectangleColor = _rectangle.Color;
+
+        DOTween.To(() => rectangleColor, x =>
+        {
+            rectangleColor = x;
+
+            _rectangle.Color = rectangleColor;
+        },
+        Color.red,
+        _shakeTime / 2f).OnComplete(() =>
+		{
+            var rectangleColorDown = _rectangle.Color;
+
+            DOTween.To(() => rectangleColor, x =>
+            {
+                rectangleColor = x;
+
+                _rectangle.Color = rectangleColor;
+            },
+            originalColor,
+            _shakeTime / 2f);
+        });
+    }
+
+    private void ChangeSortingOrderOfComponents(int factor)
+	{
+        var components = GetComponentsInChildren<Rectangle>(true);
+
+        foreach(var component in components)
+		{
+            component.SortingOrder += factor;
+        }
+
+        _targetIndicator.sortingOrder += factor;
     }
 }

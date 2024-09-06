@@ -6,6 +6,13 @@ using UnityEngine;
 using TMPro;
 using DG.Tweening;
 
+public enum ClicksCountRestriction
+{
+    HardRestriction,
+    SoftRestriction,
+    NoRestriction
+}
+
 public class Level : MonoBehaviour
 {
     [SerializeField] private GameObject _squareTemplate = null;
@@ -22,6 +29,7 @@ public class Level : MonoBehaviour
     [SerializeField] private int _maxClicksBufferForSolution = 0;
     [SerializeField] private float _squaresDistance = 0f;
     [SerializeField] private float _solutionSquaresDistance = 0f;
+    [SerializeField] private ClicksCountRestriction _clicksCountRestriction = 0f;
 
     public Square[] Squares { get; set; }
     public Square[] SolutionSquares { get; set; }
@@ -86,7 +94,7 @@ public class Level : MonoBehaviour
                 }
                 else if (squareHovered != _previousHoveredSquare && !squareHovered.Highlighted)
                 {
-                    squareHovered.OnMouseOverEnter();
+                    squareHovered.OnMouseOverEnter(true);
                 }
             }
 
@@ -118,22 +126,24 @@ public class Level : MonoBehaviour
 
             if(sameSquare)
 			{
-                if(_clicks < _solutionSequence.Length)
+				if (_clicksCountRestriction == ClicksCountRestriction.HardRestriction && ClicksLeft <= 0)
 				{
-                    _lastSquareClickedDown.ToggleTargets(Squares);
+					_lastSquareClickedDown.Shake();
 
-                    _clicks++;
-
-                    AddNewHistorySnapshot();
-                    CheckLevelCompletion();
-
-                    LevelPanel.Instance.UpdateClicksCounter();
-                }
-                else
-				{
-                    Debug.Log("No more clicks feedback");
+					LevelPanel.Instance.ShakeClicksCounter();
 				}
-            }
+				else
+				{
+					_lastSquareClickedDown.ToggleTargets(Squares);
+
+					_clicks++;
+
+					AddNewHistorySnapshot();
+					CheckLevelCompletion();
+
+					LevelPanel.Instance.UpdateClicksCounter();
+				}
+			}
 
             _lastSquareClickedDown = null;
         }
@@ -217,6 +227,19 @@ public class Level : MonoBehaviour
         CheckLevelCompletion();
     }
 
+    public void NextLevel()
+    {
+        if (_clicksCountRestriction == ClicksCountRestriction.SoftRestriction && ClicksLeft < 0)
+        {
+            LevelPanel.Instance.ShakeNextLevelButton();
+            LevelPanel.Instance.ShakeClicksCounter();
+        }
+        else
+        {
+            GenerateLevel();
+        }
+    }
+
     public void ResetLevel()
 	{
         LoadHstorySnapshot(0);
@@ -292,9 +315,16 @@ public class Level : MonoBehaviour
         
         if(levelComplete)
 		{
-            OnLevelCompletion();
+            if(_clicksCountRestriction == ClicksCountRestriction.SoftRestriction && ClicksLeft < 0)
+			{
+                LevelPanel.Instance.ShakeClicksCounter();
+            }
+			else
+			{
+                LevelPanel.Instance.UpdateHistoryButtons(false);
+            }
 
-            LevelPanel.Instance.UpdateHistoryButtons(false);
+            OnLevelCompletion();
         }
 		else
 		{
@@ -304,18 +334,21 @@ public class Level : MonoBehaviour
 
     private void OnLevelCompletion()
 	{
-        for (var i = 0; i < Squares.Length; i++)
-        {
-            var square = Squares[i];
+        if(_clicksCountRestriction != ClicksCountRestriction.SoftRestriction || ClicksLeft >= 0)
+		{
+            for (var i = 0; i < Squares.Length; i++)
+            {
+                var square = Squares[i];
 
-            square.Interactable = false;
+                square.Interactable = false;
 
-            if(square.Highlighted)
-			{
-                square.OnMouseOverExit();
+                if (square.Highlighted)
+                {
+                    square.OnMouseOverExit();
+                }
             }
         }
-
+        
         var levelCompletionFeedbackWidth = _levelCompletionFeedback.Width;
         var levelCompletionFeedbackHeight = _levelCompletionFeedback.Height;
         var levelCompletionFeedbackThicknessBaseValue = _levelCompletionFeedback.Thickness;
