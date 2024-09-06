@@ -54,7 +54,8 @@ public class Square : MonoBehaviour
 
             _outline.SetActive(false);
 
-            TargetScheme = (TargetingScheme)Random.Range(0, System.Enum.GetValues(typeof(TargetingScheme)).Length);
+            //TargetScheme = (TargetingScheme)Random.Range(0, System.Enum.GetValues(typeof(TargetingScheme)).Length);
+            TargetScheme = TargetingScheme.Self;
 
             _targetIndicator = GetComponentInChildren<SpriteRenderer>(true);
             _targetIndicator.sprite = _targetSchemeSprites[(int)TargetScheme];
