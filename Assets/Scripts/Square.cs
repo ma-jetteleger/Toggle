@@ -18,9 +18,11 @@ public class Square : MonoBehaviour
 	}
 
     [SerializeField] private GameObject _outline = null;
+    [SerializeField] private Rectangle _overlay = null;
     [SerializeField] private Color _clickedOutlineColor = Color.black;
     [SerializeField] private Sprite[] _targetSchemeSprites = null;
     [SerializeField] private Color _toggledColor = Color.black;
+    [SerializeField] private Gradient _shakeGradient = null;
     [SerializeField] private float _shakeTime = 0f;
     [SerializeField] private float _shakeStrength = 0f;
     [SerializeField] private int _shakeVibrato = 0;
@@ -41,6 +43,10 @@ public class Square : MonoBehaviour
     private Rectangle _rectangle;
     private Rectangle _outlineRectangle;
     private SpriteRenderer _targetIndicator;
+    private Tweener _shake;
+    private Tweener _colorChange;
+    private Vector3 _normalPosition;
+    private Color _normalOverlayColor;
 
 	public void Initialize(int id/*, Level level*/, Square referenceSquare = null)
 	{
@@ -48,7 +54,7 @@ public class Square : MonoBehaviour
 
         _rectangle = GetComponent<Rectangle>();
         _normalColor = _rectangle.Color;
-
+        
         _id = id;
         //_level = level;
 
@@ -58,6 +64,8 @@ public class Square : MonoBehaviour
 		{
             _outlineRectangle = _outline.GetComponent<Rectangle>();
             _normalOutlineColor = _outlineRectangle.Color;
+            _normalPosition = transform.position;
+            _normalOverlayColor = _overlay.Color;
 
             _outline.SetActive(false);
 
@@ -174,7 +182,14 @@ public class Square : MonoBehaviour
     {
         ChangeSortingOrderOfComponents(10);
 
-        transform.DOShakePosition(
+        if(_shake != null)
+		{
+            DOTween.Kill(_shake, true);
+
+            transform.position = _normalPosition;
+        }
+
+        _shake = transform.DOShakePosition(
             _shakeTime,
             _shakeStrength,
             _shakeVibrato,
@@ -184,30 +199,33 @@ public class Square : MonoBehaviour
         ).OnComplete(() =>
 		{
             ChangeSortingOrderOfComponents(-10);
+
+            transform.position = _normalPosition;
+
+            _shake = null;
         });
 
-        var originalColor = _rectangle.Color;
-        var rectangleColor = _rectangle.Color;
+        var value = 0f;
 
-        DOTween.To(() => rectangleColor, x =>
-        {
-            rectangleColor = x;
-
-            _rectangle.Color = rectangleColor;
-        },
-        Color.red,
-        _shakeTime / 2f).OnComplete(() =>
+        if(_colorChange != null)
 		{
-            var rectangleColorDown = _rectangle.Color;
+            DOTween.Kill(_colorChange, true);
 
-            DOTween.To(() => rectangleColor, x =>
-            {
-                rectangleColor = x;
+            _overlay.Color = _normalOverlayColor;
+        }
 
-                _rectangle.Color = rectangleColor;
-            },
-            originalColor,
-            _shakeTime / 2f);
+        _colorChange = DOTween.To(() => value, x =>
+        {
+            value = x;
+
+            _overlay.Color = _shakeGradient.Evaluate(value);
+        },
+        1f,
+        _shakeTime).OnComplete(() =>
+		{
+            _colorChange = null;
+
+            _overlay.Color = _normalOverlayColor;
         });
     }
 

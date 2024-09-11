@@ -24,7 +24,7 @@
 
 ## 2024-09-06
 
-- [tech] Handle the animation interruptions so they don't break when spammed
+- ~~[tech] Handle the animation interruptions so they don't break when spammed~~
 - [visuals] Change the arrows, they look ugly (away with the rounder corners)
 	- More importantly, change the "self targeting" graphic
 - ? Test different ways to display the clicks counter (counting down or up? leaving a trace and/or showing the goal amount of clicks beside the counter or not?)
