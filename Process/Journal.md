@@ -69,3 +69,7 @@ These multiple-array levels could be arranged vertically and scrollable, or in h
 We will definitely revisit this at some point.
 
 Oh and very quickly! Should the click counter count down or up? Should it "leave a trace" (i.e. show the goal amount of clicks) and show what it's actually counting to/from? I'll formulate a todo entry to try and not forget to try different things out for this.
+
+## 
+
+- If there are multiple ways to solve a level, we should reward the player for finding all the possible solutions

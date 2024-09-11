@@ -26,7 +26,6 @@ public class LevelPanel : MonoBehaviour
 	[SerializeField] private bool _clicksCounterShakeFadeOut = false;
 
 	private RectTransform _nextLevelButtonRectTransform;
-	private Image _nextLevelButtonArrowImage;
 	private Tweener _clicksCounterShake;
 	private Tweener _nextLevelButtonShake;
 	private Tweener _clicksCounterColorChange;
@@ -41,7 +40,6 @@ public class LevelPanel : MonoBehaviour
 		Instance = this;
 
 		_nextLevelButtonRectTransform = _nextLevelButton.GetComponent<RectTransform>();
-		_nextLevelButtonArrowImage = _nextLevelButton.transform.GetChild(0).GetComponent<Image>();
 
 		_clicksCounterNormalPosition = _clicksCounterText.transform.position;
 		_clicksCounterNormalColor = _clicksCounterText.color;
