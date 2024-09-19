@@ -107,3 +107,26 @@ Anyway. Basically, I'm finding the need to investigate the design space of the g
 I'm not sure why the game isn't showing its fun by itself to me like some others do. Maybe it has something to do with its design space. The size of its design space? The way its traversed? It might not explainable at that point in time (or ever?).
 
 The question of whether the core loop is too tiny or at what point minimalism breaks is scary and daunting. I could spend a lot of time reflecting on that so I'll stop for now and revisit this entry/thought in the future. 
+
+# The list
+
+- Toggle mechanisms
+	- Cascading toggles (only certain squares? indicated by special arrows?)
+	- Distance toggles (toggling squares not directly adjacent to a clicked square)
+	- Conditional toggles (when white, do something different than when black)
+	- Destroy other squares
+	- Moving other squares (swap position with the clicked square)
+- Other mechanisms
+	- Squares clicked more than once in solution (all squares? with a special indicator?)
+		- This involves implementing the alternative: make clicked squares uninteractable for the rest of an attempt for a level
+	- Movable squares (drag and drop)
+	- Non-interactable squares (permanent? toggled off = uninteractable?)
+	- 2D arrays (multiple parallel arrays? grids?)
+	
+I think this covers the possible espansion of the design space of the game as it is right now. Of course, implementing any of this is going to affect the potential design space further.	
+
+In fact, I'm getting a new idea for a maybe different game while working on this list...
+
+	- Same setup, same objective, you have an array of on/off squares with arrows in the middle and you need to match another array of on/off squares. But instead of activating the squares directly, you have a "deck" and a "hand" of squares, and you add them to the array, activating the new squares and affecting the array by doing so. Maybe then the game isn't to reach the "match" in a number of moves, but to do it as quick as possible, before an opponent. Maybe it's a card game.
+	- On your turn, you can maybe choose to "tap" a square to activate its toggle mechanisms, or choose to add a card to the array, activating it
+	- Do you play on your own array? Or on a common array with different personal objectives? (second option sounds really difficult to balance) 

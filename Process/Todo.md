@@ -37,4 +37,8 @@
 
 ## 2024-09-19
 
-- Brainstorm a list of "advanced"/"twisted" mechanics to be implemented in order to generate some fun dynamics for the game
+- ~~Brainstorm a list of "advanced"/"twisted" mechanics to be implemented in order to generate some fun dynamics for the game~~
+- Don't put useless arrows (a right arrow on the last square) (add a feature switch for that, it might not be a good idea, maybe the visual clutter is interesting, it could also be made unnecessary if implementing some of the features of the list)
+	
+
+
