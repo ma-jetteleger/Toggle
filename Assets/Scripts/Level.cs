@@ -20,6 +20,7 @@ public class Level : MonoBehaviour
     [SerializeField] private Rectangle _rectangle = null;
     [SerializeField] private Rectangle _solutionRectangle = null;
     [SerializeField] private Rectangle _levelCompletionFeedback = null;
+    [SerializeField] private int _solutionGenerationAttempts = 0;
     [SerializeField] private float _levelCompletionTime = 0f;
     [SerializeField] private AnimationCurve _levelCompletionCurve = null;
     [SerializeField] private AnimationCurve _levelCompletionThicknessCurve = null;
@@ -209,18 +210,47 @@ public class Level : MonoBehaviour
         _solutionRectangle.Width = (_solutionSquareTemplateRectangle.Width + _solutionSquaresDistance) * squares + _solutionSquaresDistance/* * 2*/;
         _solutionRectangle.Height = _solutionSquareTemplateRectangle.Height + _solutionSquaresDistance * 2;
 
-        _solutionSequence = new int[Random.Range(_minClicksForSolution, squares - _maxClicksBufferForSolution)];
+		var validSolutionSequence = false;
 
-        var shuffledIndices = indices.OrderBy(a => System.Guid.NewGuid()).ToArray();
-
-        for (var i = 0; i < _solutionSequence.Length; i++)
+		for (var i = 0; i < _solutionGenerationAttempts; i++)
 		{
-            _solutionSequence[i] = shuffledIndices[i];
+			validSolutionSequence = false;
 
-            SolutionSquares[_solutionSequence[i]].ToggleTargets(SolutionSquares);
-        }
+			_solutionSequence = new int[Random.Range(_minClicksForSolution, squares - _maxClicksBufferForSolution)];
 
-        _clicks = 0;
+			var shuffledIndices = indices.OrderBy(a => System.Guid.NewGuid()).ToArray();
+
+			for (var j = 0; j < _solutionSequence.Length; j++)
+			{
+				_solutionSequence[j] = shuffledIndices[j];
+
+				SolutionSquares[_solutionSequence[j]].ToggleTargets(SolutionSquares);
+			}
+
+			for (var j = 0; j < Squares.Length; j++)
+			{
+				if (Squares[j].Toggled != SolutionSquares[j].Toggled)
+				{
+					validSolutionSequence = true;
+
+					Debug.Log($"Generated a valid solution sequence in {i + 1} attempt(s)");
+
+					break;
+				}
+			}
+
+			if(validSolutionSequence)
+			{
+				break;
+			}
+		}
+
+		if (!validSolutionSequence)
+		{
+			Debug.Log("Couldn't generate a valid solution sequence, settling for a suboptimal one");
+		}
+
+		_clicks = 0;
 
         LevelPanel.Instance.UpdateClicksCounter();
         

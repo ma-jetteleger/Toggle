@@ -1350,6 +1350,7 @@ MonoBehaviour:
   _rectangle: {fileID: 692212901}
   _solutionRectangle: {fileID: 1044517854}
   _levelCompletionFeedback: {fileID: 463101731}
+  _solutionGenerationAttempts: 999
   _levelCompletionTime: 0.875
   _levelCompletionCurve:
     serializedVersion: 2
