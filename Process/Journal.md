@@ -70,6 +70,40 @@ We will definitely revisit this at some point.
 
 Oh and very quickly! Should the click counter count down or up? Should it "leave a trace" (i.e. show the goal amount of clicks) and show what it's actually counting to/from? I'll formulate a todo entry to try and not forget to try different things out for this.
 
-## 
+## 2024-09-09
 
-- If there are multiple ways to solve a level, we should reward the player for finding all the possible solutions
+The most recent work involved changing the preliminary visuals and some bug fixing. It might sound counter-intuitive to spend time on visuals this early in a game development project, but when it comes to minimalism, the visuals are so directly connected to the player actions, that they should at the very least be iterated upon just as much as the interactions themselves. 
+
+Also, the development cycles of a minimalist game project are treated differently than those of a regular development project. Cycles are a bit more executed in parallel as they are in normal productions. Prototyping, production and polishing are not kept separate as it would make little sense to do so when those stages, in this context, are so very short and little by themselves. The cost of "going back and forth" between stages of development is a lot less in minimalist game development, so I don't bother keeping the "visual polish" phase as an exclusively late stage of development. 
+
+I'm interested in writing more about this topic later as now is not the time to write an entire essay (and this is the first time I actively reflect on that specific question).
+
+As a seperate thought, if there are multiple ways to solve a level, we should probably reward the player for finding all the possible solutions
+	(or generate levels that only have one solution)
+		((but that might turn out to be too difficult or even maybe less interestng?))
+
+## 2024-09-19
+
+I'm thinking that I should spend some time soon on actively "finding the fun" in the game. I've been kind of playing around and implementing basic features, hoping for the fun to simply emerge from that (it sometimes does), but it doesn't seem like it's happening right now with this game, so I'll turn to a more active investigation.
+
+Basically, I've been trying to refine the core loop to make the fun "pop out" of it. Maybe I need to do more than "refine" it. Maybe I need to twist it in a different direction instead. Or maybe I need to make the core loop a little less tiny (as a minimalist developer, that's a scary thought).
+
+My first intuition is to brainstorm a list of different mechanics than the basic ones that I have implemented. First thoughts include:
+
+- Having squares toggle other squares in a maybe less intuitive, more interesting manner(s)
+	- Activating the toggle mechanisms of other squares when toggling them
+	- Toggling squares not directly adjacent to them
+- Clicking squares to do other things than just toggling other squares
+	- Making other squares uninteractable/interactable
+	- Destroying other squares
+	- Moving other squares
+
+The danger (risk?) with thinking of new mechanics to a make a minimalist game fun is that by adding mechanics, the game might not be minimalistic anymore. When/under what conditions that line would be crossed is very more unknown, at least in an explicit sense. More mechanics also mean a need to actually teach/explain/visually inform the player of those mechanics. That also might break the minimalist line.
+
+So maybe a game that needs "too many" mechanics to be fun is not a minimalist game? 
+
+Anyway. Basically, I'm finding the need to investigate the design space of the game in the hope of stumbling onto something that makes it fun. 
+
+I'm not sure why the game isn't showing its fun by itself to me like some others do. Maybe it has something to do with its design space. The size of its design space? The way its traversed? It might not explainable at that point in time (or ever?).
+
+The question of whether the core loop is too tiny or at what point minimalism breaks is scary and daunting. I could spend a lot of time reflecting on that so I'll stop for now and revisit this entry/thought in the future. 
