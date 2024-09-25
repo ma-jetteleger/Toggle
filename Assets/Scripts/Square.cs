@@ -20,7 +20,8 @@ public class Square : MonoBehaviour
 
     [SerializeField] private GameObject _outline = null;
     [SerializeField] private Rectangle _overlay = null;
-    [SerializeField] private Color _clickedOutlineColor = Color.black;
+	[SerializeField] private GameObject _targetPredictionTemplate = null;
+	[SerializeField] private Color _clickedOutlineColor = Color.black;
     [SerializeField] private Sprite[] _targetSchemeSprites = null;
     [SerializeField] private Color _toggledColor = Color.black;
     [SerializeField] private Gradient _shakeGradient = null;
@@ -48,22 +49,26 @@ public class Square : MonoBehaviour
     private Tweener _colorChange;
     private Vector3 _normalPosition;
     private Color _normalOverlayColor;
+	private List<Square> _targets;
+	private Dictionary<Square, Rectangle> _targetPredictions;
 
 	public void Initialize(int id, Level level, Square referenceSquare = null)
 	{
-        SolutionSquare = referenceSquare != null;
+		SolutionSquare = referenceSquare != null;
 
-        _rectangle = GetComponent<Rectangle>();
+		_rectangle = GetComponent<Rectangle>();
         _normalColor = _rectangle.Color;
-        
-        _id = id;
+
+		_id = id;
         _level = level;
 
-        gameObject.name = $"{(SolutionSquare ? "Solution" : "")}Square({_id})";
+		gameObject.name = $"{(SolutionSquare ? "Solution" : "")}Square({_id})";
 
-        if (!SolutionSquare)
+		if (!SolutionSquare)
 		{
-            _outlineRectangle = _outline.GetComponent<Rectangle>();
+			_targetPredictionTemplate.SetActive(false);
+
+			_outlineRectangle = _outline.GetComponent<Rectangle>();
             _normalOutlineColor = _outlineRectangle.Color;
             _normalPosition = transform.position;
             _normalOverlayColor = _overlay.Color;
@@ -104,7 +109,7 @@ public class Square : MonoBehaviour
             {
                 Toggle();
             }
-        }
+		}
 		else
 		{
             TargetScheme = referenceSquare.TargetScheme;
@@ -123,7 +128,9 @@ public class Square : MonoBehaviour
         }
         
         Highlighted = true;
-    }
+
+		ShowTargetPredictions();
+	}
 
     public void OnMouseOverExit()
     {
@@ -133,7 +140,9 @@ public class Square : MonoBehaviour
         }
         
         Highlighted = false;
-    }
+
+		HideTargetPredictions();
+	}
 
     public void OnMouseClickDown()
 	{
@@ -145,44 +154,64 @@ public class Square : MonoBehaviour
         _outlineRectangle.Color = _normalOutlineColor;
     }
 
-    public void ToggleTargets(Square[] targetArray)
+    public void SetupTargetsAndPredictions(Square[] targetArray)
 	{
-        var targets = new List<Square>();
+		_targets = new List<Square>();
 
 		switch (TargetScheme)
 		{
 			case TargetingScheme.Self:
-                targets.Add(this);
+				_targets.Add(this);
                 break;
 			case TargetingScheme.Left:
-                if(_id > 0) targets.Add(targetArray[_id - 1]);
+                if(_id > 0) _targets.Add(targetArray[_id - 1]);
                 break;
 			case TargetingScheme.Right:
-                if (_id < targetArray.Length - 1) targets.Add(targetArray[_id + 1]);
+                if (_id < targetArray.Length - 1) _targets.Add(targetArray[_id + 1]);
                 break;
 			case TargetingScheme.SelfLeft:
-                targets.Add(this);
-                if (_id > 0) targets.Add(targetArray[_id - 1]);
+				_targets.Add(this);
+                if (_id > 0) _targets.Add(targetArray[_id - 1]);
                 break;
 			case TargetingScheme.SelfRight:
-                targets.Add(this);
-                if (_id < targetArray.Length - 1) targets.Add(targetArray[_id + 1]);
+				_targets.Add(this);
+                if (_id < targetArray.Length - 1) _targets.Add(targetArray[_id + 1]);
                 break;
 			case TargetingScheme.LeftRight:
-                if (_id > 0) targets.Add(targetArray[_id - 1]);
-                if (_id < targetArray.Length - 1) targets.Add(targetArray[_id + 1]);
+                if (_id > 0) _targets.Add(targetArray[_id - 1]);
+                if (_id < targetArray.Length - 1) _targets.Add(targetArray[_id + 1]);
                 break;
 			case TargetingScheme.SelfLeftRight:
-                targets.Add(this);
-                if (_id > 0) targets.Add(targetArray[_id - 1]);
-                if (_id < targetArray.Length - 1) targets.Add(targetArray[_id + 1]);
+				_targets.Add(this);
+                if (_id > 0) _targets.Add(targetArray[_id - 1]);
+                if (_id < targetArray.Length - 1) _targets.Add(targetArray[_id + 1]);
                 break;
 		}
 
-        foreach(var target in targets)
+		if(!SolutionSquare)
 		{
-            target.Toggle();
-        }
+			_targetPredictions = new Dictionary<Square, Rectangle>();
+
+			for (var i = 0; i < _targets.Count; i++)
+			{
+				var target = _targets[i];
+
+				var newTargetPrediction = Instantiate(_targetPredictionTemplate, _targetPredictionTemplate.transform.parent).GetComponent<Rectangle>();
+				newTargetPrediction.transform.position = new Vector3(target.transform.position.x, _targetPredictionTemplate.transform.position.y, 0f);
+
+				newTargetPrediction.gameObject.SetActive(false);
+
+				_targetPredictions.Add(target, newTargetPrediction);
+			}
+		}
+	}
+
+	public void ToggleTargets()
+	{
+		foreach (var target in _targets)
+		{
+			target.Toggle();
+		}
 	}
 
 	public void Toggle()
@@ -203,7 +232,34 @@ public class Square : MonoBehaviour
             : _normalColor;
     }
 
-    public void Shake()
+	public void ShowTargetPredictions()
+	{
+		foreach(var targetPredictions in _targetPredictions)
+		{
+			targetPredictions.Value.Color = targetPredictions.Key.Toggled
+			? _normalColor
+			: _toggledColor;
+
+			if(!targetPredictions.Value.gameObject.activeSelf)
+			{
+				targetPredictions.Value.gameObject.SetActive(true);
+			}
+		}
+	}
+
+	public void HideTargetPredictions()
+	{
+		foreach (var targetPredictions in _targetPredictions)
+		{
+			targetPredictions.Value.Color = targetPredictions.Key.Toggled
+			? _normalColor
+			: _toggledColor;
+
+			targetPredictions.Value.gameObject.SetActive(false);
+		}
+	}
+
+	public void Shake()
     {
         ChangeSortingOrderOfComponents(10);
 

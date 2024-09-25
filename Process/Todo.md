@@ -19,7 +19,7 @@
 - Figure out preliminary heuristics for the generation of "interesting" levels and goals
 	~~- Don't generate "already solved" levels~~
 - ? Test whether or not it's more interesting to let players click squares more than once and if not, implement that restriction and feedback for that feature
-- ? Telegraphed effect of clicking a button? Predicting its interaction with its targets?
+- ~~? Telegraphed effect of clicking a button? Predicting its interaction with its targets?~~
 - ? Debug button to show the solution? (implement this in player-facing interface?)
 
 ## 2024-09-06
@@ -38,7 +38,11 @@
 ## 2024-09-19
 
 - ~~Brainstorm a list of "advanced"/"twisted" mechanics to be implemented in order to generate some fun dynamics for the game~~
-- Don't put useless arrows (a right arrow on the last square) (add a feature switch for that, it might not be a good idea, maybe the visual clutter is interesting, it could also be made unnecessary if implementing some of the features of the list)
-- Experiment with longer (thinner) arrays 
+- ~~Don't put useless arrows (a right arrow on the last square) (add a feature switch for that, it might not be a good idea, maybe the visual clutter is interesting, it could also be made unnecessary if implementing some of the features of the list)~~
+- ~~Experiment with longer (thinner) arrays~~
+
+## 2024-09-25
+
+- ? add crosses and checkmarks to indicate that a square is in the right toggle state? (to make it easier to "read" a level)
 
 

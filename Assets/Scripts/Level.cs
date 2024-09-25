@@ -41,6 +41,7 @@ public class Level : MonoBehaviour
 
     public Square[] Squares { get; set; }
     public Square[] SolutionSquares { get; set; }
+    public Rectangle[] PredictionSquares { get; set; }
 
     public int ClicksLeft => _solutionSequence.Length - _clicks;
     public bool EmptyHistory => _squareHistory.Count == 1;
@@ -142,7 +143,8 @@ public class Level : MonoBehaviour
 				}
 				else
 				{
-					_lastSquareClickedDown.ToggleTargets(Squares);
+					_lastSquareClickedDown.ToggleTargets();
+					_lastSquareClickedDown.ShowTargetPredictions();
 
 					_clicks++;
 
@@ -178,12 +180,16 @@ public class Level : MonoBehaviour
         Squares = new Square[squares];
         SolutionSquares = new Square[squares];
 
+        PredictionSquares = new Rectangle[squares];
+
         _squareHistory.Clear();
 
         var firstHistorySnapshot = new bool[Squares.Length];
 
         for (var i = 0; i < squares; i++)
         {
+			// Square
+
             var newSquare = Instantiate(_squareTemplate, _squareTemplate.transform.parent).GetComponent<Square>();
             newSquare.transform.localPosition = -(Vector3.right * (_squareTemplateRectangle.Width + _squaresDistance) * (squares - 1)) / 2f
                 + Vector3.right * (_squareTemplateRectangle.Width + _squaresDistance) * i;
@@ -198,6 +204,8 @@ public class Level : MonoBehaviour
 
             indices[i] = i;
 
+			// Solution square
+
             var newSolutionSquare = Instantiate(_solutionSquareTemplate, _solutionSquareTemplate.transform.parent).GetComponent<Square>();
             newSolutionSquare.transform.localPosition = -(Vector3.right * (_solutionSquareTemplateRectangle.Width + _solutionSquaresDistance) * (squares - 1)) / 2f
                 + Vector3.right * (_solutionSquareTemplateRectangle.Width + _solutionSquaresDistance) * i;
@@ -207,9 +215,19 @@ public class Level : MonoBehaviour
             newSolutionSquare.gameObject.SetActive(true);
 
             SolutionSquares[i] = newSolutionSquare;
-        }
+		}
 
-        _squareHistory.Add(firstHistorySnapshot);
+		for (var i = 0; i < Squares.Length; i++)
+		{
+			Squares[i].SetupTargetsAndPredictions(Squares);
+		}
+
+		for (var i = 0; i < SolutionSquares.Length; i++)
+		{
+			SolutionSquares[i].SetupTargetsAndPredictions(SolutionSquares);
+		}
+
+		_squareHistory.Add(firstHistorySnapshot);
 
         _rectangle.Width = (_squareTemplateRectangle.Width + _squaresDistance) * squares + _squaresDistance/* * 2*/;
         _rectangle.Height = _squareTemplateRectangle.Height + _squaresDistance * 2;
@@ -231,7 +249,7 @@ public class Level : MonoBehaviour
 			{
 				_solutionSequence[j] = shuffledIndices[j];
 
-				SolutionSquares[_solutionSequence[j]].ToggleTargets(SolutionSquares);
+				SolutionSquares[_solutionSequence[j]].ToggleTargets();
 			}
 
 			for (var j = 0; j < Squares.Length; j++)
