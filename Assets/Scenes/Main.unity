@@ -194,7 +194,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 7
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1350,6 +1350,9 @@ MonoBehaviour:
   _rectangle: {fileID: 692212901}
   _solutionRectangle: {fileID: 1044517854}
   _levelCompletionFeedback: {fileID: 463101731}
+  _squaresRange: {x: 3, y: 9}
+  _minClicksForSolution: 2
+  _maxClicksBufferForSolution: 1
   _solutionGenerationAttempts: 999
   _levelCompletionTime: 0.875
   _levelCompletionCurve:
@@ -1442,9 +1445,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _squaresRange: {x: 3, y: 6}
-  _minClicksForSolution: 2
-  _maxClicksBufferForSolution: 1
   _squaresDistance: 0.0625
   _solutionSquaresDistance: 0.0625
   _clicksCountRestriction: 0
@@ -1826,7 +1826,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1044517850}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -3.375, z: 0}
+  m_LocalPosition: {x: 0, y: -4.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
