@@ -130,3 +130,6 @@ In fact, I'm getting a new idea for a maybe different game while working on this
 	- Same setup, same objective, you have an array of on/off squares with arrows in the middle and you need to match another array of on/off squares. But instead of activating the squares directly, you have a "deck" and a "hand" of squares, and you add them to the array, activating the new squares and affecting the array by doing so. Maybe then the game isn't to reach the "match" in a number of moves, but to do it as quick as possible, before an opponent. Maybe it's a card game.
 	- On your turn, you can maybe choose to "tap" a square to activate its toggle mechanisms, or choose to add a card to the array, activating it
 	- Do you play on your own array? Or on a common array with different personal objectives? (second option sounds really difficult to balance) 
+	
+## 2024-09-25
+

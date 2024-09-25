@@ -15,22 +15,29 @@ public enum ClicksCountRestriction
 
 public class Level : MonoBehaviour
 {
+	// Components
     [SerializeField] private GameObject _squareTemplate = null;
     [SerializeField] private GameObject _solutionSquareTemplate = null;
     [SerializeField] private Rectangle _rectangle = null;
     [SerializeField] private Rectangle _solutionRectangle = null;
     [SerializeField] private Rectangle _levelCompletionFeedback = null;
-    [SerializeField] private int _solutionGenerationAttempts = 0;
+
+	// Generation parameters
+	[SerializeField] private Vector2Int _squaresRange = Vector2Int.zero;
+	[SerializeField] private int _minClicksForSolution = 0;
+	[SerializeField] private int _maxClicksBufferForSolution = 0;
+	[SerializeField] private int _solutionGenerationAttempts = 0;
+
+	// Animation/visual parameters
     [SerializeField] private float _levelCompletionTime = 0f;
     [SerializeField] private AnimationCurve _levelCompletionCurve = null;
     [SerializeField] private AnimationCurve _levelCompletionThicknessCurve = null;
     [SerializeField] private AnimationCurve _levelCompletionAlphaCurve = null;
-    [SerializeField] private Vector2Int _squaresRange = Vector2Int.zero;
-    [SerializeField] private int _minClicksForSolution = 0;
-    [SerializeField] private int _maxClicksBufferForSolution = 0;
     [SerializeField] private float _squaresDistance = 0f;
     [SerializeField] private float _solutionSquaresDistance = 0f;
-    [SerializeField] private ClicksCountRestriction _clicksCountRestriction = 0f;
+
+	// Features
+    [SerializeField] private ClicksCountRestriction _clicksCountRestriction = ClicksCountRestriction.HardRestriction;
 
     public Square[] Squares { get; set; }
     public Square[] SolutionSquares { get; set; }
@@ -181,7 +188,7 @@ public class Level : MonoBehaviour
             newSquare.transform.localPosition = -(Vector3.right * (_squareTemplateRectangle.Width + _squaresDistance) * (squares - 1)) / 2f
                 + Vector3.right * (_squareTemplateRectangle.Width + _squaresDistance) * i;
 
-            newSquare.Initialize(i);
+            newSquare.Initialize(i, this);
 
             newSquare.gameObject.SetActive(true);
 
@@ -195,7 +202,7 @@ public class Level : MonoBehaviour
             newSolutionSquare.transform.localPosition = -(Vector3.right * (_solutionSquareTemplateRectangle.Width + _solutionSquaresDistance) * (squares - 1)) / 2f
                 + Vector3.right * (_solutionSquareTemplateRectangle.Width + _solutionSquaresDistance) * i;
 
-            newSolutionSquare.Initialize(i, newSquare);
+            newSolutionSquare.Initialize(i, this, newSquare);
 
             newSolutionSquare.gameObject.SetActive(true);
 
@@ -233,7 +240,7 @@ public class Level : MonoBehaviour
 				{
 					validSolutionSequence = true;
 
-					Debug.Log($"Generated a valid solution sequence in {i + 1} attempt(s)");
+					//Debug.Log($"Generated a valid solution sequence in {i + 1} attempt(s)");
 
 					break;
 				}

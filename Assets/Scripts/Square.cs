@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using System.Linq;
 
 public class Square : MonoBehaviour
 {
@@ -37,7 +38,7 @@ public class Square : MonoBehaviour
     public TargetingScheme TargetScheme { get; set; }
 
     private int _id;
-    //private Level _level;
+    private Level _level;
     private Color _normalColor;
     private Color _normalOutlineColor;
     private Rectangle _rectangle;
@@ -48,7 +49,7 @@ public class Square : MonoBehaviour
     private Vector3 _normalPosition;
     private Color _normalOverlayColor;
 
-	public void Initialize(int id/*, Level level*/, Square referenceSquare = null)
+	public void Initialize(int id, Level level, Square referenceSquare = null)
 	{
         SolutionSquare = referenceSquare != null;
 
@@ -56,7 +57,7 @@ public class Square : MonoBehaviour
         _normalColor = _rectangle.Color;
         
         _id = id;
-        //_level = level;
+        _level = level;
 
         gameObject.name = $"{(SolutionSquare ? "Solution" : "")}Square({_id})";
 
@@ -69,8 +70,32 @@ public class Square : MonoBehaviour
 
             _outline.SetActive(false);
 
-            TargetScheme = (TargetingScheme)Random.Range(0, System.Enum.GetValues(typeof(TargetingScheme)).Length);
-            //TargetScheme = TargetingScheme.Self;
+			var first = _id == 0;
+			var last = _id == _level.Squares.Length - 1;
+
+			var targetSchemes = (TargetingScheme[])System.Enum.GetValues(typeof(TargetingScheme));
+			var possibleTargetSchemes = new List<TargetingScheme>();
+
+			for(var i = 0; i < targetSchemes.Length; i++)
+			{
+				var targetScheme = targetSchemes[i];
+
+				if ((first && targetScheme == TargetingScheme.Left) ||
+					(first && targetScheme == TargetingScheme.LeftRight) ||
+					(first && targetScheme == TargetingScheme.SelfLeft) ||
+					(first && targetScheme == TargetingScheme.SelfLeftRight) ||
+					(last && targetScheme == TargetingScheme.Right) ||
+					(last && targetScheme == TargetingScheme.LeftRight) ||
+					(last && targetScheme == TargetingScheme.SelfRight) ||
+					(last && targetScheme == TargetingScheme.SelfLeftRight))
+				{
+					continue;
+				}
+
+				possibleTargetSchemes.Add(targetSchemes[i]);
+			}
+
+			TargetScheme = possibleTargetSchemes[Random.Range(0, possibleTargetSchemes.Count)];
 
             _targetIndicator = GetComponentInChildren<SpriteRenderer>(true);
             _targetIndicator.sprite = _targetSchemeSprites[(int)TargetScheme];
