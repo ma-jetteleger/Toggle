@@ -17,7 +17,7 @@
 - ~~Next level button (debug is in place)~~
 
 - Figure out preliminary heuristics for the generation of "interesting" levels and goals
-	~~- Don't generate "already solved" levels~~
+	- ~~Don't generate "already solved" levels~~
 - ? Test whether or not it's more interesting to let players click squares more than once and if not, implement that restriction and feedback for that feature
 - ~~? Telegraphed effect of clicking a button? Predicting its interaction with its targets?~~
 - ? Debug button to show the solution? (implement this in player-facing interface?)

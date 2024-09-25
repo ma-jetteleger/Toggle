@@ -118,7 +118,7 @@ The question of whether the core loop is too tiny or at what point minimalism br
 	- Moving other squares (swap position with the clicked square)
 - Other mechanisms
 	- Squares clicked more than once in solution (all squares? with a special indicator?)
-		- This involves implementing the alternative: make clicked squares uninteractable for the rest of an attempt for a level
+		- This involves implementing the opposite: make clicked squares uninteractable for the rest of an attempt for a level
 	- Movable squares (drag and drop)
 	- Non-interactable squares (permanent? toggled off = uninteractable?)
 	- 2D arrays (multiple parallel arrays? grids?)
@@ -133,3 +133,8 @@ In fact, I'm getting a new idea for a maybe different game while working on this
 	
 ## 2024-09-25
 
+Today I worked in a very basic heuristic to generate more interesting levels: not putting useless arrows on squares. Also I made it possible to generate longer levels and added a telegraphing feature when hovering the squares (which will have to be different on mobile).
+
+The rationale behind implementing these minor modifications before working on more substantial pieces (like new mechanics and diving deep into the level generation algorithm itself) is because I want to get the feeling of playing with the squares right before I make the game more complex/fine tuned. I feel like interesting levels won't "feel" interesting if the handling of the squares and the core mechanisms of the game don't feel good because players don't know what's going on.
+
+I want players to understand what's going, on first and foremost. And it's proving more challenging than anticipated. Interactions with the squares and their resulting reactions don't feel as natural as I had originally hoped. So I'm working on that feeling to make it as natural and informative as possible before moving on to the balance/progression/variety/challenge part of the game
