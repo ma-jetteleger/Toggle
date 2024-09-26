@@ -6,10 +6,22 @@ This repository contains the code of the game and the process of its development
 
 ## How to play:
 
-The goal of the game is to change the colors of the middle interactive set of squares so they match the color of the ones at the bottom in a specified number of clicks.
+The goal of the game is to change the colors of the middle interactive set of squares so they match the array of colored rectangles at the bottom of the screen in the specified number of clicks at the bottom of the screen.
 
-Squares can be in two states, represented by two different colors. Click on squares to toggle other squares (and themselves) between these two states.
+- You can sometimes complete a level in fewer clicks, but the real challenge resides in completing it in that exact number of clicks.
 
-- A "down" arrow indicates that the squares targets itself to be toggled when clicked. 
-- Left and right arrows mean that the square targets its immediate neighbour(s). 
-- Multiple arrows mean that the square has multiple toggle targets which will all be toggled when clicked.
+Squares can be in two states, represented by two different colors: black and white. Click on squares to toggle other squares (and/or themselves) between these two states.
+
+- A diamond shape indicates that the squares targets itself to be toggled when clicked. 
+- Left and right arrows indicate that the square targets its immediate neighbour(s). 
+- Multiple shapes indicate that the square has multiple toggle targets which will all be toggled simultaneously when clicked.
+
+The black and white rectangles that appear beneath the main array when hovering a square are showing you a prediction of the effect of clicking the hovered square. They indicate the predicted color of the squares above, should you click the square you are hovering.
+
+The buttons at the top-left side of the screen only feature placeholder sprites:
+
+- The diamond button resets the level
+- The left arrow button is an "undo" button
+- The right arrow button is a "redo" button
+
+A simple animation plays when you complete a level. Click the right arrow button that appears on the right side of the screen to generate a new level.

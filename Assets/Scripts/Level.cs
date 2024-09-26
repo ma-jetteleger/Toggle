@@ -24,18 +24,19 @@ public class Level : MonoBehaviour
 
 	// Generation parameters
 	[SerializeField] private Vector2Int _squaresRange = Vector2Int.zero;
-	[SerializeField] private int _minClicksForSolution = 0;
+	//[SerializeField] private int _minClicksForSolution = 0;
 	[SerializeField] private int _maxClicksBufferForSolution = 0;
 	[SerializeField] private int _solutionGenerationAttempts = 0;
 
 	// Animation/visual parameters
-    [SerializeField] private float _levelCompletionTime = 0f;
+	[SerializeField] private float _squaresDistance = 0f;
+	[SerializeField] private float _solutionSquaresDistance = 0f;
+	[SerializeField] private Color _trueLevelCompletionColor = Color.black;
+	[SerializeField] private float _levelCompletionTime = 0f;
     [SerializeField] private AnimationCurve _levelCompletionCurve = null;
     [SerializeField] private AnimationCurve _levelCompletionThicknessCurve = null;
     [SerializeField] private AnimationCurve _levelCompletionAlphaCurve = null;
-    [SerializeField] private float _squaresDistance = 0f;
-    [SerializeField] private float _solutionSquaresDistance = 0f;
-
+    
 	// Features
     [SerializeField] private ClicksCountRestriction _clicksCountRestriction = ClicksCountRestriction.HardRestriction;
 
@@ -71,7 +72,7 @@ public class Level : MonoBehaviour
 
 	private void Start()
 	{
-        _levelCompletionFeedbackFinalSize = new Vector2(Screen.width, Screen.height) / 72.5f;
+        _levelCompletionFeedbackFinalSize = new Vector2(Screen.width, Screen.height) / 50f;
         _levelCompletionFeedback.Width = _levelCompletionFeedbackFinalSize.x / 100f;
         _levelCompletionFeedback.Height = _levelCompletionFeedbackFinalSize.y / 100f;
         _levelCompletionFeedbackBaseColor = _levelCompletionFeedback.Color;
@@ -149,6 +150,7 @@ public class Level : MonoBehaviour
 					_clicks++;
 
 					AddNewHistorySnapshot();
+
 					CheckLevelCompletion();
 
 					LevelPanel.Instance.UpdateClicksCounter();
@@ -241,7 +243,8 @@ public class Level : MonoBehaviour
 		{
 			validSolutionSequence = false;
 
-			_solutionSequence = new int[Random.Range(_minClicksForSolution, squares - _maxClicksBufferForSolution)];
+			//_solutionSequence = new int[Random.Range(_minClicksForSolution, squares - _maxClicksBufferForSolution)];
+			_solutionSequence = new int[squares - _maxClicksBufferForSolution];
 
 			var shuffledIndices = indices.OrderBy(a => System.Guid.NewGuid()).ToArray();
 
@@ -299,7 +302,7 @@ public class Level : MonoBehaviour
 	{
         LoadHstorySnapshot(0);
 
-        LevelPanel.Instance.UpdateHistoryButtons();
+		CheckLevelCompletion();
     }
 
     public void Undo()
@@ -310,7 +313,9 @@ public class Level : MonoBehaviour
         }
 
         LoadHstorySnapshot(_clicks - 1);
-    }
+
+		CheckLevelCompletion();
+	}
 
     public void Redo()
     {
@@ -320,7 +325,9 @@ public class Level : MonoBehaviour
         }
 
         LoadHstorySnapshot(_clicks + 1);
-    }
+
+		CheckLevelCompletion();
+	}
 
     private void AddNewHistorySnapshot()
 	{
@@ -351,10 +358,9 @@ public class Level : MonoBehaviour
         }
 
         LevelPanel.Instance.UpdateClicksCounter();
-        LevelPanel.Instance.UpdateHistoryButtons();
     }
 
-    private void CheckLevelCompletion()
+    public void CheckLevelCompletion()
 	{
         var levelComplete = true;
 
@@ -367,43 +373,45 @@ public class Level : MonoBehaviour
 		}
 
         LevelPanel.Instance.UpdateNextLevelButton(levelComplete);
-        
-        if(levelComplete)
+
+		if (_clicksCountRestriction != ClicksCountRestriction.SoftRestriction || ClicksLeft >= 0)
+		{
+			for (var i = 0; i < Squares.Length; i++)
+			{
+				var square = Squares[i];
+
+				square.Interactable = !levelComplete;
+
+				if (square.Highlighted)
+				{
+					square.OnMouseOverExit();
+				}
+			}
+		}
+
+		if (levelComplete)
 		{
             if(_clicksCountRestriction == ClicksCountRestriction.SoftRestriction && ClicksLeft < 0)
 			{
                 LevelPanel.Instance.ShakeClicksCounter();
             }
-			else
+			/*else
 			{
                 LevelPanel.Instance.UpdateHistoryButtons(false);
-            }
+            }*/
 
-            OnLevelCompletion();
+            OnLevelCompletion(ClicksLeft == 0);
         }
-		else
+		/*else
 		{
-            LevelPanel.Instance.UpdateHistoryButtons();
-		}
+            
+		}*/
+
+		LevelPanel.Instance.UpdateHistoryButtons();
 	}
 
-    private void OnLevelCompletion()
+    private void OnLevelCompletion(bool trueCompletion)
 	{
-        if(_clicksCountRestriction != ClicksCountRestriction.SoftRestriction || ClicksLeft >= 0)
-		{
-            for (var i = 0; i < Squares.Length; i++)
-            {
-                var square = Squares[i];
-
-                square.Interactable = false;
-
-                if (square.Highlighted)
-                {
-                    square.OnMouseOverExit();
-                }
-            }
-        }
-        
         var levelCompletionFeedbackWidth = _levelCompletionFeedback.Width;
         var levelCompletionFeedbackHeight = _levelCompletionFeedback.Height;
         var levelCompletionFeedbackThicknessBaseValue = _levelCompletionFeedback.Thickness;
@@ -434,7 +442,9 @@ public class Level : MonoBehaviour
 
         var time = 0f;
 
-        DOTween.To(() => time, x =>
+		_levelCompletionFeedback.Color = trueCompletion ? _trueLevelCompletionColor : _levelCompletionFeedbackBaseColor;
+
+		DOTween.To(() => time, x =>
         {
             time = x;
 
