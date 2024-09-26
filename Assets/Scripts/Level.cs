@@ -158,6 +158,7 @@ public class Level : MonoBehaviour
 			}
 
             _lastSquareClickedDown = null;
+			_previousHoveredSquare = null;
         }
     }
 
