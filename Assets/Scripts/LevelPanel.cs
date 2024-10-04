@@ -9,13 +9,19 @@ public class LevelPanel : MonoBehaviour
 {
     public static LevelPanel Instance { get; set; }
 
+	// Components
+	[SerializeField] private GameObject _solutionClicksBoxTemplate = null;
 	[SerializeField] private Button _nextLevelButton = null;
 	[SerializeField] private Button _resetButton = null;
 	[SerializeField] private Button _undoButton = null;
 	[SerializeField] private Button _redoButton = null;
 	[SerializeField] private TextMeshProUGUI _clicksCounterText = null;
 	[SerializeField] private Image _nextLevelButtonOverlay = null;
+
+	// References
 	[SerializeField] private Level _level = null;
+
+	// Animation/visual parameters
 	[SerializeField] private Gradient _clicksCounterShakeGradient = null;
 	[SerializeField] private Gradient _nextLevelButtonShakeGradient = null;
 	[SerializeField] private float _clicksCounterShakeTime = 0f;
@@ -34,6 +40,7 @@ public class LevelPanel : MonoBehaviour
 	private Vector3 _nextLevelButtonNormalPosition;
 	private Color _clicksCounterNormalColor;
 	private Color _nextLevelButtonNormalOverlayColor;
+	private List<TextMeshProUGUI> _solutionClicksTexts;
 
 	private void Awake()
 	{
@@ -46,6 +53,32 @@ public class LevelPanel : MonoBehaviour
 
 		_nextLevelButtonNormalPosition = _nextLevelButtonRectTransform.position;
 		_nextLevelButtonNormalOverlayColor = _nextLevelButtonOverlay.color;
+
+		_solutionClicksBoxTemplate.SetActive(false);
+
+		_solutionClicksTexts = new List<TextMeshProUGUI>();
+	}
+
+	public void SetupSolutionClicksBox(List<int[]> solutions)
+	{
+		if (_solutionClicksTexts.Count != 0)
+		{
+			foreach (var solutionClicksText in _solutionClicksTexts)
+			{
+				Destroy(solutionClicksText.transform.parent.gameObject);
+			}
+		}
+
+		_solutionClicksTexts.Clear();
+
+		for (var i = 0; i < solutions.Count; i++)
+		{
+			var newSolutionClicksText = Instantiate(_solutionClicksBoxTemplate, _solutionClicksBoxTemplate.transform.parent).GetComponentInChildren<TextMeshProUGUI>();
+			newSolutionClicksText.text = solutions[i].Length.ToString();
+			newSolutionClicksText.transform.parent.gameObject.SetActive(true);
+
+			_solutionClicksTexts.Add(newSolutionClicksText);
+		}
 	}
 
 	public void UpdateNextLevelButton(bool toggle)

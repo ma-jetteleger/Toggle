@@ -357,17 +357,23 @@ public class Level : MonoBehaviour
 			GetCombinations(array, i);
 		}
 
-		Debug.Log($"{_solutionSequences.Count} possible solutions:");
+		// Order the solution sequences to be displayed in descending order?
+		// Feels like going from highest to lowest, in terms of gameplay, 
+		// makes for a bit more of a "climactic" progression/finish
+		_solutionSequences = _solutionSequences.OrderByDescending(x => x.Length).ToList();
+
+		/*Debug.Log($"{_solutionSequences.Count} possible solutions:");
 
 		for (var i = 0; i < _solutionSequences.Count; i++)
 		{
 			Debug.Log(string.Join(", ", _solutionSequences[i]));
-		}
+		}*/
 
 		// Other things
 
 		_clicks = 0;
 
+        LevelPanel.Instance.SetupSolutionClicksBox(_solutionSequences);
         LevelPanel.Instance.UpdateClicksCounter();
         
         CheckLevelCompletion();

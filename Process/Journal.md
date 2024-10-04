@@ -139,3 +139,7 @@ Today I worked in a very basic heuristic to generate more interesting levels: no
 The rationale behind implementing these minor modifications before working on more substantial pieces (like new mechanics and diving deep into the level generation algorithm itself) is because I want to get the feeling of playing with the squares right before I make the game more complex/fine tuned. I feel like interesting levels won't "feel" interesting if the handling of the squares and the core mechanisms of the game don't feel good because players don't know what's going on.
 
 I want players to understand what's going, on first and foremost. And it's proving more challenging than anticipated. Interactions with the squares and their resulting reactions don't feel as natural as I had originally hoped. So I'm working on that feeling to make it as natural and informative as possible before moving on to the balance/progression/variety/challenge part of the game
+
+##
+
+Numbers and letters and words feels like I'm talking to the player. Icons and symbols feels like the game is talking about itself
