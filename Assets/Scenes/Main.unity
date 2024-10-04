@@ -1689,7 +1689,7 @@ MonoBehaviour:
   _rectangle: {fileID: 692212901}
   _solutionRectangle: {fileID: 1044517854}
   _levelCompletionFeedback: {fileID: 463101731}
-  _squaresRange: {x: 3, y: 9}
+  _squaresRange: {x: 5, y: 5}
   _maxClicksBufferForSolution: 1
   _solutionGenerationAttempts: 999
   _squaresDistance: 0.0625
@@ -1787,6 +1787,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   _clicksCountRestriction: 0
+  _testSquares: []
 --- !u!4 &692212898
 Transform:
   m_ObjectHideFlags: 0

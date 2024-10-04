@@ -122,6 +122,7 @@ The question of whether the core loop is too tiny or at what point minimalism br
 	- Movable squares (drag and drop)
 	- Non-interactable squares (permanent? toggled off = uninteractable?)
 	- 2D arrays (multiple parallel arrays? grids?)
+	- "programmable" clicks
 	
 I think this covers the possible espansion of the design space of the game as it is right now. Of course, implementing any of this is going to affect the potential design space further.	
 

@@ -37,9 +37,10 @@ public class Square : MonoBehaviour
     public bool Toggled { get; set; }
     public bool SolutionSquare { get; set; }
     public TargetingScheme TargetScheme { get; set; }
+	public List<Square> Targets { get; set; }
+	public int Id { get; set; }
 
-    private int _id;
-    private Level _level;
+	private Level _level;
     private Color _normalColor;
     private Color _normalOutlineColor;
     private Rectangle _rectangle;
@@ -49,7 +50,6 @@ public class Square : MonoBehaviour
     private Tweener _colorChange;
     private Vector3 _normalPosition;
     private Color _normalOverlayColor;
-	private List<Square> _targets;
 	private Dictionary<Square, Rectangle> _targetPredictions;
 
 	public void Initialize(int id, Level level, Square referenceSquare = null)
@@ -59,10 +59,10 @@ public class Square : MonoBehaviour
 		_rectangle = GetComponent<Rectangle>();
         _normalColor = _rectangle.Color;
 
-		_id = id;
+		Id = id;
         _level = level;
 
-		gameObject.name = $"{(SolutionSquare ? "Solution" : "")}Square({_id})";
+		gameObject.name = $"{(SolutionSquare ? "Solution" : "")}Square({Id})";
 
 		if (!SolutionSquare)
 		{
@@ -75,8 +75,8 @@ public class Square : MonoBehaviour
 
             _outline.SetActive(false);
 
-			var first = _id == 0;
-			var last = _id == _level.Squares.Length - 1;
+			var first = Id == 0;
+			var last = Id == _level.Squares.Length - 1;
 
 			var targetSchemes = (TargetingScheme[])System.Enum.GetValues(typeof(TargetingScheme));
 			var possibleTargetSchemes = new List<TargetingScheme>();
@@ -156,35 +156,35 @@ public class Square : MonoBehaviour
 
     public void SetupTargetsAndPredictions(Square[] targetArray)
 	{
-		_targets = new List<Square>();
+		Targets = new List<Square>();
 
 		switch (TargetScheme)
 		{
 			case TargetingScheme.Self:
-				_targets.Add(this);
+				Targets.Add(this);
                 break;
 			case TargetingScheme.Left:
-                if(_id > 0) _targets.Add(targetArray[_id - 1]);
+                if(Id > 0) Targets.Add(targetArray[Id - 1]);
                 break;
 			case TargetingScheme.Right:
-                if (_id < targetArray.Length - 1) _targets.Add(targetArray[_id + 1]);
+                if (Id < targetArray.Length - 1) Targets.Add(targetArray[Id + 1]);
                 break;
 			case TargetingScheme.SelfLeft:
-				_targets.Add(this);
-                if (_id > 0) _targets.Add(targetArray[_id - 1]);
+				Targets.Add(this);
+                if (Id > 0) Targets.Add(targetArray[Id - 1]);
                 break;
 			case TargetingScheme.SelfRight:
-				_targets.Add(this);
-                if (_id < targetArray.Length - 1) _targets.Add(targetArray[_id + 1]);
+				Targets.Add(this);
+                if (Id < targetArray.Length - 1) Targets.Add(targetArray[Id + 1]);
                 break;
 			case TargetingScheme.LeftRight:
-                if (_id > 0) _targets.Add(targetArray[_id - 1]);
-                if (_id < targetArray.Length - 1) _targets.Add(targetArray[_id + 1]);
+                if (Id > 0) Targets.Add(targetArray[Id - 1]);
+                if (Id < targetArray.Length - 1) Targets.Add(targetArray[Id + 1]);
                 break;
 			case TargetingScheme.SelfLeftRight:
-				_targets.Add(this);
-                if (_id > 0) _targets.Add(targetArray[_id - 1]);
-                if (_id < targetArray.Length - 1) _targets.Add(targetArray[_id + 1]);
+				Targets.Add(this);
+                if (Id > 0) Targets.Add(targetArray[Id - 1]);
+                if (Id < targetArray.Length - 1) Targets.Add(targetArray[Id + 1]);
                 break;
 		}
 
@@ -192,9 +192,9 @@ public class Square : MonoBehaviour
 		{
 			_targetPredictions = new Dictionary<Square, Rectangle>();
 
-			for (var i = 0; i < _targets.Count; i++)
+			for (var i = 0; i < Targets.Count; i++)
 			{
-				var target = _targets[i];
+				var target = Targets[i];
 
 				var newTargetPrediction = Instantiate(_targetPredictionTemplate, _targetPredictionTemplate.transform.parent).GetComponent<Rectangle>();
 				newTargetPrediction.transform.position = new Vector3(target.transform.position.x, _targetPredictionTemplate.transform.position.y, 0f);
@@ -208,7 +208,7 @@ public class Square : MonoBehaviour
 
 	public void ToggleTargets()
 	{
-		foreach (var target in _targets)
+		foreach (var target in Targets)
 		{
 			target.Toggle();
 		}
