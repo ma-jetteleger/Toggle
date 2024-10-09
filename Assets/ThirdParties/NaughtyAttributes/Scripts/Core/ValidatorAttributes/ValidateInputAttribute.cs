@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace NaughtyAttributes
 {
@@ -10,8 +10,8 @@ namespace NaughtyAttributes
 
         public ValidateInputAttribute(string callbackName, string message = null)
         {
-            this.CallbackName = callbackName;
-            this.Message = message;
+            CallbackName = callbackName;
+            Message = message;
         }
     }
 }

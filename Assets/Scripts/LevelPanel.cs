@@ -71,13 +71,22 @@ public class LevelPanel : MonoBehaviour
 
 		_solutionClicksTexts.Clear();
 
-		for (var i = 0; i < solutions.Count; i++)
+		if (_level.SolutionType == SolutionType.SingleSolution)
 		{
-			var newSolutionClicksText = Instantiate(_solutionClicksBoxTemplate, _solutionClicksBoxTemplate.transform.parent).GetComponentInChildren<TextMeshProUGUI>();
-			newSolutionClicksText.text = solutions[i].Length.ToString();
-			newSolutionClicksText.transform.parent.gameObject.SetActive(true);
+			//_clicksCounterText.gameObject.SetActive(true);
+		}
+		else if(_level.SolutionType == SolutionType.MultipleSolutions)
+		{
+			//_clicksCounterText.gameObject.SetActive(false);
 
-			_solutionClicksTexts.Add(newSolutionClicksText);
+			for (var i = 0; i < solutions.Count; i++)
+			{
+				var newSolutionClicksText = Instantiate(_solutionClicksBoxTemplate, _solutionClicksBoxTemplate.transform.parent).GetComponentInChildren<TextMeshProUGUI>();
+				newSolutionClicksText.text = solutions[i].Length.ToString();
+				newSolutionClicksText.transform.parent.gameObject.SetActive(true);
+
+				_solutionClicksTexts.Add(newSolutionClicksText);
+			}
 		}
 	}
 
@@ -183,7 +192,37 @@ public class LevelPanel : MonoBehaviour
 
 	public void UpdateClicksCounter()
 	{
-		_clicksCounterText.text = $"{_level.ClicksLeft}";
+		var numberToDisplay = 0;
+
+		switch (_level.SolutionType)
+		{
+			case SolutionType.SingleSolution:
+				numberToDisplay = _level.ClicksLeft;
+				break;
+			case SolutionType.MultipleSolutions:
+				//_clicksCounterText.gameObject.SetActive(_level.Clicks > 0);
+				numberToDisplay = _level.Clicks;
+
+				foreach(var solutionClicksText in _solutionClicksTexts)
+				{
+					var solutionClicks = int.Parse(solutionClicksText.text);
+					var levelComplete = _level.GetLevelCompletion();
+
+					solutionClicksText.transform.parent.GetChild(2).gameObject.SetActive(_level.Clicks > solutionClicks 
+						|| _level.Clicks == solutionClicks && !levelComplete);
+
+					// TODO: validate when a solution has been completed 
+					// + feedback/visuals
+					// + reset the level 
+					// + keep the completed solution validated (stop checking for it)
+					// + check if all solutions are completed before allowing to go to the next level
+					// (depending on the levelCompleted restriction thing)
+				}
+
+				break;
+		}
+
+		_clicksCounterText.text = $"{numberToDisplay}";
 	}
 
 	public void UpdateHistoryButtons(bool? forcedValue = null)

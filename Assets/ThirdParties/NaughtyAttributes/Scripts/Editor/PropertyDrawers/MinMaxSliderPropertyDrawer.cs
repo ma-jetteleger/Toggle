@@ -1,76 +1,108 @@
+﻿using UnityEditor;
 using UnityEngine;
-using UnityEditor;
 
 namespace NaughtyAttributes.Editor
 {
-    [PropertyDrawer(typeof(MinMaxSliderAttribute))]
-    public class MinMaxSliderPropertyDrawer : PropertyDrawer
+    [CustomPropertyDrawer(typeof(MinMaxSliderAttribute))]
+    public class MinMaxSliderPropertyDrawer : PropertyDrawerBase
     {
-        public override void DrawProperty(SerializedProperty property)
+        protected override float GetPropertyHeight_Internal(SerializedProperty property, GUIContent label)
         {
-            EditorDrawUtility.DrawHeader(property);
+            return (property.propertyType == SerializedPropertyType.Vector2 || property.propertyType == SerializedPropertyType.Vector2Int)
+                ? GetPropertyHeight(property)
+                : GetPropertyHeight(property) + GetHelpBoxHeight();
+        }
 
-            MinMaxSliderAttribute minMaxSliderAttribute = PropertyUtility.GetAttribute<MinMaxSliderAttribute>(property);
+        protected override void OnGUI_Internal(Rect rect, SerializedProperty property, GUIContent label)
+        {
+            EditorGUI.BeginProperty(rect, label, property);
 
-            if (property.propertyType == SerializedPropertyType.Vector2)
+            MinMaxSliderAttribute minMaxSliderAttribute = (MinMaxSliderAttribute)attribute;
+
+            if (property.propertyType == SerializedPropertyType.Vector2 || property.propertyType == SerializedPropertyType.Vector2Int)
             {
-                Rect controlRect = EditorGUILayout.GetControlRect();
-                float labelWidth = EditorGUIUtility.labelWidth;
+                EditorGUI.BeginProperty(rect, label, property);
+
+                float indentLength = NaughtyEditorGUI.GetIndentLength(rect);
+                float labelWidth = EditorGUIUtility.labelWidth + NaughtyEditorGUI.HorizontalSpacing;
                 float floatFieldWidth = EditorGUIUtility.fieldWidth;
-                float sliderWidth = controlRect.width - labelWidth - 2f * floatFieldWidth;
-                float sliderPadding = 5f;
+                float sliderWidth = rect.width - labelWidth - 2.0f * floatFieldWidth;
+                float sliderPadding = 5.0f;
 
                 Rect labelRect = new Rect(
-                    controlRect.x,
-                    controlRect.y,
+                    rect.x,
+                    rect.y,
                     labelWidth,
-                    controlRect.height);
+                    rect.height);
 
                 Rect sliderRect = new Rect(
-                    controlRect.x + labelWidth + floatFieldWidth + sliderPadding,
-                    controlRect.y,
-                    sliderWidth - 2f * sliderPadding,
-                    controlRect.height);
+                    rect.x + labelWidth + floatFieldWidth + sliderPadding - indentLength,
+                    rect.y,
+                    sliderWidth - 2.0f * sliderPadding + indentLength,
+                    rect.height);
 
                 Rect minFloatFieldRect = new Rect(
-                    controlRect.x + labelWidth,
-                    controlRect.y,
-                    floatFieldWidth,
-                    controlRect.height);
+                    rect.x + labelWidth - indentLength,
+                    rect.y,
+                    floatFieldWidth + indentLength,
+                    rect.height);
 
                 Rect maxFloatFieldRect = new Rect(
-                    controlRect.x + labelWidth + floatFieldWidth + sliderWidth,
-                    controlRect.y,
-                    floatFieldWidth,
-                    controlRect.height);
+                    rect.x + labelWidth + floatFieldWidth + sliderWidth - indentLength,
+                    rect.y,
+                    floatFieldWidth + indentLength,
+                    rect.height);
 
                 // Draw the label
-                EditorGUI.LabelField(labelRect, property.displayName);
+                EditorGUI.LabelField(labelRect, label.text);
 
                 // Draw the slider
                 EditorGUI.BeginChangeCheck();
 
-                Vector2 sliderValue = property.vector2Value;
-                EditorGUI.MinMaxSlider(sliderRect, ref sliderValue.x, ref sliderValue.y, minMaxSliderAttribute.MinValue, minMaxSliderAttribute.MaxValue);
-
-                sliderValue.x = EditorGUI.FloatField(minFloatFieldRect, sliderValue.x);
-                sliderValue.x = Mathf.Clamp(sliderValue.x, minMaxSliderAttribute.MinValue, Mathf.Min(minMaxSliderAttribute.MaxValue, sliderValue.y));
-
-                sliderValue.y = EditorGUI.FloatField(maxFloatFieldRect, sliderValue.y);
-                sliderValue.y = Mathf.Clamp(sliderValue.y, Mathf.Max(minMaxSliderAttribute.MinValue, sliderValue.x), minMaxSliderAttribute.MaxValue);
-
-                if (EditorGUI.EndChangeCheck())
+                if (property.propertyType == SerializedPropertyType.Vector2)
                 {
-                    property.vector2Value = sliderValue;
+                    Vector2 sliderValue = property.vector2Value;
+                    EditorGUI.MinMaxSlider(sliderRect, ref sliderValue.x, ref sliderValue.y, minMaxSliderAttribute.MinValue, minMaxSliderAttribute.MaxValue);
+
+                    sliderValue.x = EditorGUI.FloatField(minFloatFieldRect, sliderValue.x);
+                    sliderValue.x = Mathf.Clamp(sliderValue.x, minMaxSliderAttribute.MinValue, Mathf.Min(minMaxSliderAttribute.MaxValue, sliderValue.y));
+
+                    sliderValue.y = EditorGUI.FloatField(maxFloatFieldRect, sliderValue.y);
+                    sliderValue.y = Mathf.Clamp(sliderValue.y, Mathf.Max(minMaxSliderAttribute.MinValue, sliderValue.x), minMaxSliderAttribute.MaxValue);
+
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        property.vector2Value = sliderValue;
+                    }
                 }
+                else if (property.propertyType == SerializedPropertyType.Vector2Int)
+                {
+                    Vector2Int sliderValue = property.vector2IntValue;
+                    float xValue = sliderValue.x;
+                    float yValue = sliderValue.y;
+                    EditorGUI.MinMaxSlider(sliderRect, ref xValue, ref yValue, minMaxSliderAttribute.MinValue, minMaxSliderAttribute.MaxValue);
+
+                    sliderValue.x = EditorGUI.IntField(minFloatFieldRect, (int)xValue);
+                    sliderValue.x = (int)Mathf.Clamp(sliderValue.x, minMaxSliderAttribute.MinValue, Mathf.Min(minMaxSliderAttribute.MaxValue, sliderValue.y));
+
+                    sliderValue.y = EditorGUI.IntField(maxFloatFieldRect, (int)yValue);
+                    sliderValue.y = (int)Mathf.Clamp(sliderValue.y, Mathf.Max(minMaxSliderAttribute.MinValue, sliderValue.x), minMaxSliderAttribute.MaxValue);
+
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        property.vector2IntValue = sliderValue;
+                    }
+                }
+
+                EditorGUI.EndProperty();
             }
             else
             {
-                string warning = minMaxSliderAttribute.GetType().Name + " can be used only on Vector2 fields";
-                EditorDrawUtility.DrawHelpBox(warning, MessageType.Warning, logToConsole: true, context: PropertyUtility.GetTargetObject(property));
-
-                EditorDrawUtility.DrawPropertyField(property);
+                string message = minMaxSliderAttribute.GetType().Name + " can be used only on Vector2 or Vector2Int fields";
+                DrawDefaultPropertyAndHelpBox(rect, property, message, MessageType.Warning);
             }
+
+            EditorGUI.EndProperty();
         }
     }
 }

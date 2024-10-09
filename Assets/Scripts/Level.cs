@@ -5,12 +5,25 @@ using System.Linq;
 using UnityEngine;
 using TMPro;
 using DG.Tweening;
+using NaughtyAttributes;
 
-public enum ClicksCountRestriction
+public enum SolutionType
+{
+	SingleSolution,
+	MultipleSolutions
+}
+
+public enum ClicksCountToNextLevelRestriction
 {
     HardRestriction,
     SoftRestriction,
     NoRestriction
+}
+
+public enum CompletedSolutionsToNextLevelRestriction
+{
+	AllSolutions,
+	AtLeastOneSolution
 }
 
 public class Level : MonoBehaviour
@@ -75,7 +88,9 @@ public class Level : MonoBehaviour
     [SerializeField] private AnimationCurve _levelCompletionAlphaCurve = null;
     
 	// Features
-    [SerializeField] private ClicksCountRestriction _clicksCountRestriction = ClicksCountRestriction.HardRestriction;
+    [SerializeField] private SolutionType _solutionType = SolutionType.SingleSolution;
+    [SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private ClicksCountToNextLevelRestriction _clicksCountRestriction = ClicksCountToNextLevelRestriction.HardRestriction;
+	[SerializeField] [ShowIf(nameof(_solutionType), SolutionType.MultipleSolutions)] private CompletedSolutionsToNextLevelRestriction _completedSolutionsToNextLevelRestriction = CompletedSolutionsToNextLevelRestriction.AllSolutions;
 
     public Square[] Squares { get; set; }
     public Square[] SolutionSquares { get; set; }
@@ -85,9 +100,11 @@ public class Level : MonoBehaviour
 	// Should probably have a clicks counter that go up? Or multiple clicks counter that track the different solutions?
 	// I really don't like option 2
     public int ClicksLeft => _solutionSequences[0].Length - _clicks;
+    public int Clicks => _clicks;
     public bool EmptyHistory => _squareHistory.Count == 1;
     public bool TopOfHistory => _clicks == _squareHistory.Count - 1;
     public bool BottomOfHistory => _clicks == 0;
+    public SolutionType SolutionType => _solutionType;
 
     private Square _previousHoveredSquare;
     private Rectangle _squareTemplateRectangle;
@@ -177,7 +194,9 @@ public class Level : MonoBehaviour
 
             if(sameSquare)
 			{
-				if (_clicksCountRestriction == ClicksCountRestriction.HardRestriction && ClicksLeft <= 0)
+				if (_solutionType == SolutionType.SingleSolution
+					&& _clicksCountRestriction == ClicksCountToNextLevelRestriction.HardRestriction 
+					&& ClicksLeft <= 0)
 				{
 					_lastSquareClickedDown.Shake();
 
@@ -496,7 +515,9 @@ public class Level : MonoBehaviour
 
 	public void NextLevel()
     {
-        if (_clicksCountRestriction == ClicksCountRestriction.SoftRestriction && ClicksLeft < 0)
+        if (_solutionType == SolutionType.SingleSolution
+			&& _clicksCountRestriction == ClicksCountToNextLevelRestriction.SoftRestriction 
+			&& ClicksLeft < 0)
         {
             LevelPanel.Instance.ShakeNextLevelButton();
             LevelPanel.Instance.ShakeClicksCounter();
@@ -569,21 +590,29 @@ public class Level : MonoBehaviour
         LevelPanel.Instance.UpdateClicksCounter();
     }
 
-    public void CheckLevelCompletion()
+	public bool GetLevelCompletion()
 	{
-        var levelComplete = true;
+		var levelComplete = true;
 
-        for(var i = 0; i < Squares.Length; i++)
+		for (var i = 0; i < Squares.Length; i++)
 		{
-            if(Squares[i].Toggled != SolutionSquares[i].Toggled)
+			if (Squares[i].Toggled != SolutionSquares[i].Toggled)
 			{
-                levelComplete = false;
-            }
+				levelComplete = false;
+			}
 		}
+
+		return levelComplete;
+	}
+
+	public void CheckLevelCompletion()
+	{
+        var levelComplete = GetLevelCompletion();
 
         LevelPanel.Instance.UpdateNextLevelButton(levelComplete);
 
-		if (_clicksCountRestriction != ClicksCountRestriction.SoftRestriction || ClicksLeft >= 0)
+		if (_solutionType == SolutionType.SingleSolution
+			&& (_clicksCountRestriction != ClicksCountToNextLevelRestriction.SoftRestriction || ClicksLeft >= 0))
 		{
 			for (var i = 0; i < Squares.Length; i++)
 			{
@@ -600,7 +629,9 @@ public class Level : MonoBehaviour
 
 		if (levelComplete)
 		{
-            if(_clicksCountRestriction == ClicksCountRestriction.SoftRestriction && ClicksLeft < 0)
+            if(_solutionType == SolutionType.SingleSolution
+			&& _clicksCountRestriction == ClicksCountToNextLevelRestriction.SoftRestriction 
+			&& ClicksLeft < 0)
 			{
                 LevelPanel.Instance.ShakeClicksCounter();
             }

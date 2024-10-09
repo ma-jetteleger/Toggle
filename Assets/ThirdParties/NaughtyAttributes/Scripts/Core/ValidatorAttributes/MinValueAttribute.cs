@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace NaughtyAttributes
 {
@@ -9,12 +9,12 @@ namespace NaughtyAttributes
 
         public MinValueAttribute(float minValue)
         {
-            this.MinValue = minValue;
+            MinValue = minValue;
         }
 
         public MinValueAttribute(int minValue)
         {
-            this.MinValue = minValue;
+            MinValue = minValue;
         }
     }
 }

@@ -143,3 +143,7 @@ I want players to understand what's going, on first and foremost. And it's provi
 ##
 
 Numbers and letters and words feels like I'm talking to the player. Icons and symbols feels like the game is talking about itself
+
+Started putting thoughts and reflections as in-code comments
+
+Keeping the options for two mutually-exclusive features open (single-solution and multi-solution level completion): is it worth it?

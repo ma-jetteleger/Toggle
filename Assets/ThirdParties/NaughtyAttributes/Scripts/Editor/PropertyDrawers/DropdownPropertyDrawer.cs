@@ -1,130 +1,177 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
-using System.Reflection;
 using System.Collections;
+using System.Reflection;
 using System;
 using System.Collections.Generic;
 
 namespace NaughtyAttributes.Editor
 {
-    [PropertyDrawer(typeof(DropdownAttribute))]
-    public class DropdownPropertyDrawer : PropertyDrawer
+    [CustomPropertyDrawer(typeof(DropdownAttribute))]
+    public class DropdownPropertyDrawer : PropertyDrawerBase
     {
-        public override void DrawProperty(SerializedProperty property)
+        protected override float GetPropertyHeight_Internal(SerializedProperty property, GUIContent label)
         {
-            EditorDrawUtility.DrawHeader(property);
+            DropdownAttribute dropdownAttribute = (DropdownAttribute)attribute;
+            object values = GetValues(property, dropdownAttribute.ValuesName);
+            FieldInfo fieldInfo = ReflectionUtility.GetField(PropertyUtility.GetTargetObjectWithProperty(property), property.name);
 
-            DropdownAttribute dropdownAttribute = PropertyUtility.GetAttribute<DropdownAttribute>(property);
-            UnityEngine.Object target = PropertyUtility.GetTargetObject(property);
+            float propertyHeight = AreValuesValid(values, fieldInfo)
+                ? GetPropertyHeight(property)
+                : GetPropertyHeight(property) + GetHelpBoxHeight();
 
-            FieldInfo fieldInfo = ReflectionUtility.GetField(target, property.name);
-            FieldInfo valuesFieldInfo = ReflectionUtility.GetField(target, dropdownAttribute.ValuesFieldName);
+            return propertyHeight;
+        }
 
-            if (valuesFieldInfo == null)
+        protected override void OnGUI_Internal(Rect rect, SerializedProperty property, GUIContent label)
+        {
+            EditorGUI.BeginProperty(rect, label, property);
+
+            DropdownAttribute dropdownAttribute = (DropdownAttribute)attribute;
+            object target = PropertyUtility.GetTargetObjectWithProperty(property);
+
+            object valuesObject = GetValues(property, dropdownAttribute.ValuesName);
+            FieldInfo dropdownField = ReflectionUtility.GetField(target, property.name);
+
+            if (AreValuesValid(valuesObject, dropdownField))
             {
-                this.DrawWarningBox(string.Format("{0} cannot find a values field with name \"{1}\"", dropdownAttribute.GetType().Name, dropdownAttribute.ValuesFieldName));
-                EditorGUILayout.PropertyField(property, true);
-            }
-            else if (valuesFieldInfo.GetValue(target) is IList &&
-                     fieldInfo.FieldType == this.GetElementType(valuesFieldInfo))
-            {
-                // Selected value
-                object selectedValue = fieldInfo.GetValue(target);
-
-                // Values and display options
-                IList valuesList = (IList)valuesFieldInfo.GetValue(target);
-                object[] values = new object[valuesList.Count];
-                string[] displayOptions = new string[valuesList.Count];
-
-                for (int i = 0; i < values.Length; i++)
+                if (valuesObject is IList && dropdownField.FieldType == GetElementType(valuesObject))
                 {
-                    object value = valuesList[i];
-                    values[i] = value;
-                    displayOptions[i] = value.ToString();
-                }
+                    // Selected value
+                    object selectedValue = dropdownField.GetValue(target);
 
-                // Selected value index
-                int selectedValueIndex = Array.IndexOf(values, selectedValue);
-                if (selectedValueIndex < 0)
-                {
-                    selectedValueIndex = 0;
-                }
+                    // Values and display options
+                    IList valuesList = (IList)valuesObject;
+                    object[] values = new object[valuesList.Count];
+                    string[] displayOptions = new string[valuesList.Count];
 
-                // Draw the dropdown
-                this.DrawDropdown(target, fieldInfo, property.displayName, selectedValueIndex, values, displayOptions);
-            }
-            else if (valuesFieldInfo.GetValue(target) is IDropdownList)
-            {
-                // Current value
-                object selectedValue = fieldInfo.GetValue(target);
-
-                // Current value index, values and display options
-                IDropdownList dropdown = (IDropdownList)valuesFieldInfo.GetValue(target);
-                IEnumerator<KeyValuePair<string, object>> dropdownEnumerator = dropdown.GetEnumerator();
-
-                int index = -1;
-                int selectedValueIndex = -1;
-                List<object> values = new List<object>();
-                List<string> displayOptions = new List<string>();
-
-                while (dropdownEnumerator.MoveNext())
-                {
-                    index++;
-
-                    KeyValuePair<string, object> current = dropdownEnumerator.Current;
-                    if (current.Value.Equals(selectedValue))
+                    for (int i = 0; i < values.Length; i++)
                     {
-                        selectedValueIndex = index;
+                        object value = valuesList[i];
+                        values[i] = value;
+                        displayOptions[i] = value == null ? "<null>" : value.ToString();
                     }
 
-                    values.Add(current.Value);
-                    displayOptions.Add(current.Key);
-                }
+                    // Selected value index
+                    int selectedValueIndex = Array.IndexOf(values, selectedValue);
+                    if (selectedValueIndex < 0)
+                    {
+                        selectedValueIndex = 0;
+                    }
 
-                if (selectedValueIndex < 0)
+                    NaughtyEditorGUI.Dropdown(
+                        rect, property.serializedObject, target, dropdownField, label.text, selectedValueIndex, values, displayOptions);
+                }
+                else if (valuesObject is IDropdownList)
                 {
-                    selectedValueIndex = 0;
+                    // Current value
+                    object selectedValue = dropdownField.GetValue(target);
+
+                    // Current value index, values and display options
+                    int index = -1;
+                    int selectedValueIndex = -1;
+                    List<object> values = new List<object>();
+                    List<string> displayOptions = new List<string>();
+                    IDropdownList dropdown = (IDropdownList)valuesObject;
+
+                    using (IEnumerator<KeyValuePair<string, object>> dropdownEnumerator = dropdown.GetEnumerator())
+                    {
+                        while (dropdownEnumerator.MoveNext())
+                        {
+                            index++;
+
+                            KeyValuePair<string, object> current = dropdownEnumerator.Current;
+                            if (current.Value?.Equals(selectedValue) == true)
+                            {
+                                selectedValueIndex = index;
+                            }
+
+                            values.Add(current.Value);
+
+                            if (current.Key == null)
+                            {
+                                displayOptions.Add("<null>");
+                            }
+                            else if (string.IsNullOrWhiteSpace(current.Key))
+                            {
+                                displayOptions.Add("<empty>");
+                            }
+                            else
+                            {
+                                displayOptions.Add(current.Key);
+                            }
+                        }
+                    }
+
+                    if (selectedValueIndex < 0)
+                    {
+                        selectedValueIndex = 0;
+                    }
+
+                    NaughtyEditorGUI.Dropdown(
+                        rect, property.serializedObject, target, dropdownField, label.text, selectedValueIndex, values.ToArray(), displayOptions.ToArray());
                 }
-
-                // Draw the dropdown
-                this.DrawDropdown(target, fieldInfo, property.displayName, selectedValueIndex, values.ToArray(), displayOptions.ToArray());
             }
             else
             {
-                this.DrawWarningBox(typeof(DropdownAttribute).Name + " works only when the type of the field is equal to the element type of the array");
-                EditorGUILayout.PropertyField(property, true);
+                string message = string.Format("Invalid values with name '{0}' provided to '{1}'. Either the values name is incorrect or the types of the target field and the values field/property/method don't match",
+                    dropdownAttribute.ValuesName, dropdownAttribute.GetType().Name);
+
+                DrawDefaultPropertyAndHelpBox(rect, property, message, MessageType.Warning);
             }
+
+            EditorGUI.EndProperty();
         }
 
-        private Type GetElementType(FieldInfo listFieldInfo)
+        private object GetValues(SerializedProperty property, string valuesName)
         {
-            if (listFieldInfo.FieldType.IsGenericType)
+            object target = PropertyUtility.GetTargetObjectWithProperty(property);
+
+            FieldInfo valuesFieldInfo = ReflectionUtility.GetField(target, valuesName);
+            if (valuesFieldInfo != null)
             {
-                return listFieldInfo.FieldType.GetGenericArguments()[0];
+                return valuesFieldInfo.GetValue(target);
             }
-            else
+
+            PropertyInfo valuesPropertyInfo = ReflectionUtility.GetProperty(target, valuesName);
+            if (valuesPropertyInfo != null)
             {
-                return listFieldInfo.FieldType.GetElementType();
+                return valuesPropertyInfo.GetValue(target);
             }
+
+            MethodInfo methodValuesInfo = ReflectionUtility.GetMethod(target, valuesName);
+            if (methodValuesInfo != null &&
+                methodValuesInfo.ReturnType != typeof(void) &&
+                methodValuesInfo.GetParameters().Length == 0)
+            {
+                return methodValuesInfo.Invoke(target, null);
+            }
+
+            return null;
         }
 
-        private void DrawDropdown(UnityEngine.Object target, FieldInfo fieldInfo, string label, int selectedValueIndex, object[] values, string[] displayOptions)
+        private bool AreValuesValid(object values, FieldInfo dropdownField)
         {
-            EditorGUI.BeginChangeCheck();
-
-            int newIndex = EditorGUILayout.Popup(label, selectedValueIndex, displayOptions);
-
-            if (EditorGUI.EndChangeCheck())
+            if (values == null || dropdownField == null)
             {
-                Undo.RecordObject(target, "Dropdown");
-                fieldInfo.SetValue(target, values[newIndex]);
+                return false;
             }
+
+            if ((values is IList && dropdownField.FieldType == GetElementType(values)) ||
+                (values is IDropdownList))
+            {
+                return true;
+            }
+
+            return false;
         }
 
-        private void DrawWarningBox(string message)
+        private Type GetElementType(object values)
         {
-            EditorGUILayout.HelpBox(message, MessageType.Warning);
-            Debug.LogWarning(message);
+            Type valuesType = values.GetType();
+            Type elementType = ReflectionUtility.GetListElementType(valuesType);
+
+            return elementType;
         }
     }
 }

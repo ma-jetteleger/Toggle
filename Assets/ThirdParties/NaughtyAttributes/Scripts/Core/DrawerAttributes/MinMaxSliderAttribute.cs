@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace NaughtyAttributes
 {
@@ -10,8 +10,8 @@ namespace NaughtyAttributes
 
         public MinMaxSliderAttribute(float minValue, float maxValue)
         {
-            this.MinValue = minValue;
-            this.MaxValue = maxValue;
+            MinValue = minValue;
+            MaxValue = maxValue;
         }
     }
 }

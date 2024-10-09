@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace NaughtyAttributes
 {
@@ -9,7 +9,7 @@ namespace NaughtyAttributes
 
         public RequiredAttribute(string message = null)
         {
-            this.Message = message;
+            Message = message;
         }
     }
 }

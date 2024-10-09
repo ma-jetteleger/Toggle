@@ -1,9 +1,8 @@
-using UnityEditor;
+﻿using UnityEditor;
 
 namespace NaughtyAttributes.Editor
 {
-    [PropertyValidator(typeof(RequiredAttribute))]
-    public class RequiredPropertyValidator : PropertyValidator
+    public class RequiredPropertyValidator : PropertyValidatorBase
     {
         public override void ValidateProperty(SerializedProperty property)
         {
@@ -19,13 +18,13 @@ namespace NaughtyAttributes.Editor
                         errorMessage = requiredAttribute.Message;
                     }
 
-                    EditorDrawUtility.DrawHelpBox(errorMessage, MessageType.Error, logToConsole: true, context: PropertyUtility.GetTargetObject(property));
+                    NaughtyEditorGUI.HelpBox_Layout(errorMessage, MessageType.Error, context: property.serializedObject.targetObject);
                 }
             }
             else
             {
                 string warning = requiredAttribute.GetType().Name + " works only on reference types";
-                EditorDrawUtility.DrawHelpBox(warning, MessageType.Warning, logToConsole: true, context: PropertyUtility.GetTargetObject(property));
+                NaughtyEditorGUI.HelpBox_Layout(warning, MessageType.Warning, context: property.serializedObject.targetObject);
             }
         }
     }

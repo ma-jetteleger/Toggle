@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace NaughtyAttributes
 {
@@ -9,12 +9,12 @@ namespace NaughtyAttributes
 
         public MaxValueAttribute(float maxValue)
         {
-            this.MaxValue = maxValue;
+            MaxValue = maxValue;
         }
 
         public MaxValueAttribute(int maxValue)
         {
-            this.MaxValue = maxValue;
+            MaxValue = maxValue;
         }
     }
 }
