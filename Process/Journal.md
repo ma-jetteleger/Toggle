@@ -142,15 +142,29 @@ I want players to understand what's going, on first and foremost. And it's provi
 
 ## 2024-10-10
 
-Numbers and letters and words feels like I'm talking to the player. Icons and symbols feels like the game is talking about itself
-
 Started putting thoughts and reflections as in-code comments
+
+	// Should the order of clicks matter??? Right now it doesn't
+	// I expect that this will depend on what toggle features are implemented in the future 
+	// So I'll leave the code that handles permutations in, if the need to use it arises at some point
+	
+	// Order the solutions to be displayed in descending order?
+	// Feels like going from highest to lowest, in terms of gameplay, 
+	// makes for a bit more of a "climactic" progression/finish
+	
+	// Decided to not compile solutions of the same length,
+	// to avoid duplicate clicks count on the interface
+	// and to avoid the complications of checking for exact
+	// solution sequences instead of simple numbers of clicks
 
 Keeping the options for two mutually-exclusive features open (single-solution and multi-solution level completion): is it worth it?
 
-Should I deactivate clicked squares? It feels like it would help in the understandabiity of the objective of the game. But that also means I can't have solutions which have the same square(s) clicked more than once. Is that even something that we want? We should test that soon
+Should I deactivate clicked squares? It feels like it would help in the understandabiity of the objective of the game. But that also means I can't have solutions which have the same square(s) clicked more than once in the future. Is that even something that we want? We should test that soon
+
+Feature switches vs. branching
 
 Deciding to "keep it simple", vs. have the minimalism of the game itself make the development of the game simple
 
-Problem: when you have multiple solutions and they're of lengths 2 and 4, you can just do the one with length 2 + press any square twice and that'll "give" you the one of length 4 without actually finding the true length 4 solution. This is my true motivation to the the "you can only click each square once" feature
-	Implications for conditional toggle features: ...
+Numbers and letters and words feels like I'm talking to the player. Icons and symbols feels like the game is talking about itself
+
+Writing in unused/empty variables and functions in the code as reminders of features to implement

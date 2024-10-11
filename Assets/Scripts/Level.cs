@@ -53,6 +53,7 @@ public class Level : MonoBehaviour
 	// Features
     [SerializeField] private SolutionType _solutionType = SolutionType.SingleSolution;
     [SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private ClicksCountToNextLevelRestriction _clicksCountRestriction = ClicksCountToNextLevelRestriction.HardRestriction;
+    [SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private bool _forceSingleSolution = false;
 	[SerializeField] [ShowIf(nameof(_solutionType), SolutionType.MultipleSolutions)] private CompletedSolutionsToNextLevelRestriction _completedSolutionsToNextLevelRestriction = CompletedSolutionsToNextLevelRestriction.AllSolutions;
 
     public Square[] Squares { get; set; }
@@ -60,9 +61,6 @@ public class Level : MonoBehaviour
     public Rectangle[] PredictionSquares { get; set; }
 	public List<Solution> Solutions { get; set; }
 
-	// ClicksLeft doesn't really mean anything if we have more than one possible solution
-	// Should probably have a clicks counter that go up? Or multiple clicks counter that track the different solutions?
-	// I really don't like option 2
 	public int ClicksLeft => Solutions[0].Sequence.Length - _clicks;
     public int Clicks => _clicks;
     public bool EmptyHistory => _squareHistory.Count == 1;
@@ -334,7 +332,7 @@ public class Level : MonoBehaviour
 
 		for (var i = 1; i <= Solutions[0].Sequence.Length; i++)
 		{
-			// Should the order of clicks matter??? 
+			// Should the order of clicks matter??? Right now it doesn't
 			// I expect that this will depend on what toggle features are implemented in the future 
 			// So I'll leave the code that handles permutations in, if the need to use it arises at some point
 

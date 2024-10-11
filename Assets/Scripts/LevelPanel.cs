@@ -221,13 +221,6 @@ public class LevelPanel : MonoBehaviour
 					solutionClicksText.Key.Solved = _level.Clicks == solutionClicks && levelComplete;
 
 					solutionParent.GetChild(1).gameObject.SetActive(solutionClicksText.Key.Solved);
-
-					// TODO: validate when a solution has been completed 
-					// + feedback/visuals
-					// + reset the level 
-					// + keep the completed solution validated (stop checking for it)
-					// + check if all solutions are completed before allowing to go to the next level
-					// (depending on the levelCompleted restriction thing)
 				}
 
 				break;
