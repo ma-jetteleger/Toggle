@@ -2094,9 +2094,11 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _solutionType: 0
+  _solutionType: 1
   _clicksCountRestriction: 0
-  _completedSolutionsToNextLevelRestriction: 1
+  _forceSingleSolution: 0
+  _completedSolutionsToNextLevelRestriction: 0
+  _forceMultipleSolution: 0
 --- !u!4 &692212898
 Transform:
   m_ObjectHideFlags: 0
