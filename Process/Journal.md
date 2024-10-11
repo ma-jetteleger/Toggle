@@ -140,10 +140,17 @@ The rationale behind implementing these minor modifications before working on mo
 
 I want players to understand what's going, on first and foremost. And it's proving more challenging than anticipated. Interactions with the squares and their resulting reactions don't feel as natural as I had originally hoped. So I'm working on that feeling to make it as natural and informative as possible before moving on to the balance/progression/variety/challenge part of the game
 
-##
+## 2024-10-10
 
 Numbers and letters and words feels like I'm talking to the player. Icons and symbols feels like the game is talking about itself
 
 Started putting thoughts and reflections as in-code comments
 
 Keeping the options for two mutually-exclusive features open (single-solution and multi-solution level completion): is it worth it?
+
+Should I deactivate clicked squares? It feels like it would help in the understandabiity of the objective of the game. But that also means I can't have solutions which have the same square(s) clicked more than once. Is that even something that we want? We should test that soon
+
+Deciding to "keep it simple", vs. have the minimalism of the game itself make the development of the game simple
+
+Problem: when you have multiple solutions and they're of lengths 2 and 4, you can just do the one with length 2 + press any square twice and that'll "give" you the one of length 4 without actually finding the true length 4 solution. This is my true motivation to the the "you can only click each square once" feature
+	Implications for conditional toggle features: ...

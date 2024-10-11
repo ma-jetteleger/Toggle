@@ -28,43 +28,6 @@ public enum CompletedSolutionsToNextLevelRestriction
 
 public class Level : MonoBehaviour
 {
-	public class TestSquare
-	{
-		public bool OriginalState;
-		public bool Toggled;
-		public int[] TargetIds;
-
-		public TestSquare(Square referenceSquare)
-		{
-			OriginalState = referenceSquare.Toggled;
-			Toggled = OriginalState;
-		}
-
-		public void Reset()
-		{
-			Toggled = OriginalState;
-		}
-
-		public void SetupTargets(Square referenceSquare)
-		{
-			TargetIds = new int[referenceSquare.Targets.Count];
-
-			for(var i = 0; i < referenceSquare.Targets.Count; i++)
-			{
-				TargetIds[i] = referenceSquare.Targets[i].Id;
-			}
-		}
-
-		public void Click(TestSquare[] testSquares)
-		{
-			foreach(var targetId in TargetIds)
-			{
-				var target = testSquares[targetId];
-				target.Toggled = !target.Toggled;
-			}
-		}
-	}
-
 	// Components
     [SerializeField] private GameObject _squareTemplate = null;
     [SerializeField] private GameObject _solutionSquareTemplate = null;
@@ -95,11 +58,12 @@ public class Level : MonoBehaviour
     public Square[] Squares { get; set; }
     public Square[] SolutionSquares { get; set; }
     public Rectangle[] PredictionSquares { get; set; }
+	public List<Solution> Solutions { get; set; }
 
 	// ClicksLeft doesn't really mean anything if we have more than one possible solution
 	// Should probably have a clicks counter that go up? Or multiple clicks counter that track the different solutions?
 	// I really don't like option 2
-    public int ClicksLeft => _solutionSequences[0].Length - _clicks;
+	public int ClicksLeft => Solutions[0].Sequence.Length - _clicks;
     public int Clicks => _clicks;
     public bool EmptyHistory => _squareHistory.Count == 1;
     public bool TopOfHistory => _clicks == _squareHistory.Count - 1;
@@ -110,7 +74,6 @@ public class Level : MonoBehaviour
     private Rectangle _squareTemplateRectangle;
     private Rectangle _solutionSquareTemplateRectangle;
     private Square _lastSquareClickedDown;
-    private List<int[]> _solutionSequences;
     private Vector2 _levelCompletionFeedbackFinalSize;
     private Color _levelCompletionFeedbackBaseColor;
     private int _clicks;
@@ -211,9 +174,9 @@ public class Level : MonoBehaviour
 
 					AddNewHistorySnapshot();
 
-					CheckLevelCompletion();
-
 					LevelPanel.Instance.UpdateClicksCounter();
+
+					CheckLevelCompletion();
 				}
 			}
 
@@ -312,7 +275,7 @@ public class Level : MonoBehaviour
 
 		// Main solution
 
-		_solutionSequences = new List<int[]>();
+		Solutions = new List<Solution>();
 
 		var validSolutionSequence = false;
 
@@ -321,15 +284,18 @@ public class Level : MonoBehaviour
 			validSolutionSequence = false;
 
 			//_solutionSequence = new int[Random.Range(_minClicksForSolution, squares - _maxClicksBufferForSolution)];
-			var mainSolutionSequence = new int[squares - _maxClicksBufferForSolution];
+			var mainSolution = new Solution
+			{
+				Sequence = new int[squares - _maxClicksBufferForSolution]
+			};
 
 			var shuffledIndices = indices.OrderBy(a => System.Guid.NewGuid()).ToArray();
 
-			for (var j = 0; j < mainSolutionSequence.Length; j++)
+			for (var j = 0; j < mainSolution.Sequence.Length; j++)
 			{
-				mainSolutionSequence[j] = shuffledIndices[j];
+				mainSolution.Sequence[j] = shuffledIndices[j];
 
-				SolutionSquares[mainSolutionSequence[j]].ToggleTargets();
+				SolutionSquares[mainSolution.Sequence[j]].ToggleTargets();
 			}
 
 			for (var j = 0; j < Squares.Length; j++)
@@ -346,7 +312,7 @@ public class Level : MonoBehaviour
 
 			if(validSolutionSequence)
 			{
-				_solutionSequences.Add(mainSolutionSequence);
+				Solutions.Add(mainSolution);
 
 				break;
 			}
@@ -366,7 +332,7 @@ public class Level : MonoBehaviour
 			array[i] = i;
 		}
 
-		for (var i = 1; i <= _solutionSequences[0].Length; i++)
+		for (var i = 1; i <= Solutions[0].Sequence.Length; i++)
 		{
 			// Should the order of clicks matter??? 
 			// I expect that this will depend on what toggle features are implemented in the future 
@@ -376,10 +342,10 @@ public class Level : MonoBehaviour
 			GetCombinations(array, i);
 		}
 
-		// Order the solution sequences to be displayed in descending order?
+		// Order the solutions to be displayed in descending order?
 		// Feels like going from highest to lowest, in terms of gameplay, 
 		// makes for a bit more of a "climactic" progression/finish
-		_solutionSequences = _solutionSequences.OrderByDescending(x => x.Length).ToList();
+		Solutions = Solutions.OrderByDescending(x => x.Sequence.Length).ToList();
 
 		/*Debug.Log($"{_solutionSequences.Count} possible solutions:");
 
@@ -392,7 +358,7 @@ public class Level : MonoBehaviour
 
 		_clicks = 0;
 
-        LevelPanel.Instance.SetupSolutionClicksBox(_solutionSequences);
+        LevelPanel.Instance.SetupSolutionBoxes(Solutions);
         LevelPanel.Instance.UpdateClicksCounter();
         
         CheckLevelCompletion();
@@ -409,9 +375,20 @@ public class Level : MonoBehaviour
 	{
 		if (currentCombination.Count == n)
 		{
-			var sameAsMainSolutionSequence = currentCombination.SequenceEqual(_solutionSequences[0].OrderBy(x => x));
+			var sameAsMainSolutionSequence = currentCombination.SequenceEqual(Solutions[0].Sequence.OrderBy(x => x));
 
 			if(sameAsMainSolutionSequence)
+			{
+				return;
+			}
+
+			// Decided to not compile solutions of the same length,
+			// to avoid duplicate clicks count on the interface
+			// and to avoid the complications of checking for exact
+			// solution sequences instead of simple numbers of clicks
+			var sameLengthAsAnotherSolution = Solutions.Any(x => x.Sequence.Length == currentCombination.Count);
+
+			if (sameLengthAsAnotherSolution)
 			{
 				return;
 			}
@@ -434,7 +411,10 @@ public class Level : MonoBehaviour
 				}
 			}
 
-			_solutionSequences.Add(currentCombination.ToArray());
+			Solutions.Add(new Solution
+			{
+				Sequence = currentCombination.ToArray()
+			});
 
 			return;
 		}
@@ -609,7 +589,20 @@ public class Level : MonoBehaviour
 	{
         var levelComplete = GetLevelCompletion();
 
-        LevelPanel.Instance.UpdateNextLevelButton(levelComplete);
+		var allSolutionsFound = true;
+
+		foreach(var solution in Solutions)
+		{
+			if(!solution.Solved)
+			{
+				allSolutionsFound = false;
+				
+				break;
+			}
+		}
+
+        LevelPanel.Instance.UpdateNextLevelButton(_completedSolutionsToNextLevelRestriction == CompletedSolutionsToNextLevelRestriction.AtLeastOneSolution && levelComplete
+			|| _completedSolutionsToNextLevelRestriction == CompletedSolutionsToNextLevelRestriction.AllSolutions && allSolutionsFound);
 
 		if (_solutionType == SolutionType.SingleSolution
 			&& (_clicksCountRestriction != ClicksCountToNextLevelRestriction.SoftRestriction || ClicksLeft >= 0))
@@ -640,11 +633,10 @@ public class Level : MonoBehaviour
                 LevelPanel.Instance.UpdateHistoryButtons(false);
             }*/
 
-			// ClicksLeft == 0 doesn't mean true completion 
-			// It's possible to have different solutions with the same amount of clicks
-			// True completion should probably be to find all possible solutions
+			var trueCompletion = _solutionType == SolutionType.SingleSolution && ClicksLeft == 0
+				|| _solutionType == SolutionType.MultipleSolutions && allSolutionsFound;
 
-			OnLevelCompletion(ClicksLeft == 0);
+			OnLevelCompletion(trueCompletion);
         }
 		/*else
 		{

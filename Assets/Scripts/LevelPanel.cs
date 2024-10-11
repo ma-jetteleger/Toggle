@@ -40,7 +40,7 @@ public class LevelPanel : MonoBehaviour
 	private Vector3 _nextLevelButtonNormalPosition;
 	private Color _clicksCounterNormalColor;
 	private Color _nextLevelButtonNormalOverlayColor;
-	private List<TextMeshProUGUI> _solutionClicksTexts;
+	private Dictionary<Solution, TextMeshProUGUI> _solutionClicksTexts;
 
 	private void Awake()
 	{
@@ -56,16 +56,16 @@ public class LevelPanel : MonoBehaviour
 
 		_solutionClicksBoxTemplate.SetActive(false);
 
-		_solutionClicksTexts = new List<TextMeshProUGUI>();
+		_solutionClicksTexts = new Dictionary<Solution, TextMeshProUGUI>();
 	}
 
-	public void SetupSolutionClicksBox(List<int[]> solutions)
+	public void SetupSolutionBoxes(List<Solution> solutions)
 	{
 		if (_solutionClicksTexts.Count != 0)
 		{
 			foreach (var solutionClicksText in _solutionClicksTexts)
 			{
-				Destroy(solutionClicksText.transform.parent.gameObject);
+				Destroy(solutionClicksText.Value.transform.parent.gameObject);
 			}
 		}
 
@@ -82,10 +82,10 @@ public class LevelPanel : MonoBehaviour
 			for (var i = 0; i < solutions.Count; i++)
 			{
 				var newSolutionClicksText = Instantiate(_solutionClicksBoxTemplate, _solutionClicksBoxTemplate.transform.parent).GetComponentInChildren<TextMeshProUGUI>();
-				newSolutionClicksText.text = solutions[i].Length.ToString();
+				newSolutionClicksText.text = solutions[i].Sequence.Length.ToString();
 				newSolutionClicksText.transform.parent.gameObject.SetActive(true);
 
-				_solutionClicksTexts.Add(newSolutionClicksText);
+				_solutionClicksTexts.Add(solutions[i], newSolutionClicksText);
 			}
 		}
 	}
@@ -205,11 +205,22 @@ public class LevelPanel : MonoBehaviour
 
 				foreach(var solutionClicksText in _solutionClicksTexts)
 				{
-					var solutionClicks = int.Parse(solutionClicksText.text);
+					if(solutionClicksText.Key.Solved)
+					{
+						continue;
+					}
+
+					var solutionClicks = int.Parse(solutionClicksText.Value.text);
 					var levelComplete = _level.GetLevelCompletion();
 
-					solutionClicksText.transform.parent.GetChild(2).gameObject.SetActive(_level.Clicks > solutionClicks 
+					var solutionParent = solutionClicksText.Value.transform.parent;
+
+					solutionParent.GetChild(3).gameObject.SetActive(_level.Clicks > solutionClicks 
 						|| _level.Clicks == solutionClicks && !levelComplete);
+
+					solutionClicksText.Key.Solved = _level.Clicks == solutionClicks && levelComplete;
+
+					solutionParent.GetChild(1).gameObject.SetActive(solutionClicksText.Key.Solved);
 
 					// TODO: validate when a solution has been completed 
 					// + feedback/visuals
