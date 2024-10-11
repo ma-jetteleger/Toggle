@@ -112,6 +112,7 @@ The question of whether the core loop is too tiny or at what point minimalism br
 
 - Toggle mechanisms
 	- Cascading toggles (only certain squares? indicated by special arrows?)
+	- Wrap-around toggles (for the first and last square)
 	- Distance toggles (toggling squares not directly adjacent to a clicked square)
 	- Conditional toggles (when white, do something different than when black)
 	- Destroy other squares
@@ -142,29 +143,54 @@ I want players to understand what's going, on first and foremost. And it's provi
 
 ## 2024-10-10
 
-Started putting thoughts and reflections as in-code comments
+Started putting some thoughts and reflections as in-code comments. It felt very intuitive to write about questions, uncertainties, options and reflections about a feature right where the very specific uncertain elements of that feature live in the code. It helped to write about something right in the local context of that thing, basically.
+
+I'm unsure what to do about this new type of documentation. Do I round them up and detail them here? Do I leave them in the code until they're "resolved"? It's interesting to think about their lifespan in the code, as the code is something that shifts and changes a lot, so these bits of reflection might be more shortlived than others, the ones that appear in this journal, for example
+
+Right now I decided to copy and paste these in-code reflections here, so I could comment on them
 
 	// Should the order of clicks matter??? Right now it doesn't
 	// I expect that this will depend on what toggle features are implemented in the future 
 	// So I'll leave the code that handles permutations in, if the need to use it arises at some point
 	
+	After implementing some algorithm to test for all possible solutions to a particular puzzle, I stumbled onto a pretty big revelation. Turns out that, for any particular solution to a puzzle (the specific squares clicked to reach a desired state of the array), all of the other permutations of those clicks are also valid solutions! So it doesn't matter in what order you click those squares, just that you click the right ones. 
+
+	I'm not sure if it totally breaks the game or not... there still is some challenge in figuring out which squares need to be clicked. And it's not even a guarantee that the player will catch on to this. I took running some code and looking at the debug for me to figure out, it definitely didn't *feel* like the order didn't matter. 
+
+	This could also be solved by implementing some advanced toggle features like conditional toggles. Making the order of clicks matter. But this would also increase the complexity of the overall design of the game, so this kind of feature is kept on ice for now
+	
 	// Order the solutions to be displayed in descending order?
 	// Feels like going from highest to lowest, in terms of gameplay, 
 	// makes for a bit more of a "climactic" progression/finish
+	
+	Simple UI question. I'll definitely need to test this and ask players what they prefer
 	
 	// Decided to not compile solutions of the same length,
 	// to avoid duplicate clicks count on the interface
 	// and to avoid the complications of checking for exact
 	// solution sequences instead of simple numbers of clicks
+	
+	This is an example of function following form, not the other way around. It felt weird to have the same number displayed for two different solutions. Since the only signifier we have to "identify" solutions visually for the players is a number, it makes it so that the same number == the same solution. So I cheated the algorithm and "cut" those solutions that have the same number of clicks. 
+	
+	I feel like it's a bit of a waste, since I find that the more solutions a level has, the more interesting it is (maybe not 100% correlated, they must be other factors, but this is still a contributing factor). So it's sad to cut out "content" for the game like that. I might try to find a solution to this (identifying solutions with more than just a number, so they can be identified)
+	
+	There's another reason I decided to cut these solutions though. They're harder to identify and validate in code as well! So this is also an example of content/features cut to simplify the development of the game
 
-Keeping the options for two mutually-exclusive features open (single-solution and multi-solution level completion): is it worth it?
+I'm also finding myself writing in unused/empty variables and functions in the code as reminders of features to implement. Using the code as self-communication is new for me, especially up to that point, but it's feeling pretty intuitive and effective to do so. Not "jumping out" of the project to talk to yourself, take note and document, but keeping in the flow and doing so right as you are coding 
 
-Should I deactivate clicked squares? It feels like it would help in the understandabiity of the objective of the game. But that also means I can't have solutions which have the same square(s) clicked more than once in the future. Is that even something that we want? We should test that soon
+Another thought: keeping the options for two mutually-exclusive features open (single-solution and multi-solution level completion): is it worth it?
 
-Feature switches vs. branching
+	I worked a lot on implementing a way to keep two options for a feature I had in mind available and to be able to switch between them for 1: testing purposes and 2: figuring which one of these options, later on, would fit best with the rest of the game. It's basically my way of not committing to a change in the design space of the game, because I have no clear intuition on which one of the two is best
+	
+	So basically I implemented a feature switch to toggle (no pun intended) between these two "versions" of the game's design. It was pretty convoluted and cluttered up the code and I'm questioning whether or not it was actually worth it. I could have done the same thing by using the "branch" feature in git and I'm interesting in trying this out for a similar situation in the future. I'm unsure how brancing could have benefitted me, in this case, and how it would have allowed be to develop these two "versions" of the game in parallel like the feature switch does. We'll have to see in the future, to compare both approaches
+	
+	A question to ask (or to have had asked, before doing all that work to keep both versions of the feature alive) could be: is the value of keeping both versions alive worth all that work? Honestly, maybe not. In minimalist games, I find that I am drawn to exploring the entire design space of a game's idea. So I'm always tempted to use the power of minimalism (not having a lot of options to begin with) to do just that, by not committing to big changes in the design space to keep all options open. Well, I am drawn to that in the development of any type of games, it's just that minimalist game design makes that (seemingly) possible. There is definitely a limit to this, however, and this is why I'm asking: is it even worth it?
 
-Deciding to "keep it simple", vs. have the minimalism of the game itself make the development of the game simple
+A thought that is more specific to the game: should I deactivate clicked squares? (that question keeps popping up since the beginning of the development of the game, this is probably a sign I should answer it soon) It feels like it would help in the understandabiity of the objective of the game. But that also means I can't have solutions which have the same square(s) clicked more than once in the future. Is that even something that we want? We should test that soon
+	
+	I decided to keep this thought in the journal, but in the meantime, I stumbled into a somewhat-game-breaking problem (see 2 commits ago) that might be solved by the deactivating clicked squares. So this could be my "excuse" to finally implement that feature
 
-Numbers and letters and words feels like I'm talking to the player. Icons and symbols feels like the game is talking about itself
+Sometimes, a minimalist game stays minimalistic by itself. It doesn't offer a too broad design space and the decisions to make are simple and few in number. Sometimes, I have to be very specific and deliberate to "keep it simple" despite the growing and complex potential features that emerge and that can make the game more interesting. Toggle is the of that second type
 
-Writing in unused/empty variables and functions in the code as reminders of features to implement
+Final thought that's really unrelated to this iteration of the game: numbers and letters and words feel like I'm talking to the player. Icons and symbols feels like the game is talking about itself. I'd like to move away from using numbers are some points. Maybe using collections of dots like on the faces of a die? We'll see
+

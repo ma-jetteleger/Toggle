@@ -55,8 +55,9 @@ public class Level : MonoBehaviour
     [SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private ClicksCountToNextLevelRestriction _clicksCountRestriction = ClicksCountToNextLevelRestriction.HardRestriction;
     [SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private bool _forceSingleSolution = false;
 	[SerializeField] [ShowIf(nameof(_solutionType), SolutionType.MultipleSolutions)] private CompletedSolutionsToNextLevelRestriction _completedSolutionsToNextLevelRestriction = CompletedSolutionsToNextLevelRestriction.AllSolutions;
+	[SerializeField] [ShowIf(nameof(_solutionType), SolutionType.MultipleSolutions)] private bool _forceMultipleSolution = false;
 
-    public Square[] Squares { get; set; }
+	public Square[] Squares { get; set; }
     public Square[] SolutionSquares { get; set; }
     public Rectangle[] PredictionSquares { get; set; }
 	public List<Solution> Solutions { get; set; }
