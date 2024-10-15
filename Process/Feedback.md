@@ -13,9 +13,9 @@
 - Felt overwhelmed beyond the first level (too mnay squares?)
 + Game is possible to understand and play without reading the rules (although an actual progression in the generation of the level would help a lot)
 	+ Players learning by themselves might actually be a source of motivation
-- Dinstinguising between the UI and the actual game elements was not trivial
+- ~~Dinstinguising between the UI and the actual game elements was not trivial~~
 - Array of solution rectangles might look like a progress bar
 - The function of the preview rectangles is not so obvious
-- Solutions can be figured out "too linearly" by going from left to right
-	? Introducing "wrap around toggles" for the end squares might be a solution
+- ~~Solutions can be figured out "too linearly" by going from left to right~~
+	? ~~Introducing "wrap around toggles" for the end squares might be a solution~~
 ? Someone suggested to have mutliple "solution setup" for the same level

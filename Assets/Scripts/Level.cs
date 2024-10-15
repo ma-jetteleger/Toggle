@@ -51,6 +51,7 @@ public class Level : MonoBehaviour
     [SerializeField] private AnimationCurve _levelCompletionAlphaCurve = null;
     
 	// Features
+    [SerializeField] private bool _progression = false;
     [SerializeField] private bool _wrapAroundToggles = false;
     [SerializeField] private SolutionType _solutionType = SolutionType.SingleSolution;
     [SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private ClicksCountToNextLevelRestriction _clicksCountRestriction = ClicksCountToNextLevelRestriction.HardRestriction;
