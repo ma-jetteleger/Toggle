@@ -41,6 +41,9 @@ public class LevelPanel : MonoBehaviour
 	private Color _clicksCounterNormalColor;
 	private Color _nextLevelButtonNormalOverlayColor;
 	private Dictionary<Solution, TextMeshProUGUI> _solutionClicksTexts;
+	private Image _resetArrow;
+	private Image _undoArrow;
+	private Image _redoArrow;
 
 	private void Awake()
 	{
@@ -57,6 +60,10 @@ public class LevelPanel : MonoBehaviour
 		_solutionClicksBoxTemplate.SetActive(false);
 
 		_solutionClicksTexts = new Dictionary<Solution, TextMeshProUGUI>();
+
+		_resetArrow = _resetButton.transform.GetChild(0).GetComponent<Image>();
+		_undoArrow = _undoButton.transform.GetChild(0).GetComponent<Image>();
+		_redoArrow = _redoButton.transform.GetChild(0).GetComponent<Image>();
 	}
 
 	public void SetupSolutionBoxes(List<Solution> solutions)
@@ -232,8 +239,13 @@ public class LevelPanel : MonoBehaviour
 	public void UpdateHistoryButtons(bool? forcedValue = null)
 	{
 		_resetButton.interactable = forcedValue != null ? forcedValue.Value : (!_level.EmptyHistory && !_level.BottomOfHistory);
+		_resetArrow.color = new Color(_resetArrow.color.r, _resetArrow.color.g, _resetArrow.color.b, _resetButton.interactable ? 1f : 0.5f);
+
 		_undoButton.interactable = forcedValue != null ? forcedValue.Value : (!_level.EmptyHistory && !_level.BottomOfHistory);
+		_undoArrow.color = new Color(_undoArrow.color.r, _undoArrow.color.g, _undoArrow.color.b, _undoButton.interactable ? 1f : 0.5f);
+
 		_redoButton.interactable = forcedValue != null ? forcedValue.Value : (!_level.EmptyHistory && !_level.TopOfHistory);
+		_redoArrow.color = new Color(_redoArrow.color.r, _redoArrow.color.g, _redoArrow.color.b, _redoButton.interactable ? 1f : 0.5f);
 	}
 
 	public void UI_Reset()

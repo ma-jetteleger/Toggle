@@ -51,4 +51,4 @@
 - Organize levels (and the generation of levels) to follow some kind of progression curve
 	- Eventually: test if this is enough to "teach" the game to first time players
 - Add "wrap around" toggle indicators
-- Change the placeholder UI arrows
+- ~~Change the placeholder UI arrows for the history buttons~~
