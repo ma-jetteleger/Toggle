@@ -5,8 +5,9 @@
 - So focused on the center squares and glyphs, didn't notice the number for the clicks at first
 	- It needs to be bigger and displayed more prominently
 + Solid core loop, incentivizes you to keep going
++ Great format for a mobile game
 + Someone likes the totally random, not progressive way levels are spat out
-- Most everyone else disliked that and would enjoy a progressive level generations scheme instead
+	- Most everyone else disliked that and would enjoy a progressive level generations scheme instead
 ? Brute forcing levels is possible (and also kinda fun?)
 + The game "gets you to play it" without an incentive
 - Felt overwhelmed beyond the first level (too mnay squares?)
