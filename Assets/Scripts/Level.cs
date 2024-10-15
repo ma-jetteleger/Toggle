@@ -61,6 +61,7 @@ public class Level : MonoBehaviour
     public Square[] SolutionSquares { get; set; }
     public Rectangle[] PredictionSquares { get; set; }
 	public List<Solution> Solutions { get; set; }
+	public List<Solution> PotentialSolutions { get; set; }
 
 	public int ClicksLeft => Solutions[0].Sequence.Length - _clicks;
     public int Clicks => _clicks;
@@ -282,85 +283,104 @@ public class Level : MonoBehaviour
 		// Main solution
 
 		Solutions = new List<Solution>();
+		PotentialSolutions = new List<Solution>();
 
 		var validSolutionSequence = false;
 
-		for (var i = 0; i < _solutionGenerationAttempts; i++)
+		for(var k = 0; k < _solutionGenerationAttempts; k++)
 		{
 			validSolutionSequence = false;
 
-			//_solutionSequence = new int[Random.Range(_minClicksForSolution, squares - _maxClicksBufferForSolution)];
-			var mainSolution = new Solution
+			for (var i = 0; i < _solutionGenerationAttempts; i++)
 			{
-				Sequence = new int[squares - _maxClicksBufferForSolution]
-			};
+				validSolutionSequence = false;
 
-			var shuffledIndices = indices.OrderBy(a => System.Guid.NewGuid()).ToArray();
-
-			for (var j = 0; j < mainSolution.Sequence.Length; j++)
-			{
-				mainSolution.Sequence[j] = shuffledIndices[j];
-
-				SolutionSquares[mainSolution.Sequence[j]].ToggleTargets();
-			}
-
-			for (var j = 0; j < Squares.Length; j++)
-			{
-				if (Squares[j].Toggled != SolutionSquares[j].Toggled)
+				//_solutionSequence = new int[Random.Range(_minClicksForSolution, squares - _maxClicksBufferForSolution)];
+				var mainSolution = new Solution
 				{
-					validSolutionSequence = true;
+					Sequence = new int[squares - _maxClicksBufferForSolution]
+				};
 
-					//Debug.Log($"Generated a valid solution sequence in {i + 1} attempt(s)");
+				var shuffledIndices = indices.OrderBy(a => System.Guid.NewGuid()).ToArray();
+
+				for (var j = 0; j < mainSolution.Sequence.Length; j++)
+				{
+					mainSolution.Sequence[j] = shuffledIndices[j];
+
+					SolutionSquares[mainSolution.Sequence[j]].ToggleTargets();
+				}
+
+				for (var j = 0; j < Squares.Length; j++)
+				{
+					if (Squares[j].Toggled != SolutionSquares[j].Toggled)
+					{
+						validSolutionSequence = true;
+
+						//Debug.Log($"Generated a valid solution sequence in {i + 1} attempt(s)");
+
+						break;
+					}
+				}
+
+				if (validSolutionSequence)
+				{
+					PotentialSolutions.Add(mainSolution);
 
 					break;
 				}
 			}
 
-			if(validSolutionSequence)
+			if (!validSolutionSequence)
 			{
-				Solutions.Add(mainSolution);
+				Debug.Log("Couldn't generate a valid solution sequence, settling for a suboptimal one");
+			}
+
+			// Other solutions
+
+			var array = new int[Squares.Length];
+
+			for (var i = 0; i < array.Length; i++)
+			{
+				array[i] = i;
+			}
+
+			for (var i = 1; i <= PotentialSolutions[0].Sequence.Length; i++)
+			{
+				// Should the order of clicks matter??? Right now it doesn't
+				// I expect that this will depend on what toggle features are implemented in the future 
+				// So I'll leave the code that handles permutations in, if the need to use it arises at some point
+
+				//GetPermutations(array, i);
+				GetCombinations(array, i);
+			}
+
+			if (_solutionType == SolutionType.SingleSolution && _forceSingleSolution && PotentialSolutions.Count > 1)
+			{
+				if(k == _solutionGenerationAttempts - 1)
+				{
+					Debug.Log("Couldn't force a single solution, settling for multiple");
+				}
+				
+				continue;
+			}
+			else if (_solutionType == SolutionType.MultipleSolutions && _forceMultipleSolution && PotentialSolutions.Count == 1)
+			{
+				if (k == _solutionGenerationAttempts - 1)
+				{
+					Debug.Log("Couldn't force multiple solutions, settling for a single one");
+				}
+
+				continue;
+			}
+			else
+			{
+				// Order the solutions to be displayed in descending order?
+				// Feels like going from highest to lowest, in terms of gameplay, 
+				// makes for a bit more of a "climactic" progression/finish
+				Solutions = PotentialSolutions.OrderByDescending(x => x.Sequence.Length).ToList();
 
 				break;
 			}
-		}
-
-		if (!validSolutionSequence)
-		{
-			Debug.Log("Couldn't generate a valid solution sequence, settling for a suboptimal one");
-		}
-
-		// Other solutions
-
-		var array = new int[Squares.Length];
-
-		for (var i = 0; i < array.Length; i++)
-		{
-			array[i] = i;
-		}
-
-		for (var i = 1; i <= Solutions[0].Sequence.Length; i++)
-		{
-			// Should the order of clicks matter??? Right now it doesn't
-			// I expect that this will depend on what toggle features are implemented in the future 
-			// So I'll leave the code that handles permutations in, if the need to use it arises at some point
-
-			//GetPermutations(array, i);
-			GetCombinations(array, i);
-		}
-
-		// Order the solutions to be displayed in descending order?
-		// Feels like going from highest to lowest, in terms of gameplay, 
-		// makes for a bit more of a "climactic" progression/finish
-		Solutions = Solutions.OrderByDescending(x => x.Sequence.Length).ToList();
-
-		if(_solutionType == SolutionType.SingleSolution && _forceSingleSolution && Solutions.Count > 1)
-		{
-			// TODO: Retry for another solution or another level
-		}
-
-		if (_solutionType == SolutionType.MultipleSolutions && _forceMultipleSolution && Solutions.Count == 1)
-		{
-			// TODO: Retry for another solution or another level
 		}
 
 		/*Debug.Log($"{_solutionSequences.Count} possible solutions:");
@@ -391,7 +411,7 @@ public class Level : MonoBehaviour
 	{
 		if (currentCombination.Count == n)
 		{
-			var sameAsMainSolutionSequence = currentCombination.SequenceEqual(Solutions[0].Sequence.OrderBy(x => x));
+			var sameAsMainSolutionSequence = currentCombination.SequenceEqual(PotentialSolutions[0].Sequence.OrderBy(x => x));
 
 			if(sameAsMainSolutionSequence)
 			{
@@ -402,7 +422,7 @@ public class Level : MonoBehaviour
 			// to avoid duplicate clicks count on the interface
 			// and to avoid the complications of checking for exact
 			// solution sequences instead of simple numbers of clicks
-			var sameLengthAsAnotherSolution = Solutions.Any(x => x.Sequence.Length == currentCombination.Count);
+			var sameLengthAsAnotherSolution = PotentialSolutions.Any(x => x.Sequence.Length == currentCombination.Count);
 
 			if (sameLengthAsAnotherSolution)
 			{
@@ -427,7 +447,7 @@ public class Level : MonoBehaviour
 				}
 			}
 
-			Solutions.Add(new Solution
+			PotentialSolutions.Add(new Solution
 			{
 				Sequence = currentCombination.ToArray()
 			});

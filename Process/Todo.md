@@ -31,7 +31,7 @@
 ## 2024-09-09
 
 - ~~Find a way to let the player "play out" all the possible solutions solution of a level~~
-	- Or generate levels that only have one solution
+	- ~~Or generate levels that only have one solution~~
 	- ~~Or handle both, and add a feature switch for this~~
 
 ## 2024-09-19
@@ -43,5 +43,6 @@
 ## 2024-09-25
 
 - ? add crosses and checkmarks to indicate that a square is in the right toggle state? (to make it easier to "read" a level)
-- Restrict squares to be clickable only once per level
+- ~~Restrict squares to be clickable only once per level~~
+- ~~Only generate levels with multiple solutions in multi-solution mode~~
 

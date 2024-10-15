@@ -2135,7 +2135,7 @@ MonoBehaviour:
   _levelCompletionFeedback: {fileID: 463101731}
   _squaresRange: {x: 3, y: 9}
   _maxClicksBufferForSolution: 1
-  _solutionGenerationAttempts: 999
+  _solutionGenerationAttempts: 99
   _squaresDistance: 0.0625
   _solutionSquaresDistance: 0.0625
   _trueLevelCompletionColor: {r: 0.125, g: 0.875, b: 0.125, a: 1}
