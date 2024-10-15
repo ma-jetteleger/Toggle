@@ -51,6 +51,7 @@ public class Level : MonoBehaviour
     [SerializeField] private AnimationCurve _levelCompletionAlphaCurve = null;
     
 	// Features
+    [SerializeField] private bool _wrapAroundToggles = false;
     [SerializeField] private SolutionType _solutionType = SolutionType.SingleSolution;
     [SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private ClicksCountToNextLevelRestriction _clicksCountRestriction = ClicksCountToNextLevelRestriction.HardRestriction;
     [SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private bool _forceSingleSolution = false;
@@ -69,6 +70,7 @@ public class Level : MonoBehaviour
     public bool TopOfHistory => _clicks == _squareHistory.Count - 1;
     public bool BottomOfHistory => _clicks == 0;
     public SolutionType SolutionType => _solutionType;
+    public bool WrapAroundToggles => _wrapAroundToggles;
 
     private Square _previousHoveredSquare;
     private Rectangle _squareTemplateRectangle;

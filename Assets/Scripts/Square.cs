@@ -102,27 +102,34 @@ public class Square : MonoBehaviour
 			var first = Id == 0;
 			var last = Id == _level.Squares.Length - 1;
 
-			var targetSchemes = (TargetingScheme[])System.Enum.GetValues(typeof(TargetingScheme));
-			var possibleTargetSchemes = new List<TargetingScheme>();
+            var possibleTargetSchemes = new List<TargetingScheme>();
+            var targetSchemes = (TargetingScheme[])System.Enum.GetValues(typeof(TargetingScheme));
 
-			for(var i = 0; i < targetSchemes.Length; i++)
+            if (level.WrapAroundToggles)
 			{
-				var targetScheme = targetSchemes[i];
+                possibleTargetSchemes = targetSchemes.ToList();
+            }
+			else
+			{
+                for (var i = 0; i < targetSchemes.Length; i++)
+                {
+                    var targetScheme = targetSchemes[i];
 
-				if ((first && targetScheme == TargetingScheme.Left) ||
-					(first && targetScheme == TargetingScheme.LeftRight) ||
-					(first && targetScheme == TargetingScheme.SelfLeft) ||
-					(first && targetScheme == TargetingScheme.SelfLeftRight) ||
-					(last && targetScheme == TargetingScheme.Right) ||
-					(last && targetScheme == TargetingScheme.LeftRight) ||
-					(last && targetScheme == TargetingScheme.SelfRight) ||
-					(last && targetScheme == TargetingScheme.SelfLeftRight))
-				{
-					continue;
-				}
+                    if ((first && targetScheme == TargetingScheme.Left) ||
+                        (first && targetScheme == TargetingScheme.LeftRight) ||
+                        (first && targetScheme == TargetingScheme.SelfLeft) ||
+                        (first && targetScheme == TargetingScheme.SelfLeftRight) ||
+                        (last && targetScheme == TargetingScheme.Right) ||
+                        (last && targetScheme == TargetingScheme.LeftRight) ||
+                        (last && targetScheme == TargetingScheme.SelfRight) ||
+                        (last && targetScheme == TargetingScheme.SelfLeftRight))
+                    {
+                        continue;
+                    }
 
-				possibleTargetSchemes.Add(targetSchemes[i]);
-			}
+                    possibleTargetSchemes.Add(targetSchemes[i]);
+                }
+            }
 
 			TargetScheme = possibleTargetSchemes[Random.Range(0, possibleTargetSchemes.Count)];
 
@@ -185,30 +192,111 @@ public class Square : MonoBehaviour
 		switch (TargetScheme)
 		{
 			case TargetingScheme.Self:
+
 				Targets.Add(this);
+
                 break;
+
 			case TargetingScheme.Left:
-                if(Id > 0) Targets.Add(targetArray[Id - 1]);
+
+                if(Id > 0)
+				{
+                    Targets.Add(targetArray[Id - 1]);
+                }
+				else
+				{
+                    Targets.Add(targetArray[targetArray.Length - 1]);
+                }
+
                 break;
+
 			case TargetingScheme.Right:
-                if (Id < targetArray.Length - 1) Targets.Add(targetArray[Id + 1]);
+
+                if (Id < targetArray.Length - 1)
+				{
+                    Targets.Add(targetArray[Id + 1]);
+                }
+				else
+				{
+                    Targets.Add(targetArray[0]);
+                }
+
                 break;
+
 			case TargetingScheme.SelfLeft:
+
 				Targets.Add(this);
-                if (Id > 0) Targets.Add(targetArray[Id - 1]);
+
+                if (Id > 0)
+                {
+                    Targets.Add(targetArray[Id - 1]);
+                }
+                else
+                {
+                    Targets.Add(targetArray[targetArray.Length - 1]);
+                }
+
                 break;
+
 			case TargetingScheme.SelfRight:
+
 				Targets.Add(this);
-                if (Id < targetArray.Length - 1) Targets.Add(targetArray[Id + 1]);
+
+                if (Id < targetArray.Length - 1)
+                {
+                    Targets.Add(targetArray[Id + 1]);
+                }
+                else
+                {
+                    Targets.Add(targetArray[0]);
+                }
+
                 break;
+
 			case TargetingScheme.LeftRight:
-                if (Id > 0) Targets.Add(targetArray[Id - 1]);
-                if (Id < targetArray.Length - 1) Targets.Add(targetArray[Id + 1]);
+
+                if (Id > 0)
+                {
+                    Targets.Add(targetArray[Id - 1]);
+                }
+                else
+                {
+                    Targets.Add(targetArray[targetArray.Length - 1]);
+                }
+
+                if (Id < targetArray.Length - 1)
+                {
+                    Targets.Add(targetArray[Id + 1]);
+                }
+                else
+                {
+                    Targets.Add(targetArray[0]);
+                }
+
                 break;
+
 			case TargetingScheme.SelfLeftRight:
-				Targets.Add(this);
-                if (Id > 0) Targets.Add(targetArray[Id - 1]);
-                if (Id < targetArray.Length - 1) Targets.Add(targetArray[Id + 1]);
+				
+                Targets.Add(this);
+
+                if (Id > 0)
+                {
+                    Targets.Add(targetArray[Id - 1]);
+                }
+                else
+                {
+                    Targets.Add(targetArray[targetArray.Length - 1]);
+                }
+                
+                if (Id < targetArray.Length - 1)
+                {
+                    Targets.Add(targetArray[Id + 1]);
+                }
+                else
+                {
+                    Targets.Add(targetArray[0]);
+                }
+
                 break;
 		}
 

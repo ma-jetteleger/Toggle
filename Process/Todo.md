@@ -47,8 +47,8 @@
 
 ## 2024-10-15
 
-- Better display the clicks counter
+- Better (more prominently) display the clicks counter
 - Organize levels (and the generation of levels) to follow some kind of progression curve
 	- Eventually: test if this is enough to "teach" the game to first time players
-- Add "wrap around" toggle indicators
+- ~~Add "wrap around" toggle indicators~~
 - ~~Change the placeholder UI arrows for the history buttons~~
