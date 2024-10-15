@@ -26,13 +26,13 @@
 - ~~[tech] Handle the animation interruptions so they don't break when spammed~~
 - ~~[visuals] Change the arrows, they look ugly (away with the rounder corners)~~
 	- ~~More importantly, change the "self targeting" graphic~~
-- ? Test different ways to display the clicks counter (counting down or up? leaving a trace and/or showing the goal amount of clicks beside the counter or not?)
 
 ## 2024-09-09
 
 - ~~Find a way to let the player "play out" all the possible solutions solution of a level~~
-	- ~~Or generate levels that only have one solution~~
-	- ~~Or handle both, and add a feature switch for this~~
+	- ~~Handle both, and add a feature switch for this~~
+	- ~~And generate levels that only have one solution in single solution mode~~
+	- ~~And only generate levels with multiple solutions in multi-solution mode~~
 
 ## 2024-09-19
 
@@ -42,7 +42,13 @@
 
 ## 2024-09-25
 
-- ? add crosses and checkmarks to indicate that a square is in the right toggle state? (to make it easier to "read" a level)
+- ? Add crosses and checkmarks to indicate that a square is in the right toggle state? (to make it easier to "read" a level)
 - ~~Restrict squares to be clickable only once per level~~
-- ~~Only generate levels with multiple solutions in multi-solution mode~~
 
+## 2024-10-15
+
+- Better display the clicks counter
+- Organize levels (and the generation of levels) to follow some kind of progression curve
+	- Eventually: test if this is enough to "teach" the game to first time players
+- Add "wrap around" toggle indicators
+- Change the placeholder UI arrows
