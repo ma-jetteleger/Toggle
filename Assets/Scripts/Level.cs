@@ -76,7 +76,7 @@ public class Level : MonoBehaviour
     private Vector2 _levelCompletionFeedbackFinalSize;
     private Color _levelCompletionFeedbackBaseColor;
     private int _clicks;
-    private List<bool[]> _squareHistory;
+    private List<HistorySquare[]> _squareHistory;
 	private TestSquare[] _testSquares;
 
     private void Awake()
@@ -87,7 +87,7 @@ public class Level : MonoBehaviour
         _squareTemplate.SetActive(false);
         _solutionSquareTemplate.SetActive(false);
 
-        _squareHistory = new List<bool[]>();
+        _squareHistory = new List<HistorySquare[]>();
     }
 
 	private void Start()
@@ -152,8 +152,6 @@ public class Level : MonoBehaviour
 
             var sameSquare = squareClickedUp != null && squareClickedUp == _lastSquareClickedDown;
 
-            _lastSquareClickedDown.OnMouseClickUp();
-
             if(sameSquare)
 			{
 				if (_solutionType == SolutionType.SingleSolution
@@ -167,7 +165,9 @@ public class Level : MonoBehaviour
 				else
 				{
 					_lastSquareClickedDown.ToggleTargets();
-					_lastSquareClickedDown.ShowTargetPredictions();
+					//_lastSquareClickedDown.ShowTargetPredictions();
+					_lastSquareClickedDown.HideTargetPredictions();
+					_lastSquareClickedDown.Interactable = false;
 
 					_clicks++;
 
@@ -179,7 +179,10 @@ public class Level : MonoBehaviour
 				}
 			}
 
-            _lastSquareClickedDown = null;
+			_lastSquareClickedDown.OnMouseClickUp();
+			_lastSquareClickedDown.OnMouseOverExit();
+
+			_lastSquareClickedDown = null;
 			_previousHoveredSquare = null;
         }
     }
@@ -215,7 +218,7 @@ public class Level : MonoBehaviour
 
         _squareHistory.Clear();
 
-        var firstHistorySnapshot = new bool[Squares.Length];
+        var firstHistorySnapshot = new HistorySquare[Squares.Length];
 
         for (var i = 0; i < squares; i++)
         {
@@ -231,7 +234,11 @@ public class Level : MonoBehaviour
 
             Squares[i] = newSquare;
 
-            firstHistorySnapshot[i] = Squares[i].Toggled;
+			firstHistorySnapshot[i] = new HistorySquare()
+			{
+				Toggled = Squares[i].Toggled,
+				Interactable = true
+			}; 
 
             indices[i] = i;
 
@@ -345,6 +352,16 @@ public class Level : MonoBehaviour
 		// Feels like going from highest to lowest, in terms of gameplay, 
 		// makes for a bit more of a "climactic" progression/finish
 		Solutions = Solutions.OrderByDescending(x => x.Sequence.Length).ToList();
+
+		if(_solutionType == SolutionType.SingleSolution && _forceSingleSolution && Solutions.Count > 1)
+		{
+			// TODO: Retry for another solution or another level
+		}
+
+		if (_solutionType == SolutionType.MultipleSolutions && _forceMultipleSolution && Solutions.Count == 1)
+		{
+			// TODO: Retry for another solution or another level
+		}
 
 		/*Debug.Log($"{_solutionSequences.Count} possible solutions:");
 
@@ -545,11 +562,15 @@ public class Level : MonoBehaviour
             _squareHistory.RemoveAt(i); 
         }
 
-        var newHistorySnapshot = new bool[Squares.Length];
+        var newHistorySnapshot = new HistorySquare[Squares.Length];
 
         for(var i = 0; i < Squares.Length; i++)
 		{
-            newHistorySnapshot[i] = Squares[i].Toggled;
+			newHistorySnapshot[i] = new HistorySquare()
+			{
+				Toggled = Squares[i].Toggled,
+				Interactable = Squares[i].Interactable
+			};
         }
 
         _squareHistory.Add(newHistorySnapshot);
@@ -563,7 +584,8 @@ public class Level : MonoBehaviour
 
         for (var i = 0; i < Squares.Length; i++)
         {
-            Squares[i].Toggle(historySnapshot[i]);
+            Squares[i].Toggle(historySnapshot[i].Toggled);
+			Squares[i].Interactable = historySnapshot[i].Interactable;
         }
 
         LevelPanel.Instance.UpdateClicksCounter();

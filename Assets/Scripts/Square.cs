@@ -19,7 +19,8 @@ public class Square : MonoBehaviour
 	}
 
     [SerializeField] private GameObject _outline = null;
-    [SerializeField] private Rectangle _overlay = null;
+    [SerializeField] private Rectangle _noMoreClicksOverlay = null;
+    [SerializeField] private Rectangle _uninteractableOverlay = null;
 	[SerializeField] private GameObject _targetPredictionTemplate = null;
 	[SerializeField] private Color _clickedOutlineColor = Color.black;
     [SerializeField] private Sprite[] _targetSchemeSprites = null;
@@ -32,14 +33,34 @@ public class Square : MonoBehaviour
     [SerializeField] private bool _shakeSnapping = false;
     [SerializeField] private bool _shakeFadeOut = false;
 
-    public bool Interactable { get; set; }
-    public bool Highlighted { get; set; }
+    public bool Interactable 
+    {
+        get 
+        { 
+            return _interactable; 
+        }
+
+        set 
+        { 
+            _interactable = value;
+
+            if(_uninteractableOverlay.gameObject.activeSelf == _interactable)
+			{
+                MatchUninteractableOverlayColorWithRectangle();
+
+                _uninteractableOverlay.gameObject.SetActive(!_interactable);
+            }
+        }
+    }
+
     public bool Toggled { get; set; }
+    public bool Highlighted { get; set; }
     public bool SolutionSquare { get; set; }
     public TargetingScheme TargetScheme { get; set; }
 	public List<Square> Targets { get; set; }
 	public int Id { get; set; }
 
+    private bool _interactable;
 	private Level _level;
     private Color _normalColor;
     private Color _normalOutlineColor;
@@ -51,15 +72,17 @@ public class Square : MonoBehaviour
     private Vector3 _normalPosition;
     private Color _normalOverlayColor;
 	private Dictionary<Square, Rectangle> _targetPredictions;
+    private float _uninteractableOverlayAlpha;
 
-	public void Initialize(int id, Level level, Square referenceSquare = null)
+
+    public void Initialize(int id, Level level, Square referenceSquare = null)
 	{
 		SolutionSquare = referenceSquare != null;
 
 		_rectangle = GetComponent<Rectangle>();
         _normalColor = _rectangle.Color;
-
-		Id = id;
+        
+        Id = id;
         _level = level;
 
 		gameObject.name = $"{(SolutionSquare ? "Solution" : "")}Square({Id})";
@@ -71,7 +94,8 @@ public class Square : MonoBehaviour
 			_outlineRectangle = _outline.GetComponent<Rectangle>();
             _normalOutlineColor = _outlineRectangle.Color;
             _normalPosition = transform.position;
-            _normalOverlayColor = _overlay.Color;
+            _normalOverlayColor = _noMoreClicksOverlay.Color;
+            _uninteractableOverlayAlpha = _uninteractableOverlay.Color.a;
 
             _outline.SetActive(false);
 
@@ -109,15 +133,15 @@ public class Square : MonoBehaviour
             {
                 Toggle();
             }
-		}
+
+            Interactable = true;
+        }
 		else
 		{
             TargetScheme = referenceSquare.TargetScheme;
 
             Toggle(referenceSquare.Toggled);
         }
-
-        Interactable = true;
     }
 
     public void OnMouseOverEnter(bool showOutline)
@@ -221,6 +245,11 @@ public class Square : MonoBehaviour
         _rectangle.Color = Toggled 
             ? _toggledColor
             : _normalColor;
+
+        if (!Interactable && !SolutionSquare)
+        {
+            MatchUninteractableOverlayColorWithRectangle();
+        }
     }
 
     public void Toggle(bool toggle)
@@ -230,6 +259,11 @@ public class Square : MonoBehaviour
         _rectangle.Color = Toggled
             ? _toggledColor
             : _normalColor;
+
+        if (!Interactable && !SolutionSquare)
+        {
+            MatchUninteractableOverlayColorWithRectangle();
+        }
     }
 
 	public void ShowTargetPredictions()
@@ -292,22 +326,30 @@ public class Square : MonoBehaviour
 		{
             DOTween.Kill(_colorChange, true);
 
-            _overlay.Color = _normalOverlayColor;
+            _noMoreClicksOverlay.Color = _normalOverlayColor;
         }
 
         _colorChange = DOTween.To(() => value, x =>
         {
             value = x;
 
-            _overlay.Color = _shakeGradient.Evaluate(value);
+            _noMoreClicksOverlay.Color = _shakeGradient.Evaluate(value);
         },
         1f,
         _shakeTime).OnComplete(() =>
 		{
             _colorChange = null;
 
-            _overlay.Color = _normalOverlayColor;
+            _noMoreClicksOverlay.Color = _normalOverlayColor;
         });
+    }
+
+    private void MatchUninteractableOverlayColorWithRectangle()
+	{
+        var color = _rectangle.Color;
+        color.a = _uninteractableOverlayAlpha;
+
+        _uninteractableOverlay.Color = color;
     }
 
     private void ChangeSortingOrderOfComponents(int factor)
