@@ -52,3 +52,6 @@
 	- Eventually: test if this is enough to "teach" the game to first time players
 - ~~Add "wrap around" toggle indicators~~
 - ~~Change the placeholder UI arrows for the history buttons~~
+- ? Make some squares always interactable? 
+	- I want to test the "feeling" of this, but it might just bring back the multiple solutions problem so.. eh..
+- Add a menu with options to enable players/testers to test different modes and parameters 

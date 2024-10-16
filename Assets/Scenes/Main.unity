@@ -2230,6 +2230,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _progression: 0
+  _wrapAroundToggles: 1
   _solutionType: 1
   _clicksCountRestriction: 0
   _forceSingleSolution: 0

@@ -194,3 +194,16 @@ Sometimes, a minimalist game stays minimalistic by itself. It doesn't offer a to
 
 Final thought that's really unrelated to this iteration of the game: numbers and letters and words feel like I'm talking to the player. Icons and symbols feels like the game is talking about itself. I'd like to move away from using numbers are some points. Maybe using collections of dots like on the faces of a die? We'll see
 
+## 2024-10-15
+
+My current concern was to fix the "click a square multiple times to reach the specific amount of clicks for a solution" problem. I fixed it by making the squares uninteractable after being clicked once per level. I found that it also had the extra consequence of also emphasizing the "puzzle solving" aspect of the game by making the effect of clicking a square more clear than before. Basically, it enhanced the feedback. This new restriction makes the whole experience of a level feel more like a unique puzzle than a fiddly trial-and-error type of challenge.
+
+Since the last change, I basically have to game "modes": single solution and multi-solution. I found it very weird that it was still possible to generate multi-solution puzzles in single solution mode, and vice versa. The difference in modes wasn't the generation of the levels, but only the player-facing goal/win condition. I changed that by forcing the algorithm to generate levels that can only fit the mode their in. That way, the game is/feels more different across those two modes.
+
+I also started adressing the feedback I received from the playtests that were done last week. I definitely started with some low hanging fruits, like visual changes on the UI. Next I introduced a "new" mechanic: the wrap around toggles (first square can toggle the last of the array, and vice versa). It's not really a new mechanic, from my perspective, it's more like repurposing a buggy feature into a functional one. At the beginning, I had "useless" arrows pointing left from the first square of the array and right from the last, they toggled nothing. I removed them with some extra conditional coding. Well to add this "new" mechanic of wrap around toggles, I simply removed that conditional coding and quickly added the functionality to link the first and last square together as if adjacent. It's fun to think that minimalism allows me to repurpose and turn code around very quickly into another "new" feature since eveything is so simply coupled together.
+
+Next on my list: 
+
+- Progression through difficulty/complexity of levels
+- A way to test different features and modes from the game itself
+- Oh and make the clicks counter more prominent/clear (why am I avoiding some tasks like this one, which isn't new like the two I just mentionned? is it because it's not a new shiny thing to work on? is it because it's "return" and it's value in the project is less clear? is it because I don't have an immediate knowledge on how to tackle it? mmm)
