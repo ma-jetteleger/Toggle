@@ -49,9 +49,11 @@
 
 - Better (more prominently) display the clicks counter
 - Organize levels (and the generation of levels) to follow some kind of progression curve
-	- Eventually: test if this is enough to "teach" the game to first time players
+	- Test if this is enough to "teach" the game to first time players
 - ~~Add "wrap around" toggle indicators~~
 - ~~Change the placeholder UI arrows for the history buttons~~
 - ? Make some squares always interactable? 
-	- I want to test the "feeling" of this, but it might just bring back the multiple solutions problem so.. eh..
 - Add a menu with options to enable players/testers to test different modes and parameters 
+- Mobile interface
+	- Figure out how to convey the information that is conveyed when hovering squares without hover functionalities
+	- Figure out how to maintain the visibility of the toggle indicators when using fingers to press on squares
