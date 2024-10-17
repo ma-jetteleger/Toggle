@@ -48,7 +48,7 @@
 ## 2024-10-15
 
 - Better (more prominently) display the clicks counter
-- Organize levels (and the generation of levels) to follow some kind of progression curve
+- ~~Organize levels (and the generation of levels) to follow some kind of progression curve~~
 	- Test if this is enough to "teach" the game to first time players
 - ~~Add "wrap around" toggle indicators~~
 - ~~Change the placeholder UI arrows for the history buttons~~
@@ -57,3 +57,5 @@
 - Mobile interface
 	- Figure out how to convey the information that is conveyed when hovering squares without hover functionalities
 	- Figure out how to maintain the visibility of the toggle indicators when using fingers to press on squares
+- [bug] Don't compile multiple solutions with the same amount of steps
+- [bug] Level generation algorithm is suggesting solutions that are impossible/broken

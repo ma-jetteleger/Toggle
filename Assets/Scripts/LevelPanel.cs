@@ -17,6 +17,7 @@ public class LevelPanel : MonoBehaviour
 	[SerializeField] private Button _redoButton = null;
 	[SerializeField] private TextMeshProUGUI _clicksCounterText = null;
 	[SerializeField] private Image _nextLevelButtonOverlay = null;
+	[SerializeField] private TextMeshProUGUI _levelsClearedText = null;
 
 	// References
 	[SerializeField] private Level _level = null;
@@ -95,6 +96,11 @@ public class LevelPanel : MonoBehaviour
 				_solutionClicksTexts.Add(solutions[i], newSolutionClicksText);
 			}
 		}
+	}
+
+	public void UpdateLevelsClearedText(int levelsCleared)
+	{
+		_levelsClearedText.text = levelsCleared.ToString();
 	}
 
 	public void UpdateNextLevelButton(bool toggle)

@@ -61,7 +61,6 @@ public class Level : MonoBehaviour
 
 	public Square[] Squares { get; set; }
     public Square[] SolutionSquares { get; set; }
-    public Rectangle[] PredictionSquares { get; set; }
 	public List<Solution> Solutions { get; set; }
 	public List<Solution> PotentialSolutions { get; set; }
 
@@ -80,6 +79,7 @@ public class Level : MonoBehaviour
     private Vector2 _levelCompletionFeedbackFinalSize;
     private Color _levelCompletionFeedbackBaseColor;
     private int _clicks;
+    private int _progressionIndex;
     private List<HistorySquare[]> _squareHistory;
 	private TestSquare[] _testSquares;
 
@@ -102,13 +102,15 @@ public class Level : MonoBehaviour
         _levelCompletionFeedbackBaseColor = _levelCompletionFeedback.Color;
 
         GenerateLevel();
-    }
+
+		LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex);
+	}
 
     private void Update()
     {
         if(_lastSquareClickedDown == null)
 		{
-            if(Input.GetKeyDown(KeyCode.Return))
+            if (Input.GetKeyDown(KeyCode.Return))
 			{
                 GenerateLevel();
 
@@ -116,8 +118,26 @@ public class Level : MonoBehaviour
 
                 return;
             }
+			if (Input.GetKeyDown(KeyCode.LeftArrow))
+			{
+				_progressionIndex--;
 
-            var squareHovered = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero).collider?.GetComponent<Square>();
+				LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex);
+			}
+			if (Input.GetKeyDown(KeyCode.RightArrow))
+			{
+				_progressionIndex++;
+
+				LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex);
+			}
+			if (Input.GetKeyDown(KeyCode.Backspace))
+			{
+				_progressionIndex = 0;
+
+				LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex);
+			}
+
+			var squareHovered = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero).collider?.GetComponent<Square>();
 
             if (squareHovered != null)
             {
@@ -206,19 +226,19 @@ public class Level : MonoBehaviour
             {
                 Destroy(solutionSquare.gameObject);
             }
-        }
+		}
 
 		// Generation
 
-        var squares = Random.Range(_squaresRange.x, _squaresRange.y + 1);
+        var squares = _progression 
+			? (int)Mathf.Min(_squaresRange.x + Mathf.Floor(_progressionIndex / 2f), _squaresRange.y)
+			: Random.Range(_squaresRange.x, _squaresRange.y + 1);
         var indices = new int[squares];
 
         Squares = new Square[squares];
         SolutionSquares = new Square[squares];
 
 		_testSquares = new TestSquare[squares];
-
-        PredictionSquares = new Rectangle[squares];
 
         _squareHistory.Clear();
 
@@ -386,12 +406,12 @@ public class Level : MonoBehaviour
 			}
 		}
 
-		/*Debug.Log($"{_solutionSequences.Count} possible solutions:");
+		Debug.Log($"{Solutions.Count} possible solutions:");
 
-		for (var i = 0; i < _solutionSequences.Count; i++)
+		for (var i = 0; i < Solutions.Count; i++)
 		{
-			Debug.Log(string.Join(", ", _solutionSequences[i]));
-		}*/
+			Debug.Log(string.Join(", ", Solutions[i].Sequence));
+		}
 
 		// Other things
 
@@ -681,6 +701,14 @@ public class Level : MonoBehaviour
 				|| _solutionType == SolutionType.MultipleSolutions && allSolutionsFound;
 
 			OnLevelCompletion(trueCompletion);
+
+			if((_solutionType == SolutionType.MultipleSolutions && allSolutionsFound)
+				|| _solutionType == SolutionType.SingleSolution)
+			{
+				_progressionIndex++;
+
+				LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex);
+			}
         }
 		/*else
 		{
