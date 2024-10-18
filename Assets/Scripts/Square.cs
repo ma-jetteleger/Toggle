@@ -73,6 +73,7 @@ public class Square : MonoBehaviour
     private Color _normalOverlayColor;
 	private Dictionary<Square, Rectangle> _targetPredictions;
     private float _uninteractableOverlayAlpha;
+    private Square _referenceSquare;
 
 
     public void Initialize(int id, Level level, Square referenceSquare = null)
@@ -145,10 +146,17 @@ public class Square : MonoBehaviour
         }
 		else
 		{
-            TargetScheme = referenceSquare.TargetScheme;
+            _referenceSquare = referenceSquare;
 
-            Toggle(referenceSquare.Toggled);
+            TargetScheme = _referenceSquare.TargetScheme;
+
+            Toggle(_referenceSquare.Toggled);
         }
+    }
+
+    public void Reinitialize()
+	{
+        Toggle(_referenceSquare.Toggled);
     }
 
     public void OnMouseOverEnter(bool showOutline)

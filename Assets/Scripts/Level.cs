@@ -215,68 +215,68 @@ public class Level : MonoBehaviour
 	{
 		// Clean up
 
-        if(Squares != null && Squares.Length != 0)
+		if (Squares != null && Squares.Length != 0)
 		{
-            foreach(var square in Squares)
+			foreach (var square in Squares)
 			{
-                Destroy(square.gameObject);
+				Destroy(square.gameObject);
 			}
 
-            foreach (var solutionSquare in SolutionSquares)
-            {
-                Destroy(solutionSquare.gameObject);
-            }
+			foreach (var solutionSquare in SolutionSquares)
+			{
+				Destroy(solutionSquare.gameObject);
+			}
 		}
 
 		// Generation
 
-        var squares = _progression 
+		var squares = _progression
 			? (int)Mathf.Min(_squaresRange.x + Mathf.Floor(_progressionIndex / 2f), _squaresRange.y)
 			: Random.Range(_squaresRange.x, _squaresRange.y + 1);
-        var indices = new int[squares];
+		var indices = new int[squares];
 
-        Squares = new Square[squares];
-        SolutionSquares = new Square[squares];
+		Squares = new Square[squares];
+		SolutionSquares = new Square[squares];
 
 		_testSquares = new TestSquare[squares];
 
-        _squareHistory.Clear();
+		_squareHistory.Clear();
 
-        var firstHistorySnapshot = new HistorySquare[Squares.Length];
+		var firstHistorySnapshot = new HistorySquare[Squares.Length];
 
-        for (var i = 0; i < squares; i++)
-        {
+		for (var i = 0; i < squares; i++)
+		{
 			// Square
 
-            var newSquare = Instantiate(_squareTemplate, _squareTemplate.transform.parent).GetComponent<Square>();
-            newSquare.transform.localPosition = -(Vector3.right * (_squareTemplateRectangle.Width + _squaresDistance) * (squares - 1)) / 2f
-                + Vector3.right * (_squareTemplateRectangle.Width + _squaresDistance) * i;
+			var newSquare = Instantiate(_squareTemplate, _squareTemplate.transform.parent).GetComponent<Square>();
+			newSquare.transform.localPosition = -(Vector3.right * (_squareTemplateRectangle.Width + _squaresDistance) * (squares - 1)) / 2f
+				+ Vector3.right * (_squareTemplateRectangle.Width + _squaresDistance) * i;
 
-            newSquare.Initialize(i, this);
+			newSquare.Initialize(i, this);
 
-            newSquare.gameObject.SetActive(true);
+			newSquare.gameObject.SetActive(true);
 
-            Squares[i] = newSquare;
+			Squares[i] = newSquare;
 
 			firstHistorySnapshot[i] = new HistorySquare()
 			{
 				Toggled = Squares[i].Toggled,
 				Interactable = true
-			}; 
+			};
 
-            indices[i] = i;
+			indices[i] = i;
 
 			// Solution square
 
-            var newSolutionSquare = Instantiate(_solutionSquareTemplate, _solutionSquareTemplate.transform.parent).GetComponent<Square>();
-            newSolutionSquare.transform.localPosition = -(Vector3.right * (_solutionSquareTemplateRectangle.Width + _solutionSquaresDistance) * (squares - 1)) / 2f
-                + Vector3.right * (_solutionSquareTemplateRectangle.Width + _solutionSquaresDistance) * i;
+			var newSolutionSquare = Instantiate(_solutionSquareTemplate, _solutionSquareTemplate.transform.parent).GetComponent<Square>();
+			newSolutionSquare.transform.localPosition = -(Vector3.right * (_solutionSquareTemplateRectangle.Width + _solutionSquaresDistance) * (squares - 1)) / 2f
+				+ Vector3.right * (_solutionSquareTemplateRectangle.Width + _solutionSquaresDistance) * i;
 
-            newSolutionSquare.Initialize(i, this, newSquare);
+			newSolutionSquare.Initialize(i, this, newSquare);
 
-            newSolutionSquare.gameObject.SetActive(true);
+			newSolutionSquare.gameObject.SetActive(true);
 
-            SolutionSquares[i] = newSolutionSquare;
+			SolutionSquares[i] = newSolutionSquare;
 
 			// Test square
 
@@ -297,114 +297,127 @@ public class Level : MonoBehaviour
 
 		_squareHistory.Add(firstHistorySnapshot);
 
-        _rectangle.Width = (_squareTemplateRectangle.Width + _squaresDistance) * squares + _squaresDistance/* * 2*/;
-        _rectangle.Height = _squareTemplateRectangle.Height + _squaresDistance * 2;
+		_rectangle.Width = (_squareTemplateRectangle.Width + _squaresDistance) * squares + _squaresDistance/* * 2*/;
+		_rectangle.Height = _squareTemplateRectangle.Height + _squaresDistance * 2;
 
-        _solutionRectangle.Width = (_solutionSquareTemplateRectangle.Width + _solutionSquaresDistance) * squares + _solutionSquaresDistance/* * 2*/;
-        _solutionRectangle.Height = _solutionSquareTemplateRectangle.Height + _solutionSquaresDistance * 2;
+		_solutionRectangle.Width = (_solutionSquareTemplateRectangle.Width + _solutionSquaresDistance) * squares + _solutionSquaresDistance/* * 2*/;
+		_solutionRectangle.Height = _solutionSquareTemplateRectangle.Height + _solutionSquaresDistance * 2;
 
-		// Main solution
+		GenerateSolution(indices, 0);
+	}
 
+	private void GenerateSolution(int[] indices, int attempt)
+	{
+		if(attempt > 0)
+		{
+			foreach (var solutionSquare in SolutionSquares)
+			{
+				solutionSquare.Reinitialize();
+			}
+		}
+		
 		Solutions = new List<Solution>();
-		PotentialSolutions = new List<Solution>();
 
 		var validSolutionSequence = false;
 
-		for(var k = 0; k < _solutionGenerationAttempts; k++)
+		for (var i = 0; i < _solutionGenerationAttempts; i++)
 		{
 			validSolutionSequence = false;
 
-			for (var i = 0; i < _solutionGenerationAttempts; i++)
+			//_solutionSequence = new int[Random.Range(_minClicksForSolution, squares - _maxClicksBufferForSolution)];
+			var mainSolution = new Solution
 			{
-				validSolutionSequence = false;
+				Sequence = new int[indices.Length - _maxClicksBufferForSolution]
+			};
 
-				//_solutionSequence = new int[Random.Range(_minClicksForSolution, squares - _maxClicksBufferForSolution)];
-				var mainSolution = new Solution
+			var shuffledIndices = indices.OrderBy(a => System.Guid.NewGuid()).ToArray();
+
+			for (var j = 0; j < mainSolution.Sequence.Length; j++)
+			{
+				mainSolution.Sequence[j] = shuffledIndices[j];
+
+				SolutionSquares[mainSolution.Sequence[j]].ToggleTargets();
+			}
+
+			for (var j = 0; j < Squares.Length; j++)
+			{
+				if (Squares[j].Toggled != SolutionSquares[j].Toggled)
 				{
-					Sequence = new int[squares - _maxClicksBufferForSolution]
-				};
+					validSolutionSequence = true;
 
-				var shuffledIndices = indices.OrderBy(a => System.Guid.NewGuid()).ToArray();
-
-				for (var j = 0; j < mainSolution.Sequence.Length; j++)
-				{
-					mainSolution.Sequence[j] = shuffledIndices[j];
-
-					SolutionSquares[mainSolution.Sequence[j]].ToggleTargets();
-				}
-
-				for (var j = 0; j < Squares.Length; j++)
-				{
-					if (Squares[j].Toggled != SolutionSquares[j].Toggled)
-					{
-						validSolutionSequence = true;
-
-						//Debug.Log($"Generated a valid solution sequence in {i + 1} attempt(s)");
-
-						break;
-					}
-				}
-
-				if (validSolutionSequence)
-				{
-					PotentialSolutions.Add(mainSolution);
+					//Debug.Log($"Generated a valid solution sequence in {i + 1} attempt(s)");
 
 					break;
 				}
 			}
 
-			if (!validSolutionSequence)
+			if (validSolutionSequence)
 			{
-				Debug.Log("Couldn't generate a valid solution sequence, settling for a suboptimal one");
-			}
-
-			// Other solutions
-
-			var array = new int[Squares.Length];
-
-			for (var i = 0; i < array.Length; i++)
-			{
-				array[i] = i;
-			}
-
-			for (var i = 1; i <= PotentialSolutions[0].Sequence.Length; i++)
-			{
-				// Should the order of clicks matter??? Right now it doesn't
-				// I expect that this will depend on what toggle features are implemented in the future 
-				// So I'll leave the code that handles permutations in, if the need to use it arises at some point
-
-				//GetPermutations(array, i);
-				GetCombinations(array, i);
-			}
-
-			if (_solutionType == SolutionType.SingleSolution && _forceSingleSolution && PotentialSolutions.Count > 1)
-			{
-				if(k == _solutionGenerationAttempts - 1)
-				{
-					Debug.Log("Couldn't force a single solution, settling for multiple");
-				}
-				
-				continue;
-			}
-			else if (_solutionType == SolutionType.MultipleSolutions && _forceMultipleSolution && PotentialSolutions.Count == 1)
-			{
-				if (k == _solutionGenerationAttempts - 1)
-				{
-					Debug.Log("Couldn't force multiple solutions, settling for a single one");
-				}
-
-				continue;
-			}
-			else
-			{
-				// Order the solutions to be displayed in descending order?
-				// Feels like going from highest to lowest, in terms of gameplay, 
-				// makes for a bit more of a "climactic" progression/finish
-				Solutions = PotentialSolutions.OrderByDescending(x => x.Sequence.Length).ToList();
+				Solutions.Add(mainSolution);
 
 				break;
 			}
 		}
+
+		if (!validSolutionSequence)
+		{
+			Debug.Log("Couldn't generate a valid solution sequence, settling for a suboptimal one");
+		}
+
+		// Other solutions
+
+		var array = new int[Squares.Length];
+
+		for (var i = 0; i < array.Length; i++)
+		{
+			array[i] = i;
+		}
+
+		for (var i = 1; i <= Solutions[0].Sequence.Length; i++)
+		{
+			// Should the order of clicks matter??? Right now it doesn't
+			// I expect that this will depend on what toggle features are implemented in the future 
+			// So I'll leave the code that handles permutations in, if the need to use it arises at some point
+
+			//GetPermutations(array, i);
+			GetCombinations(array, i);
+		}
+
+		if (_solutionType == SolutionType.SingleSolution && _forceSingleSolution && Solutions.Count > 1)
+		{
+			if(attempt < _solutionGenerationAttempts)
+			{
+				//Debug.Log("Had to recurse");
+
+				attempt++;
+
+				GenerateSolution(indices, attempt);
+
+				return;
+			}
+
+			Debug.Log("Couldn't force a single solution, settling for multiple");
+		}
+		else if (_solutionType == SolutionType.MultipleSolutions && _forceMultipleSolution && Solutions.Count == 1)
+		{
+			if (attempt < _solutionGenerationAttempts)
+			{
+				//Debug.Log("Had to recurse");
+
+				attempt++;
+
+				GenerateSolution(indices, attempt);
+
+				return;
+			}
+
+			Debug.Log("Couldn't force multiple solutions, settling for a single one");
+		}
+
+		// Order the solutions to be displayed in descending order?
+		// Feels like going from highest to lowest, in terms of gameplay, 
+		// makes for a bit more of a "climactic" progression/finish
+		Solutions = Solutions.OrderByDescending(x => x.Sequence.Length).ToList();
 
 		Debug.Log($"{Solutions.Count} possible solutions:");
 
@@ -417,11 +430,13 @@ public class Level : MonoBehaviour
 
 		_clicks = 0;
 
-        LevelPanel.Instance.SetupSolutionBoxes(Solutions);
-        LevelPanel.Instance.UpdateClicksCounter();
-        
-        CheckLevelCompletion();
-    }
+		LevelPanel.Instance.SetupSolutionBoxes(Solutions);
+		LevelPanel.Instance.UpdateClicksCounter();
+
+		CheckLevelCompletion();
+
+		return;
+	}
 
 	public void GetCombinations(int[] array, int n)
 	{
@@ -434,7 +449,8 @@ public class Level : MonoBehaviour
 	{
 		if (currentCombination.Count == n)
 		{
-			var sameAsMainSolutionSequence = currentCombination.SequenceEqual(PotentialSolutions[0].Sequence.OrderBy(x => x));
+			//var sameAsMainSolutionSequence = currentCombination.SequenceEqual(PotentialSolutions[0].Sequence.OrderBy(x => x));
+			var sameAsMainSolutionSequence = currentCombination.SequenceEqual(Solutions[0].Sequence.OrderBy(x => x));
 
 			if(sameAsMainSolutionSequence)
 			{
@@ -445,7 +461,8 @@ public class Level : MonoBehaviour
 			// to avoid duplicate clicks count on the interface
 			// and to avoid the complications of checking for exact
 			// solution sequences instead of simple numbers of clicks
-			var sameLengthAsAnotherSolution = PotentialSolutions.Any(x => x.Sequence.Length == currentCombination.Count);
+			//var sameLengthAsAnotherSolution = PotentialSolutions.Any(x => x.Sequence.Length == currentCombination.Count);
+			var sameLengthAsAnotherSolution = Solutions.Any(x => x.Sequence.Length == currentCombination.Count);
 
 			if (sameLengthAsAnotherSolution)
 			{
@@ -470,7 +487,8 @@ public class Level : MonoBehaviour
 				}
 			}
 
-			PotentialSolutions.Add(new Solution
+			//PotentialSolutions.Add(new Solution
+			Solutions.Add(new Solution
 			{
 				Sequence = currentCombination.ToArray()
 			});
@@ -636,6 +654,17 @@ public class Level : MonoBehaviour
 
 	public bool GetLevelCompletion()
 	{
+		/*if(_solutionType == SolutionType.MultipleSolutions)
+		{
+			foreach (var solution in Solutions)
+			{
+				if(solution.Solved && solution.Sequence.Length == _clicks)
+				{
+					return false;
+				}
+			}
+		}*/
+
 		var levelComplete = true;
 
 		for (var i = 0; i < Squares.Length; i++)
