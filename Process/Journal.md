@@ -207,3 +207,18 @@ Next on my list:
 - Progression through difficulty/complexity of levels
 - A way to test different features and modes from the game itself
 - Oh and make the clicks counter more prominent/clear (why am I avoiding some tasks like this one, which isn't new like the two I just mentionned? is it because it's not a new shiny thing to work on? is it because it's "return" and it's value in the project is less clear? is it because I don't have an immediate knowledge on how to tackle it? mmm)
+
+## 2024-10-18
+
+I introduced a very basic progression scheme for now that can be summarized as: more levels = more squares. It's definitely not enough, some of the features should be introduced progressively as well, like some of the more "complex" targeting arrows and the wrap around toggles, even the multi-solution levels should maybe be introduced a bit later on than right at the beginning.
+
+After fixing the bug that broke level generation for multi-solution levels, I now realize that I can't rely on real-time level generation to create levels that always have multiple solutions or always just one. The random aspect of the level generation makes it so sometimes it's impossible for a configuration of square targets et toggle states to have multiple solution. I really want to make it that in multi-solution there are only multi-solution levels generated, otherwise the inconsistency it would feel very much like a bug. To fix this, I'm tempted to do the following:
+
+- Pre-emptively generate every possible combination of square state/arrows for each amount of squares that I support in the game and build a master list of all the levels that indeed have multiple solutions 
+- Store this static list somewhere in the code and pull from that list instead of generating levels in real time
+
+This would ensure that the levels presented to the players are always valid according to the "level generation rules" that I set, without just guessing. It would also help me limit the number of possible levels from "infinite" to an actual concrete number, which could be useful in assessing the possibility space of the playable level configurations.
+
+This sounds good intuitively, but I'm worried it might be too complex or even too computationally intensive to be actually feasible. 
+
+In this project, minimalism is slowly manifesting itself as the most thorough/exhaustive exploration of a possibility space.

@@ -57,5 +57,11 @@
 - Mobile interface
 	- Figure out how to convey the information that is conveyed when hovering squares without hover functionalities
 	- Figure out how to maintain the visibility of the toggle indicators when using fingers to press on squares
-- [bug] Don't compile multiple solutions with the same amount of steps
-- [bug] Level generation algorithm is suggesting solutions that are impossible/broken
+- ~~[bug] Don't compile multiple solutions with the same amount of steps~~
+- ~~[bug] Level generation algorithm is suggesting solutions that are impossible/broken~~
+
+## 2024-10-18
+
+- Actually enforce multi-solutions/single-solution in their respective mode
+- Don't show the "level cleared" animation when re-inputing an already discovered solution
+- Involve more features in the progression (different targeting arrows, wrap around toggles)
