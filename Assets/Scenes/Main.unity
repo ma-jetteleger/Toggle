@@ -2393,7 +2393,7 @@ MonoBehaviour:
   _rectangle: {fileID: 692212901}
   _solutionRectangle: {fileID: 1044517854}
   _levelCompletionFeedback: {fileID: 463101731}
-  _squaresRange: {x: 4, y: 9}
+  _squaresRange: {x: 3, y: 9}
   _maxClicksBufferForSolution: 1
   _solutionGenerationAttempts: 99
   _squaresDistance: 0.0625
@@ -2490,7 +2490,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _progression: 1
+  _progression: 0
   _wrapAroundToggles: 1
   _solutionType: 1
   _clicksCountRestriction: 0

@@ -79,6 +79,8 @@ public class Level : MonoBehaviour
     public SolutionType SolutionType => _solutionType;
     public bool WrapAroundToggles => _wrapAroundToggles;
 
+    private string _levelsFilePath => Application.persistentDataPath + "/" + (_solutionType == SolutionType.SingleSolution? _singleSolutionLevelsFile : _multiSolutionsLevelsFile);
+
     private Square _previousHoveredSquare;
     private Rectangle _squareTemplateRectangle;
     private Rectangle _solutionSquareTemplateRectangle;
@@ -89,6 +91,9 @@ public class Level : MonoBehaviour
     private int _progressionIndex;
     private List<HistorySquare[]> _squareHistory;
 	private TestSquare[] _testSquares;
+	private List<string> _playedLevels;
+
+	private string _loadedLevelCode;
 
     private void Awake()
 	{
@@ -99,7 +104,10 @@ public class Level : MonoBehaviour
         _solutionSquareTemplate.SetActive(false);
 
         _squareHistory = new List<HistorySquare[]>();
-    }
+
+		_playedLevels = new List<string>();
+
+	}
 
 	private void Start()
 	{
@@ -220,8 +228,8 @@ public class Level : MonoBehaviour
 
 	private void OverwriteLevel(string levelCode)
 	{
-		var splitLevelCode = levelCode != null ? levelCode.Split(';') : null;
-		var splitSquaresCode = levelCode != null ? splitLevelCode[0].Split(',') : null;
+		var splitLevelCode = levelCode.Split(';');
+		var splitSquaresCode = splitLevelCode[0].Split(',');
 
 		if(splitSquaresCode.Length != Squares.Length)
 		{
@@ -230,25 +238,15 @@ public class Level : MonoBehaviour
 			return;
 		}
 
-		var splitGoalCode = levelCode != null ? splitLevelCode[1].Split(',') : null;
-		var splitSolutionsCode = levelCode != null ? splitLevelCode[2].Split(',') : null;
+		var splitGoalCode = splitLevelCode[1].Split(',');
+		var splitSolutionsCode = splitLevelCode[2].Split(',');
 
 		for (var i = 0; i < Squares.Length; i++)
 		{
-			var squareCodeToggle = splitSquaresCode[i] != null
-				? splitSquaresCode[i][0] == 't'
-				: (bool?)null;
-			var squareCodeTarget = splitSquaresCode[i] != null
-				? (Square.TargetingScheme)int.Parse(splitSquaresCode[i][1].ToString())
-				: (Square.TargetingScheme?)null;
+			var squareCodeToggle = splitSquaresCode[i][0] == 't';
+			var squareCodeTarget = (Square.TargetingScheme)int.Parse(splitSquaresCode[i][1].ToString());
 
-			var square = Squares[i];
-
-			square.Initialize(
-				i,
-				this,
-				squareCodeToggle,
-				squareCodeTarget);
+			Squares[i].Overwrite(squareCodeToggle, squareCodeTarget);
 		}
 
 		var firstHistorySnapshot = _squareHistory[0];
@@ -261,6 +259,7 @@ public class Level : MonoBehaviour
 			firstHistorySnapshot[i].Interactable = true;
 		}
 
+		_squareHistory.Clear();
 		_squareHistory.Add(firstHistorySnapshot);
 
 		GenerateSolution(splitGoalCode, splitSolutionsCode);
@@ -506,28 +505,8 @@ public class Level : MonoBehaviour
 			GetCombinations(array, i);
 		}
 
-		if (_solutionType == SolutionType.SingleSolution && _forceSingleSolution && Solutions.Count > 1)
-		{
-			if(attempt < _solutionGenerationAttempts)
-			{
-				//Debug.Log("Had to recurse");
-
-				attempt++;
-
-				GenerateSolution(indices, attempt);
-
-				return;
-			}
-
-			//Debug.Log("Couldn't force a single solution, settling for multiple");
-			Debug.Log("Couldn't force a single solution for randomly generated level, loading a prevalidated level from file");
-
-			OverwriteLevel("t6,t1,f3,f2;t,t,t,t;321");
-
-			// TODO: pull from the list of already computed levels instead
-			// + compile a list of played levels and don't pull from these
-		}
-		else if (_solutionType == SolutionType.MultipleSolutions && _forceMultipleSolution && Solutions.Count == 1)
+		if ((_solutionType == SolutionType.SingleSolution && _forceSingleSolution && Solutions.Count > 1)
+			|| (_solutionType == SolutionType.MultipleSolutions && _forceMultipleSolution && Solutions.Count == 1))
 		{
 			if (attempt < _solutionGenerationAttempts)
 			{
@@ -540,51 +519,27 @@ public class Level : MonoBehaviour
 				return;
 			}
 
-			//Debug.Log("Couldn't force multiple solutions, settling for a single one");
-			Debug.Log("Couldn't force multiple solutions for randomly generated level, loading a prevalidated level from file");
+			//Debug.Log("Couldn't force a single solution, settling for multiple");
+			Debug.Log($"Couldn't force {(_solutionType == SolutionType.SingleSolution ? "a single solution" : "multiple solutions")}" +
+				$" for a randomly generated level, loading a prevalidated level from file");
 
-			OverwriteLevel("t0,f1,f3,t6;f,f,t,f;321,1");
+			var pregeneratedLevel = GetValidPregeneratedLevel();
 
-			// TODO: pull from the list of already computed levels instead
-			// + compile a list of played levels and don't pull from these
+			OverwriteLevel(pregeneratedLevel);
 		}
 		else
 		{
-			var levelLine = string.Empty;
+			var levelLine = GetCurrentLevelCode();
 
-			for (var i = 0; i < Squares.Length; i++)
-			{
-				var square = Squares[i];
-
-				levelLine += $"{(square.Toggled ? "n" : "f")}{(int)square.TargetScheme}{(i < Squares.Length - 1 ? "," : string.Empty)}";
-			}
-
-			levelLine += ";";
-
-			for (var i = 0; i < SolutionSquares.Length; i++)
-			{
-				var solutionSquare = SolutionSquares[i];
-
-				levelLine += $"{(solutionSquare.Toggled ? "n" : "f")}{(i < SolutionSquares.Length - 1 ? "," : string.Empty)}";
-			}
-
-			levelLine += ";";
-
-			for (var i = 0; i < Solutions.Count; i++)
-			{
-				var solution = Solutions[i];
-
-				levelLine += $"{string.Join("", solution.Sequence)}{(i < Solutions.Count - 1 ? "," : string.Empty)}";
-			}
+			_loadedLevelCode = levelLine;
 
 			levelLine += "\n";
 
-			var path = Application.persistentDataPath + "/" + (_solutionType == SolutionType.SingleSolution ? _singleSolutionLevelsFile : _multiSolutionsLevelsFile);
-			var lines = File.ReadAllLines(path);
+			var lines = File.ReadAllLines(_levelsFilePath);
 
 			if(!lines.Any(x => x.Equals(levelLine, StringComparison.OrdinalIgnoreCase)))
 			{
-				File.AppendAllText(path, levelLine);
+				File.AppendAllText(_levelsFilePath, levelLine);
 			}
 
 			// Order the solutions to be displayed in descending order?
@@ -599,6 +554,51 @@ public class Level : MonoBehaviour
 				Debug.Log(string.Join(", ", Solutions[i].Sequence));
 			}*/
 		}
+	}
+
+	private string GetValidPregeneratedLevel()
+	{
+		// Compiling a list of played levels to exclude broadly will not work
+		// since we'll be trying to follow a progression curve. We'll need to search the list 
+		// with criteria about the currently enabled progression features to make this actually work. 
+		// So I'll leave the pull from file fully random for now, as we'll require more work
+		// later to make this fix work down the line anyway
+
+		var lines = File.ReadAllLines(_levelsFilePath);
+
+		return lines[UnityEngine.Random.Range(0, lines.Length)];
+	}
+
+	private string GetCurrentLevelCode()
+	{
+		var levelLine = string.Empty;
+
+		for (var i = 0; i < Squares.Length; i++)
+		{
+			var square = Squares[i];
+
+			levelLine += $"{(square.Toggled ? "t" : "f")}{(int)square.TargetScheme}{(i < Squares.Length - 1 ? "," : string.Empty)}";
+		}
+
+		levelLine += ";";
+
+		for (var i = 0; i < SolutionSquares.Length; i++)
+		{
+			var solutionSquare = SolutionSquares[i];
+
+			levelLine += $"{(solutionSquare.Toggled ? "t" : "f")}{(i < SolutionSquares.Length - 1 ? "," : string.Empty)}";
+		}
+
+		levelLine += ";";
+
+		for (var i = 0; i < Solutions.Count; i++)
+		{
+			var solution = Solutions[i];
+
+			levelLine += $"{string.Join("", solution.Sequence)}{(i < Solutions.Count - 1 ? "," : string.Empty)}";
+		}
+
+		return levelLine;
 	}
 
 	public void GetCombinations(int[] array, int n)
@@ -900,6 +900,10 @@ public class Level : MonoBehaviour
 				_progressionIndex++;
 
 				LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex);
+
+				var levelCode = GetCurrentLevelCode();
+
+				_playedLevels.Add(levelCode);
 			}
         }
 		/*else

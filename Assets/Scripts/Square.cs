@@ -168,6 +168,15 @@ public class Square : MonoBehaviour
         }
     }
 
+    public void Overwrite(bool toggle, TargetingScheme targetingScheme)
+	{
+        Toggle(toggle);
+
+        TargetScheme = targetingScheme;
+
+        _targetIndicator.sprite = _targetSchemeSprites[(int)TargetScheme];
+    }
+
     public void Reinitialize()
 	{
         Toggle(_referenceSquare.Toggled);
