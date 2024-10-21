@@ -2393,7 +2393,7 @@ MonoBehaviour:
   _rectangle: {fileID: 692212901}
   _solutionRectangle: {fileID: 1044517854}
   _levelCompletionFeedback: {fileID: 463101731}
-  _squaresRange: {x: 3, y: 9}
+  _squaresRange: {x: 4, y: 9}
   _maxClicksBufferForSolution: 1
   _solutionGenerationAttempts: 99
   _squaresDistance: 0.0625
@@ -2497,6 +2497,8 @@ MonoBehaviour:
   _forceSingleSolution: 1
   _completedSolutionsToNextLevelRestriction: 0
   _forceMultipleSolution: 1
+  _singleSolutionLevelsFile: SingleSolutionLevels.txt
+  _multiSolutionsLevelsFile: MultiSolutionsLevels.txt
 --- !u!4 &692212898
 Transform:
   m_ObjectHideFlags: 0
@@ -8503,7 +8505,7 @@ PrefabInstance:
       objectReference: {fileID: 2074359288}
     - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
       propertyPath: _shakeGradient.m_ColorSpace
-      value: 0
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
       propertyPath: _shakeGradient.m_NumAlphaKeys

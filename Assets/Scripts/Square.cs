@@ -76,7 +76,7 @@ public class Square : MonoBehaviour
     private Square _referenceSquare;
 
 
-    public void Initialize(int id, Level level, Square referenceSquare = null)
+    public void Initialize(int id, Level level, bool? toggle = null, TargetingScheme? targetingScheme = null, Square referenceSquare = null)
 	{
 		SolutionSquare = referenceSquare != null;
 
@@ -100,46 +100,60 @@ public class Square : MonoBehaviour
 
             _outline.SetActive(false);
 
-			var first = Id == 0;
-			var last = Id == _level.Squares.Length - 1;
-
-            var possibleTargetSchemes = new List<TargetingScheme>();
-            var targetSchemes = (TargetingScheme[])System.Enum.GetValues(typeof(TargetingScheme));
-
-            if (level.WrapAroundToggles)
+            if(!targetingScheme.HasValue)
 			{
-                possibleTargetSchemes = targetSchemes.ToList();
-            }
-			else
-			{
-                for (var i = 0; i < targetSchemes.Length; i++)
+                var first = Id == 0;
+                var last = Id == _level.Squares.Length - 1;
+
+                var possibleTargetSchemes = new List<TargetingScheme>();
+                var targetSchemes = (TargetingScheme[])System.Enum.GetValues(typeof(TargetingScheme));
+
+                if (level.WrapAroundToggles)
                 {
-                    var targetScheme = targetSchemes[i];
-
-                    if ((first && targetScheme == TargetingScheme.Left) ||
-                        (first && targetScheme == TargetingScheme.LeftRight) ||
-                        (first && targetScheme == TargetingScheme.SelfLeft) ||
-                        (first && targetScheme == TargetingScheme.SelfLeftRight) ||
-                        (last && targetScheme == TargetingScheme.Right) ||
-                        (last && targetScheme == TargetingScheme.LeftRight) ||
-                        (last && targetScheme == TargetingScheme.SelfRight) ||
-                        (last && targetScheme == TargetingScheme.SelfLeftRight))
-                    {
-                        continue;
-                    }
-
-                    possibleTargetSchemes.Add(targetSchemes[i]);
+                    possibleTargetSchemes = targetSchemes.ToList();
                 }
-            }
+                else
+                {
+                    for (var i = 0; i < targetSchemes.Length; i++)
+                    {
+                        var targetScheme = targetSchemes[i];
 
-			TargetScheme = possibleTargetSchemes[Random.Range(0, possibleTargetSchemes.Count)];
+                        if ((first && targetScheme == TargetingScheme.Left) ||
+                            (first && targetScheme == TargetingScheme.LeftRight) ||
+                            (first && targetScheme == TargetingScheme.SelfLeft) ||
+                            (first && targetScheme == TargetingScheme.SelfLeftRight) ||
+                            (last && targetScheme == TargetingScheme.Right) ||
+                            (last && targetScheme == TargetingScheme.LeftRight) ||
+                            (last && targetScheme == TargetingScheme.SelfRight) ||
+                            (last && targetScheme == TargetingScheme.SelfLeftRight))
+                        {
+                            continue;
+                        }
+
+                        possibleTargetSchemes.Add(targetSchemes[i]);
+                    }
+                }
+
+                TargetScheme = possibleTargetSchemes[Random.Range(0, possibleTargetSchemes.Count)];
+            }
+            else
+			{
+                TargetScheme = targetingScheme.Value;
+            }
 
             _targetIndicator = GetComponentInChildren<SpriteRenderer>(true);
             _targetIndicator.sprite = _targetSchemeSprites[(int)TargetScheme];
 
-            if (Random.Range(0f, 1f) > 0.5f)
-            {
-                Toggle();
+            if(!toggle.HasValue)
+			{
+                if (Random.Range(0f, 1f) > 0.5f)
+                {
+                    Toggle();
+                }
+            }
+			else
+			{
+                Toggle(toggle.Value);
             }
 
             Interactable = true;

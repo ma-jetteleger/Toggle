@@ -221,4 +221,10 @@ This would ensure that the levels presented to the players are always valid acco
 
 This sounds good intuitively, but I'm worried it might be too complex or even too computationally intensive to be actually feasible. 
 
-In this project, minimalism is slowly manifesting itself as the most thorough/exhaustive exploration of a possibility space.
+In this project, minimalism is slowly manifesting itself as the most thorough/exhaustive exploration of a possibility space. Therefore, the role of a minimalist designer is to restrain the possibility space as much as possible so it's possible to explore it exhaustively?
+
+## 2024-10-19
+
+I won't do the whole exhaustive thing, I computed just the amount of possible levels (every possible configuration of toggle states and target schemes for each square + every possible solutions for every possible configuration) and it was in the trillions, and this is just with the basic features of the game. It doesn't make sense to store/iterate through/sift through that amount of data at any point.
+
+The easier version of this is to still keep the random/brute force level generation algorithm and run it repetitively, storing the valid levels in a file, and pulling from those already validated levels in that file when it's not possible to generate a valid one at runtime.

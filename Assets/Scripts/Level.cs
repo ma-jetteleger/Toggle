@@ -6,6 +6,9 @@ using UnityEngine;
 using TMPro;
 using DG.Tweening;
 using NaughtyAttributes;
+using System.IO;
+using UnityEditor;
+using System;
 
 public enum SolutionType
 {
@@ -58,6 +61,10 @@ public class Level : MonoBehaviour
     [SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private bool _forceSingleSolution = false;
 	[SerializeField] [ShowIf(nameof(_solutionType), SolutionType.MultipleSolutions)] private CompletedSolutionsToNextLevelRestriction _completedSolutionsToNextLevelRestriction = CompletedSolutionsToNextLevelRestriction.AllSolutions;
 	[SerializeField] [ShowIf(nameof(_solutionType), SolutionType.MultipleSolutions)] private bool _forceMultipleSolution = false;
+
+	// File stuff
+	[SerializeField] private string _singleSolutionLevelsFile = string.Empty;
+	[SerializeField] private string _multiSolutionsLevelsFile = string.Empty;
 
 	public Square[] Squares { get; set; }
     public Square[] SolutionSquares { get; set; }
@@ -211,7 +218,57 @@ public class Level : MonoBehaviour
         }
     }
 
-    public void GenerateLevel()
+	private void OverwriteLevel(string levelCode)
+	{
+		var splitLevelCode = levelCode != null ? levelCode.Split(';') : null;
+		var splitSquaresCode = levelCode != null ? splitLevelCode[0].Split(',') : null;
+
+		if(splitSquaresCode.Length != Squares.Length)
+		{
+			Debug.Log("Can't overwrite a level with a different amount of squares than in the level code");
+
+			return;
+		}
+
+		var splitGoalCode = levelCode != null ? splitLevelCode[1].Split(',') : null;
+		var splitSolutionsCode = levelCode != null ? splitLevelCode[2].Split(',') : null;
+
+		for (var i = 0; i < Squares.Length; i++)
+		{
+			var squareCodeToggle = splitSquaresCode[i] != null
+				? splitSquaresCode[i][0] == 't'
+				: (bool?)null;
+			var squareCodeTarget = splitSquaresCode[i] != null
+				? (Square.TargetingScheme)int.Parse(splitSquaresCode[i][1].ToString())
+				: (Square.TargetingScheme?)null;
+
+			var square = Squares[i];
+
+			square.Initialize(
+				i,
+				this,
+				squareCodeToggle,
+				squareCodeTarget);
+		}
+
+		var firstHistorySnapshot = _squareHistory[0];
+
+		for (var i = 0; i < Squares.Length; i++)
+		{
+			Squares[i].SetupTargetsAndPredictions(Squares);
+
+			firstHistorySnapshot[i].Toggled = Squares[i].Toggled;
+			firstHistorySnapshot[i].Interactable = true;
+		}
+
+		_squareHistory.Add(firstHistorySnapshot);
+
+		GenerateSolution(splitGoalCode, splitSolutionsCode);
+
+		LevelPanel.Instance.SetupSolutionBoxes(Solutions);
+	}
+
+    public void GenerateLevel(string levelCode = null)
 	{
 		// Clean up
 
@@ -228,11 +285,19 @@ public class Level : MonoBehaviour
 			}
 		}
 
+		var splitLevelCode = levelCode != null ? levelCode.Split(';') : null;
+		var splitSquaresCode = levelCode != null ? splitLevelCode[0].Split(',') : null;
+		var splitGoalCode = levelCode != null ? splitLevelCode[1].Split(',') : null;
+		var splitSolutionsCode = levelCode != null ? splitLevelCode[2].Split(',') : null;
+
 		// Generation
 
-		var squares = _progression
-			? (int)Mathf.Min(_squaresRange.x + Mathf.Floor(_progressionIndex / 2f), _squaresRange.y)
-			: Random.Range(_squaresRange.x, _squaresRange.y + 1);
+		var squares = levelCode != null
+			? splitSquaresCode.Length
+			: _progression
+				? (int)Mathf.Min(_squaresRange.x + Mathf.Floor(_progressionIndex / 2f), _squaresRange.y)
+				: UnityEngine.Random.Range(_squaresRange.x, _squaresRange.y + 1);
+
 		var indices = new int[squares];
 
 		Squares = new Square[squares];
@@ -248,11 +313,26 @@ public class Level : MonoBehaviour
 		{
 			// Square
 
+			var squareCodeToggle = splitSquaresCode != null
+				? splitSquaresCode[i] != null
+					? splitSquaresCode[i][0] == 't'
+					: (bool?)null
+				: null;
+			var squareCodeTarget = splitSquaresCode != null
+				? splitSquaresCode[i] != null
+					? (Square.TargetingScheme)int.Parse(splitSquaresCode[i][1].ToString())
+					: (Square.TargetingScheme?)null
+				: null;
+
 			var newSquare = Instantiate(_squareTemplate, _squareTemplate.transform.parent).GetComponent<Square>();
 			newSquare.transform.localPosition = -(Vector3.right * (_squareTemplateRectangle.Width + _squaresDistance) * (squares - 1)) / 2f
 				+ Vector3.right * (_squareTemplateRectangle.Width + _squaresDistance) * i;
 
-			newSquare.Initialize(i, this);
+			newSquare.Initialize(
+				i, 
+				this,
+				squareCodeToggle,
+				squareCodeTarget);
 
 			newSquare.gameObject.SetActive(true);
 
@@ -272,7 +352,7 @@ public class Level : MonoBehaviour
 			newSolutionSquare.transform.localPosition = -(Vector3.right * (_solutionSquareTemplateRectangle.Width + _solutionSquaresDistance) * (squares - 1)) / 2f
 				+ Vector3.right * (_solutionSquareTemplateRectangle.Width + _solutionSquaresDistance) * i;
 
-			newSolutionSquare.Initialize(i, this, newSquare);
+			newSolutionSquare.Initialize(i, this, null, null, newSquare);
 
 			newSolutionSquare.gameObject.SetActive(true);
 
@@ -303,7 +383,50 @@ public class Level : MonoBehaviour
 		_solutionRectangle.Width = (_solutionSquareTemplateRectangle.Width + _solutionSquaresDistance) * squares + _solutionSquaresDistance/* * 2*/;
 		_solutionRectangle.Height = _solutionSquareTemplateRectangle.Height + _solutionSquaresDistance * 2;
 
-		GenerateSolution(indices, 0);
+		if(levelCode != null)
+		{
+			GenerateSolution(splitGoalCode, splitSolutionsCode);
+		}
+		else
+		{
+			GenerateSolution(indices, 0);
+		}
+
+		_clicks = 0;
+
+		LevelPanel.Instance.SetupSolutionBoxes(Solutions);
+		LevelPanel.Instance.UpdateClicksCounter();
+
+		CheckLevelCompletion();
+	}
+
+	private void GenerateSolution(string[] splitGoalCode, string[] splitSolutionsCode)
+	{
+		Solutions = new List<Solution>();
+
+		foreach(var solutionstring in splitSolutionsCode)
+		{
+			var newSolution = new Solution
+			{
+				Sequence = new int[solutionstring.Length],
+				Solved = false
+			};
+
+			for (var i = 0; i < solutionstring.Length; i++)
+			{
+				var character = solutionstring[i];
+				newSolution.Sequence[i] = int.Parse(character.ToString());
+			}
+
+			Solutions.Add(newSolution);
+		}
+
+		for (var i = 0; i < SolutionSquares.Length; i++)
+		{
+			var solutionSquare = SolutionSquares[i];
+
+			solutionSquare.Toggle(splitGoalCode[i] == "t");
+		}
 	}
 
 	private void GenerateSolution(int[] indices, int attempt)
@@ -319,7 +442,7 @@ public class Level : MonoBehaviour
 		Solutions = new List<Solution>();
 
 		var validSolutionSequence = false;
-
+		
 		for (var i = 0; i < _solutionGenerationAttempts; i++)
 		{
 			validSolutionSequence = false;
@@ -396,7 +519,13 @@ public class Level : MonoBehaviour
 				return;
 			}
 
-			Debug.Log("Couldn't force a single solution, settling for multiple");
+			//Debug.Log("Couldn't force a single solution, settling for multiple");
+			Debug.Log("Couldn't force a single solution for randomly generated level, loading a prevalidated level from file");
+
+			OverwriteLevel("t6,t1,f3,f2;t,t,t,t;321");
+
+			// TODO: pull from the list of already computed levels instead
+			// + compile a list of played levels and don't pull from these
 		}
 		else if (_solutionType == SolutionType.MultipleSolutions && _forceMultipleSolution && Solutions.Count == 1)
 		{
@@ -411,31 +540,65 @@ public class Level : MonoBehaviour
 				return;
 			}
 
-			Debug.Log("Couldn't force multiple solutions, settling for a single one");
+			//Debug.Log("Couldn't force multiple solutions, settling for a single one");
+			Debug.Log("Couldn't force multiple solutions for randomly generated level, loading a prevalidated level from file");
+
+			OverwriteLevel("t0,f1,f3,t6;f,f,t,f;321,1");
+
+			// TODO: pull from the list of already computed levels instead
+			// + compile a list of played levels and don't pull from these
 		}
-
-		// Order the solutions to be displayed in descending order?
-		// Feels like going from highest to lowest, in terms of gameplay, 
-		// makes for a bit more of a "climactic" progression/finish
-		Solutions = Solutions.OrderByDescending(x => x.Sequence.Length).ToList();
-
-		Debug.Log($"{Solutions.Count} possible solutions:");
-
-		for (var i = 0; i < Solutions.Count; i++)
+		else
 		{
-			Debug.Log(string.Join(", ", Solutions[i].Sequence));
+			var levelLine = string.Empty;
+
+			for (var i = 0; i < Squares.Length; i++)
+			{
+				var square = Squares[i];
+
+				levelLine += $"{(square.Toggled ? "n" : "f")}{(int)square.TargetScheme}{(i < Squares.Length - 1 ? "," : string.Empty)}";
+			}
+
+			levelLine += ";";
+
+			for (var i = 0; i < SolutionSquares.Length; i++)
+			{
+				var solutionSquare = SolutionSquares[i];
+
+				levelLine += $"{(solutionSquare.Toggled ? "n" : "f")}{(i < SolutionSquares.Length - 1 ? "," : string.Empty)}";
+			}
+
+			levelLine += ";";
+
+			for (var i = 0; i < Solutions.Count; i++)
+			{
+				var solution = Solutions[i];
+
+				levelLine += $"{string.Join("", solution.Sequence)}{(i < Solutions.Count - 1 ? "," : string.Empty)}";
+			}
+
+			levelLine += "\n";
+
+			var path = Application.persistentDataPath + "/" + (_solutionType == SolutionType.SingleSolution ? _singleSolutionLevelsFile : _multiSolutionsLevelsFile);
+			var lines = File.ReadAllLines(path);
+
+			if(!lines.Any(x => x.Equals(levelLine, StringComparison.OrdinalIgnoreCase)))
+			{
+				File.AppendAllText(path, levelLine);
+			}
+
+			// Order the solutions to be displayed in descending order?
+			// Feels like going from highest to lowest, in terms of gameplay, 
+			// makes for a bit more of a "climactic" progression/finish
+			Solutions = Solutions.OrderByDescending(x => x.Sequence.Length).ToList();
+
+			/*Debug.Log($"{Solutions.Count} possible solutions:");
+
+			for (var i = 0; i < Solutions.Count; i++)
+			{
+				Debug.Log(string.Join(", ", Solutions[i].Sequence));
+			}*/
 		}
-
-		// Other things
-
-		_clicks = 0;
-
-		LevelPanel.Instance.SetupSolutionBoxes(Solutions);
-		LevelPanel.Instance.UpdateClicksCounter();
-
-		CheckLevelCompletion();
-
-		return;
 	}
 
 	public void GetCombinations(int[] array, int n)
