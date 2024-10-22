@@ -64,4 +64,4 @@
 
 - Actually enforce multi-solutions/single-solution in their respective mode
 - Don't show the "level cleared" animation when re-inputing an already discovered solution
-- Involve more features in the progression (different targeting arrows, wrap around toggles)
+- Involve more features in the progression (different targeting arrows, ~~wrap around toggles~~)
