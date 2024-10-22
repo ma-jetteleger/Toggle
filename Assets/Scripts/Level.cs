@@ -55,7 +55,7 @@ public class Level : MonoBehaviour
     
 	// Features
     [SerializeField] private bool _progression = false;
-    [SerializeField] private bool _wrapAroundToggles = false;
+	[SerializeField] [HideIf(nameof(_progression))] private bool _wrapAroundToggles = false;
     [SerializeField] private SolutionType _solutionType = SolutionType.SingleSolution;
     [SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private ClicksCountToNextLevelRestriction _clicksCountRestriction = ClicksCountToNextLevelRestriction.HardRestriction;
     [SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private bool _forceSingleSolution = false;
@@ -63,8 +63,10 @@ public class Level : MonoBehaviour
 	[SerializeField] [ShowIf(nameof(_solutionType), SolutionType.MultipleSolutions)] private bool _forceMultipleSolution = false;
 
 	// File stuff
+	[SerializeField] private bool _saveLevelsToFile = false;
 	[SerializeField] private string _singleSolutionLevelsFile = string.Empty;
 	[SerializeField] private string _multiSolutionsLevelsFile = string.Empty;
+	[SerializeField] private int _playedLevelQueueSize = 0;
 
 	public Square[] Squares { get; set; }
     public Square[] SolutionSquares { get; set; }
@@ -91,9 +93,8 @@ public class Level : MonoBehaviour
     private int _progressionIndex;
     private List<HistorySquare[]> _squareHistory;
 	private TestSquare[] _testSquares;
-	private List<string> _playedLevels;
-
-	private string _loadedLevelCode;
+	private Queue<string> _playedLevels;
+	private string _levelCode;
 
     private void Awake()
 	{
@@ -105,7 +106,7 @@ public class Level : MonoBehaviour
 
         _squareHistory = new List<HistorySquare[]>();
 
-		_playedLevels = new List<string>();
+		_playedLevels = new Queue<string>();
 
 	}
 
@@ -126,12 +127,19 @@ public class Level : MonoBehaviour
         if(_lastSquareClickedDown == null)
 		{
             if (Input.GetKeyDown(KeyCode.Return))
-			{
-                GenerateLevel();
+			{ 
+				_playedLevels.Enqueue(_levelCode);
+					
+				if(_playedLevels.Count > _playedLevelQueueSize)
+				{
+					_playedLevels.Dequeue();
+				}
 
-                //OnLevelCompletion();
+				GenerateLevel();
 
-                return;
+				//OnLevelCompletion();
+
+				return;
             }
 			if (Input.GetKeyDown(KeyCode.LeftArrow))
 			{
@@ -294,9 +302,14 @@ public class Level : MonoBehaviour
 		var squares = levelCode != null
 			? splitSquaresCode.Length
 			: _progression
-				? (int)Mathf.Min(_squaresRange.x + Mathf.Floor(_progressionIndex / 2f), _squaresRange.y)
+				? (int)Mathf.Min(_squaresRange.x + Mathf.Floor(_progressionIndex / 3f), _squaresRange.y)
 				: UnityEngine.Random.Range(_squaresRange.x, _squaresRange.y + 1);
 
+		if(_progression)
+		{
+			_wrapAroundToggles = _progressionIndex >= 2;
+		}
+		
 		var indices = new int[squares];
 
 		Squares = new Square[squares];
@@ -441,13 +454,15 @@ public class Level : MonoBehaviour
 		Solutions = new List<Solution>();
 
 		var validSolutionSequence = false;
-		
+
+		var mainSolution = (Solution)null;
+
 		for (var i = 0; i < _solutionGenerationAttempts; i++)
 		{
 			validSolutionSequence = false;
 
 			//_solutionSequence = new int[Random.Range(_minClicksForSolution, squares - _maxClicksBufferForSolution)];
-			var mainSolution = new Solution
+			mainSolution = new Solution
 			{
 				Sequence = new int[indices.Length - _maxClicksBufferForSolution]
 			};
@@ -483,7 +498,22 @@ public class Level : MonoBehaviour
 
 		if (!validSolutionSequence)
 		{
-			Debug.Log("Couldn't generate a valid solution sequence, settling for a suboptimal one");
+			Debug.Log("Couldn't generate a valid solution sequence, loading a prevalidated level from file");
+
+			var pregeneratedLevel = GetValidPregeneratedLevel();
+
+			if (pregeneratedLevel != null)
+			{
+				_levelCode = pregeneratedLevel;
+
+				OverwriteLevel(_levelCode);
+
+				return;
+			}
+			else
+			{
+				Debug.Log($"Couldn't find a valid unplayed pregenerated level... What do we do here???");
+			}
 		}
 
 		// Other solutions
@@ -505,6 +535,10 @@ public class Level : MonoBehaviour
 			GetCombinations(array, i);
 		}
 
+#if UNITY_EDITOR
+		var saveLevelToFile = _saveLevelsToFile;
+#endif
+
 		if ((_solutionType == SolutionType.SingleSolution && _forceSingleSolution && Solutions.Count > 1)
 			|| (_solutionType == SolutionType.MultipleSolutions && _forceMultipleSolution && Solutions.Count == 1))
 		{
@@ -525,35 +559,50 @@ public class Level : MonoBehaviour
 
 			var pregeneratedLevel = GetValidPregeneratedLevel();
 
-			OverwriteLevel(pregeneratedLevel);
+			if(pregeneratedLevel != null)
+			{
+				_levelCode = pregeneratedLevel;
+
+				OverwriteLevel(_levelCode);
+
+				return;
+			}
+
+#if UNITY_EDITOR
+			saveLevelToFile = false;
+#endif
+
+			Debug.Log($"Couldn't find a valid unplayed pregenerated level, settling for a random " +
+				$"{(_solutionType == SolutionType.SingleSolution ? "multi-solution" : "single-solution")} level");
 		}
-		else
+
+		_levelCode = GetCurrentLevelCode();
+
+#if UNITY_EDITOR
+		if (saveLevelToFile)
 		{
-			var levelLine = GetCurrentLevelCode();
-
-			_loadedLevelCode = levelLine;
-
-			levelLine += "\n";
+			var levelLine = _levelCode + "\n";
 
 			var lines = File.ReadAllLines(_levelsFilePath);
 
-			if(!lines.Any(x => x.Equals(levelLine, StringComparison.OrdinalIgnoreCase)))
+			if (!lines.Any(x => x.Equals(levelLine, StringComparison.OrdinalIgnoreCase)))
 			{
 				File.AppendAllText(_levelsFilePath, levelLine);
 			}
-
-			// Order the solutions to be displayed in descending order?
-			// Feels like going from highest to lowest, in terms of gameplay, 
-			// makes for a bit more of a "climactic" progression/finish
-			Solutions = Solutions.OrderByDescending(x => x.Sequence.Length).ToList();
-
-			/*Debug.Log($"{Solutions.Count} possible solutions:");
-
-			for (var i = 0; i < Solutions.Count; i++)
-			{
-				Debug.Log(string.Join(", ", Solutions[i].Sequence));
-			}*/
 		}
+#endif
+
+		// Order the solutions to be displayed in descending order?
+		// Feels like going from highest to lowest, in terms of gameplay, 
+		// makes for a bit more of a "climactic" progression/finish
+		Solutions = Solutions.OrderByDescending(x => x.Sequence.Length).ToList();
+
+		/*Debug.Log($"{Solutions.Count} possible solutions:");
+
+		for (var i = 0; i < Solutions.Count; i++)
+		{
+			Debug.Log(string.Join(", ", Solutions[i].Sequence));
+		}*/
 	}
 
 	private string GetValidPregeneratedLevel()
@@ -566,7 +615,46 @@ public class Level : MonoBehaviour
 
 		var lines = File.ReadAllLines(_levelsFilePath);
 
-		return lines[UnityEngine.Random.Range(0, lines.Length)];
+		var possibleLines = new List<string>();
+
+		foreach(var line in lines)
+		{
+			if(_playedLevels.Any(x => x.Equals(line)))
+			{
+				continue;
+			}
+
+			var splitLevelCode = line.Split(';');
+			var splitSquaresCode = splitLevelCode[0].Split(',');
+
+			// This assumes the levels are ordered in ascending number of squares in the file
+			if(splitSquaresCode.Length > Squares.Length)
+			{
+				break;
+			}
+
+			if(!_wrapAroundToggles)
+			{
+				var firstSquareTargetScheme = (Square.TargetingScheme)int.Parse(splitSquaresCode[0][1].ToString());
+				var lastSquareTargetScheme = (Square.TargetingScheme)int.Parse(splitSquaresCode[splitSquaresCode.Length - 1][1].ToString());
+
+				if (firstSquareTargetScheme == Square.TargetingScheme.Left ||
+					firstSquareTargetScheme == Square.TargetingScheme.LeftRight ||
+					firstSquareTargetScheme == Square.TargetingScheme.SelfLeft ||
+					firstSquareTargetScheme == Square.TargetingScheme.SelfLeftRight ||
+					lastSquareTargetScheme == Square.TargetingScheme.Right ||
+					lastSquareTargetScheme == Square.TargetingScheme.LeftRight ||
+					lastSquareTargetScheme == Square.TargetingScheme.SelfRight ||
+					lastSquareTargetScheme == Square.TargetingScheme.SelfLeftRight)
+				{
+					continue;
+				}
+			}
+
+			possibleLines.Add(line);
+		}
+
+		return possibleLines.Count > 0 ? possibleLines[UnityEngine.Random.Range(0, possibleLines.Count)] : null;
 	}
 
 	private string GetCurrentLevelCode()
@@ -610,6 +698,11 @@ public class Level : MonoBehaviour
 
 	private void Combine(int[] array, List<int> currentCombination, int startIndex, int n)
 	{
+		if(_solutionType == SolutionType.SingleSolution && Solutions.Count > 1)
+		{
+			return;
+		}
+
 		if (currentCombination.Count == n)
 		{
 			//var sameAsMainSolutionSequence = currentCombination.SequenceEqual(PotentialSolutions[0].Sequence.OrderBy(x => x));
@@ -661,6 +754,11 @@ public class Level : MonoBehaviour
 
 		for (int i = startIndex; i < array.Length; i++)
 		{
+			if (_solutionType == SolutionType.SingleSolution && Solutions.Count > 1)
+			{
+				return;
+			}
+
 			currentCombination.Add(array[i]);
 
 			Combine(array, currentCombination, i + 1, n);
@@ -901,9 +999,12 @@ public class Level : MonoBehaviour
 
 				LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex);
 
-				var levelCode = GetCurrentLevelCode();
+				_playedLevels.Enqueue(_levelCode);
 
-				_playedLevels.Add(levelCode);
+				if (_playedLevels.Count > _playedLevelQueueSize)
+				{
+					_playedLevels.Dequeue();
+				}
 			}
         }
 		/*else

@@ -33,3 +33,9 @@
 - Should the preview rectangles show the whole predicted array, not just the "changed squares"?
 	- This would make it easier for players to predict their next move
 	- Do we want to make it easier for players to predict their next move?
+	
+## 2024-10-22
+
+- Should the number of possible solutions in multi-solution mode be a progression factor?
+	- More solutions = harder/later levels?
+- Should we try for main solutions that are more than 1 away from the total number of squares?
