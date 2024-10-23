@@ -61,7 +61,7 @@
 
 ## 2024-10-18
 
-- Actually enforce multi-solutions/single-solution in their respective mode
+- ~~Actually enforce multi-solutions/single-solution in their respective mode~~
 - Don't show the "level cleared" animation when re-inputing an already discovered solution
 - Involve more features in the progression (different targeting arrows, ~~wrap around toggles~~)
 - Better (more prominently) display the clicks counter

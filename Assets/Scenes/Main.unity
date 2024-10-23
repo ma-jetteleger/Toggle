@@ -2492,7 +2492,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   _progression: 1
   _wrapAroundToggles: 1
-  _solutionType: 1
+  _solutionType: 0
   _clicksCountRestriction: 0
   _forceSingleSolution: 1
   _completedSolutionsToNextLevelRestriction: 0
