@@ -81,7 +81,8 @@ public class Level : MonoBehaviour
     public SolutionType SolutionType => _solutionType;
     public bool WrapAroundToggles => _wrapAroundToggles;
 
-    private string _levelsFilePath => Application.persistentDataPath + "/" + (_solutionType == SolutionType.SingleSolution? _singleSolutionLevelsFile : _multiSolutionsLevelsFile);
+    private string _levelsFileName => _solutionType == SolutionType.SingleSolution? _singleSolutionLevelsFile : _multiSolutionsLevelsFile;
+    private string _levelsFilePath => Application.persistentDataPath + "/" + _levelsFileName;
 
     private Square _previousHoveredSquare;
     private Rectangle _squareTemplateRectangle;
@@ -607,13 +608,8 @@ public class Level : MonoBehaviour
 
 	private string GetValidPregeneratedLevel()
 	{
-		// Compiling a list of played levels to exclude broadly will not work
-		// since we'll be trying to follow a progression curve. We'll need to search the list 
-		// with criteria about the currently enabled progression features to make this actually work. 
-		// So I'll leave the pull from file fully random for now, as we'll require more work
-		// later to make this fix work down the line anyway
-
-		var lines = File.ReadAllLines(_levelsFilePath);
+		//var lines = File.ReadAllLines(_levelsFilePath);
+		var lines = Resources.Load<TextAsset>(_levelsFileName.Split('.')[0]).text.Split('\n');
 
 		var possibleLines = new List<string>();
 
