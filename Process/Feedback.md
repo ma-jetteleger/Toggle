@@ -10,7 +10,7 @@
 	- Most everyone else disliked that and would enjoy a progressive level generations scheme instead
 ? Brute forcing levels is possible (and also kinda fun?)
 + The game "gets you to play it" without an incentive
-- Felt overwhelmed beyond the first level (too mnay squares?)
+~~- Felt overwhelmed beyond the first level (too many squares?)~~
 + Game is possible to understand and play without reading the rules (although an actual progression in the generation of the level would help a lot)
 	+ Players learning by themselves might actually be a source of motivation
 - ~~Dinstinguising between the UI and the actual game elements was not trivial~~

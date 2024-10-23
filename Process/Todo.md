@@ -47,7 +47,6 @@
 
 ## 2024-10-15
 
-- Better (more prominently) display the clicks counter
 - ~~Organize levels (and the generation of levels) to follow some kind of progression curve~~
 	- Test if this is enough to "teach" the game to first time players
 - ~~Add "wrap around" toggle indicators~~
@@ -65,3 +64,4 @@
 - Actually enforce multi-solutions/single-solution in their respective mode
 - Don't show the "level cleared" animation when re-inputing an already discovered solution
 - Involve more features in the progression (different targeting arrows, ~~wrap around toggles~~)
+- Better (more prominently) display the clicks counter
