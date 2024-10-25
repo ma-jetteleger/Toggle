@@ -228,3 +228,15 @@ In this project, minimalism is slowly manifesting itself as the most thorough/ex
 I won't do the whole exhaustive thing, I computed just the amount of possible levels (every possible configuration of toggle states and target schemes for each square + every possible solutions for every possible configuration) and it was in the trillions, and this is just with the basic features of the game. It doesn't make sense to store/iterate through/sift through that amount of data at any point.
 
 The easier version of this is to still keep the random/brute force level generation algorithm and run it repetitively, storing the valid levels in a file, and pulling from those already validated levels in that file when it's not possible to generate a valid one at runtime.
+
+## 2024-10-24
+
+Enforcing consistency in the level generation algorithm turned out to be a really challenging technical hurdle. I really focused on this issue because I felt like progression, extra features and visual/experiential polishing was secondary to a consistent goal.
+
+Having to fix this issue instead on working on expanding the design of the game really made me reflect on my priorities as far as which features the end-version of the game will include. In the beginning of the project, I was thinking about all these possible features and how they might make the game more fun, more challenging, longer and more interesting. Being in the weeds on the technical side of the game helped me gain perspective and re-scope the project.
+
+Well, re-scoping is not exactly easy and done, but I know that I'll prioritize teaching the game through a intelligent progression through the available features first, then maybe add a feature or two (Not the ones that are about more than arrows and toggles. Maybe cascading toggles, maybe distance toggles, maybe adding squares in 2D space). My intuition is that the decision to include extra "maybe" features should be based on which features are already partially supported in the current system, as opposed to the ones requiring a brand new system or the complicated transformation of one.
+
+I'd also like to take the time to reflect on minimalism more generally, outside of very specific and concrete applications in this game.
+
+...
