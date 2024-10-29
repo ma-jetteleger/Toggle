@@ -428,7 +428,12 @@ public class Level : MonoBehaviour
 			for (var i = 0; i < solutionstring.Length; i++)
 			{
 				var character = solutionstring[i];
-				newSolution.Sequence[i] = int.Parse(character.ToString());
+				var parsed = int.TryParse(character.ToString(), out int solutionInt);
+
+				if(parsed)
+				{
+					newSolution.Sequence[i] = solutionInt;
+				}
 			}
 
 			Solutions.Add(newSolution);
@@ -623,8 +628,13 @@ public class Level : MonoBehaviour
 			var splitLevelCode = line.Split(';');
 			var splitSquaresCode = splitLevelCode[0].Split(',');
 
+			if (splitSquaresCode.Length < Squares.Length)
+			{
+				continue;
+			}
+
 			// This assumes the levels are ordered in ascending number of squares in the file
-			if(splitSquaresCode.Length > Squares.Length)
+			if (splitSquaresCode.Length > Squares.Length)
 			{
 				break;
 			}
