@@ -55,7 +55,15 @@ public class Level : MonoBehaviour
     
 	// Features
     [SerializeField] private bool _progression = false;
+	[SerializeField] [ShowIf(nameof(_progression))] private int _completedLevelsForExtraSquare = 0;
+	[SerializeField] [ShowIf(nameof(_progression))] private int _wrapAroundTogglesIndex = 0;
+	[SerializeField] [ShowIf(nameof(_progression))] private int _leftRightTargetIndex = 0;
+	[SerializeField] [ShowIf(nameof(_progression))] private int _selfSideTargetIndex = 0;
+	[SerializeField] [ShowIf(nameof(_progression))] private int _selfLeftRightTargetIndex = 0;
 	[SerializeField] [HideIf(nameof(_progression))] private bool _wrapAroundToggles = false;
+	[SerializeField] [HideIf(nameof(_progression))] private bool _leftRightTarget = false;
+	[SerializeField] [HideIf(nameof(_progression))] private bool _selfSideTarget = false;
+	[SerializeField] [HideIf(nameof(_progression))] private bool _selfLeftRightTarget = false;
     [SerializeField] private SolutionType _solutionType = SolutionType.SingleSolution;
     [SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private ClicksCountToNextLevelRestriction _clicksCountRestriction = ClicksCountToNextLevelRestriction.HardRestriction;
     [SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private bool _forceSingleSolution = false;
@@ -80,6 +88,9 @@ public class Level : MonoBehaviour
     public bool BottomOfHistory => _clicks == 0;
     public SolutionType SolutionType => _solutionType;
     public bool WrapAroundToggles => _wrapAroundToggles;
+    public bool LeftRightTarget => _leftRightTarget;
+    public bool SelfSideTarget => _selfSideTarget;
+    public bool SelfLeftRightTarget => _selfLeftRightTarget;
 
     private string _levelsFileName => _solutionType == SolutionType.SingleSolution? _singleSolutionLevelsFile : _multiSolutionsLevelsFile;
     private string _levelsFilePath => Application.persistentDataPath + "/" + _levelsFileName;
@@ -303,12 +314,15 @@ public class Level : MonoBehaviour
 		var squares = levelCode != null
 			? splitSquaresCode.Length
 			: _progression
-				? (int)Mathf.Min(_squaresRange.x + Mathf.Floor(_progressionIndex / 3f), _squaresRange.y)
+				? (int)Mathf.Min(_squaresRange.x + Mathf.Floor(_progressionIndex / (float)_completedLevelsForExtraSquare), _squaresRange.y)
 				: UnityEngine.Random.Range(_squaresRange.x, _squaresRange.y + 1);
 
 		if(_progression)
 		{
-			_wrapAroundToggles = _progressionIndex >= 2;
+			_wrapAroundToggles = _progressionIndex >= _wrapAroundTogglesIndex;
+			_leftRightTarget = _progressionIndex >= _leftRightTargetIndex;
+			_selfSideTarget = _progressionIndex >= _selfSideTargetIndex;
+			_selfLeftRightTarget = _progressionIndex >= _selfLeftRightTargetIndex;
 		}
 		
 		var indices = new int[squares];
@@ -421,7 +435,7 @@ public class Level : MonoBehaviour
 		{
 			var newSolution = new Solution
 			{
-				Sequence = new int[solutionstring.Length],
+				Sequence = new int[solutionstring.Length - 1],
 				Solved = false
 			};
 
@@ -639,22 +653,71 @@ public class Level : MonoBehaviour
 				break;
 			}
 
-			if(!_wrapAroundToggles)
-			{
-				var firstSquareTargetScheme = (Square.TargetingScheme)int.Parse(splitSquaresCode[0][1].ToString());
-				var lastSquareTargetScheme = (Square.TargetingScheme)int.Parse(splitSquaresCode[splitSquaresCode.Length - 1][1].ToString());
+			var validSquares = true;
 
-				if (firstSquareTargetScheme == Square.TargetingScheme.Left ||
-					firstSquareTargetScheme == Square.TargetingScheme.LeftRight ||
-					firstSquareTargetScheme == Square.TargetingScheme.SelfLeft ||
-					firstSquareTargetScheme == Square.TargetingScheme.SelfLeftRight ||
-					lastSquareTargetScheme == Square.TargetingScheme.Right ||
-					lastSquareTargetScheme == Square.TargetingScheme.LeftRight ||
-					lastSquareTargetScheme == Square.TargetingScheme.SelfRight ||
-					lastSquareTargetScheme == Square.TargetingScheme.SelfLeftRight)
+			for (var i = 0; i < splitSquaresCode.Length; i++)
+			{
+				var squareCode = splitSquaresCode[i];
+				var squareTargetingScheme = (Square.TargetingScheme)int.Parse(squareCode[1].ToString());
+
+				var first = i == 0;
+				var last = i == splitSquaresCode.Length - 1;
+
+				switch (squareTargetingScheme)
 				{
-					continue;
+					case Square.TargetingScheme.Self:
+						break;
+					case Square.TargetingScheme.Left:
+						if (!WrapAroundToggles && first)
+						{
+							validSquares = false;
+						}
+						break;
+					case Square.TargetingScheme.Right:
+						if (!WrapAroundToggles && last)
+						{
+							validSquares = false;
+						}
+						break;
+					case Square.TargetingScheme.SelfLeft:
+						if ((!WrapAroundToggles && first)
+							|| !SelfSideTarget)
+						{
+							validSquares = false;
+						}
+						break;
+					case Square.TargetingScheme.SelfRight:
+						if ((!WrapAroundToggles && last)
+							|| !SelfSideTarget)
+						{
+							validSquares = false;
+						}
+						break;
+					case Square.TargetingScheme.LeftRight:
+						if ((!WrapAroundToggles && (first || last))
+							|| !LeftRightTarget)
+						{
+							validSquares = false;
+						}
+						break;
+					case Square.TargetingScheme.SelfLeftRight:
+						if ((!WrapAroundToggles && (first || last))
+							|| !SelfLeftRightTarget)
+						{
+							validSquares = false;
+						}
+						break;
 				}
+
+				if(!validSquares)
+				{
+					break;
+				}
+			}
+
+			if(!validSquares)
+			{
+				continue;
 			}
 
 			possibleLines.Add(line);

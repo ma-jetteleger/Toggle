@@ -63,10 +63,10 @@
 
 - ~~Actually enforce multi-solutions/single-solution in their respective mode~~
 - Don't show the "level cleared" animation when re-inputing an already discovered solution
-- Involve more features in the progression (different targeting arrows, ~~wrap around toggles~~)
-	- Make the progression be more easily editable, not just lines of code
+- ~~Involve more features in the progression (different targeting arrows, wrap around toggles)~~
+	- ~~Make the progression be more easily editable, not just lines of code~~
 - Better (more prominently) display the clicks counter
 
 ## 2024-10-29
 
-- [bug] Solutions are generated that have the same amount of clicks as the level length in single-solution mode (or at least they're displayed as such)
+- ~~[bug] Solutions are generated that have the same amount of clicks as the level length in single-solution mode (or at least they're displayed as such)~~

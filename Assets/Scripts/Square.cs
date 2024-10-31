@@ -108,35 +108,62 @@ public class Square : MonoBehaviour
                 var possibleTargetSchemes = new List<TargetingScheme>();
                 var targetSchemes = (TargetingScheme[])System.Enum.GetValues(typeof(TargetingScheme));
 
-                if (level.WrapAroundToggles)
-                {
-                    possibleTargetSchemes = targetSchemes.ToList();
-                }
-                else
-                {
-                    for (var i = 0; i < targetSchemes.Length; i++)
-                    {
-                        var targetScheme = targetSchemes[i];
+                for (var i = 0; i < targetSchemes.Length; i++)
+				{
+                    var targetScheme = targetSchemes[i];
 
-                        if ((first && targetScheme == TargetingScheme.Left) ||
-                            (first && targetScheme == TargetingScheme.LeftRight) ||
-                            (first && targetScheme == TargetingScheme.SelfLeft) ||
-                            (first && targetScheme == TargetingScheme.SelfLeftRight) ||
-                            (last && targetScheme == TargetingScheme.Right) ||
-                            (last && targetScheme == TargetingScheme.LeftRight) ||
-                            (last && targetScheme == TargetingScheme.SelfRight) ||
-                            (last && targetScheme == TargetingScheme.SelfLeftRight))
-                        {
-                            continue;
-                        }
+					switch (targetScheme)
+					{
+						case TargetingScheme.Self:
+                            break;
+						case TargetingScheme.Left:
+                            if(!level.WrapAroundToggles && first)
+							{
+                                continue;
+							}
+							break;
+						case TargetingScheme.Right:
+                            if (!level.WrapAroundToggles && last)
+                            {
+                                continue;
+                            }
+                            break;
+						case TargetingScheme.SelfLeft:
+                            if ((!level.WrapAroundToggles && first)
+                                || !level.SelfSideTarget)
+                            {
+                                continue;
+                            }
+                            break;
+						case TargetingScheme.SelfRight:
+                            if ((!level.WrapAroundToggles && last)
+                                || !level.SelfSideTarget)
+                            {
+                                continue;
+                            }
+                            break;
+						case TargetingScheme.LeftRight:
+                            if ((!level.WrapAroundToggles && (first || last))
+                                || !level.LeftRightTarget)
+                            {
+                                continue;
+                            }
+                            break;
+						case TargetingScheme.SelfLeftRight:
+                            if ((!level.WrapAroundToggles && (first || last))
+                                || !level.SelfLeftRightTarget)
+                            {
+                                continue;
+                            }
+                            break;
+					}
 
-                        possibleTargetSchemes.Add(targetSchemes[i]);
-                    }
+                    possibleTargetSchemes.Add(targetScheme);
                 }
 
                 TargetScheme = possibleTargetSchemes[Random.Range(0, possibleTargetSchemes.Count)];
-            }
-            else
+			}
+			else
 			{
                 TargetScheme = targetingScheme.Value;
             }
@@ -157,7 +184,7 @@ public class Square : MonoBehaviour
             }
 
             Interactable = true;
-        }
+		}
 		else
 		{
             _referenceSquare = referenceSquare;
@@ -166,9 +193,9 @@ public class Square : MonoBehaviour
 
             Toggle(_referenceSquare.Toggled);
         }
-    }
+	}
 
-    public void Overwrite(bool toggle, TargetingScheme targetingScheme)
+	public void Overwrite(bool toggle, TargetingScheme targetingScheme)
 	{
         Toggle(toggle);
 

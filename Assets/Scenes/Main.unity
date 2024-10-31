@@ -2491,7 +2491,15 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   _progression: 1
+  _completedLevelsForExtraSquare: 2
+  _wrapAroundTogglesIndex: 5
+  _leftRightTargetIndex: 2
+  _selfSideTargetIndex: 4
+  _selfLeftRightTargetIndex: 6
   _wrapAroundToggles: 1
+  _leftRightTarget: 0
+  _selfSideTarget: 0
+  _selfLeftRightTarget: 0
   _solutionType: 1
   _clicksCountRestriction: 0
   _forceSingleSolution: 1
