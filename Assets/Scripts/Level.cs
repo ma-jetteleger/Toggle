@@ -107,6 +107,7 @@ public class Level : MonoBehaviour
 	private TestSquare[] _testSquares;
 	private Queue<string> _playedLevels;
 	private string _levelCode;
+	private bool _trulyCompleted;
 
     private void Awake()
 	{
@@ -289,6 +290,8 @@ public class Level : MonoBehaviour
 
     public void GenerateLevel(string levelCode = null)
 	{
+		_trulyCompleted = false;
+
 		// Clean up
 
 		if (Squares != null && Squares.Length != 0)
@@ -917,7 +920,7 @@ public class Level : MonoBehaviour
 
     public void ResetLevel()
 	{
-        LoadHstorySnapshot(0);
+        LoadHistorySnapshot(0);
 
 		CheckLevelCompletion();
     }
@@ -929,7 +932,7 @@ public class Level : MonoBehaviour
             return;
         }
 
-        LoadHstorySnapshot(_clicks - 1);
+        LoadHistorySnapshot(_clicks - 1);
 
 		CheckLevelCompletion();
 	}
@@ -941,7 +944,7 @@ public class Level : MonoBehaviour
             return;
         }
 
-        LoadHstorySnapshot(_clicks + 1);
+        LoadHistorySnapshot(_clicks + 1);
 
 		CheckLevelCompletion();
 	}
@@ -967,7 +970,7 @@ public class Level : MonoBehaviour
         _squareHistory.Add(newHistorySnapshot);
     }
 
-    private void LoadHstorySnapshot(int index)
+    private void LoadHistorySnapshot(int index)
 	{
         _clicks = index;
 
@@ -1010,7 +1013,11 @@ public class Level : MonoBehaviour
 
 	public void CheckLevelCompletion()
 	{
-        var levelComplete = GetLevelCompletion();
+		//LevelPanel.Instance.UpdateClicksCounter(); ??
+		// Do this here instead of outside of it?
+		// It might be useful to check for already solved solution to not show the level clear animation if it's a repeat solution
+
+		var levelComplete = GetLevelCompletion();
 
 		var allSolutionsFound = true;
 
@@ -1056,30 +1063,36 @@ public class Level : MonoBehaviour
                 LevelPanel.Instance.UpdateHistoryButtons(false);
             }*/
 
-			var trueCompletion = _solutionType == SolutionType.SingleSolution && ClicksLeft == 0
+			
+
+			if(!_trulyCompleted)
+			{
+				var trueCompletion = _solutionType == SolutionType.SingleSolution && ClicksLeft == 0
 				|| _solutionType == SolutionType.MultipleSolutions && allSolutionsFound;
 
-			OnLevelCompletion(trueCompletion);
-
-			if((_solutionType == SolutionType.MultipleSolutions && allSolutionsFound)
-				|| _solutionType == SolutionType.SingleSolution)
-			{
-				_progressionIndex++;
-
-				LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex);
-
-				_playedLevels.Enqueue(_levelCode);
-
-				if (_playedLevels.Count > _playedLevelQueueSize)
+				if (trueCompletion)
 				{
-					_playedLevels.Dequeue();
+					_trulyCompleted = true;
+				}
+
+				OnLevelCompletion(trueCompletion);
+
+				if ((_solutionType == SolutionType.MultipleSolutions && allSolutionsFound)
+					|| _solutionType == SolutionType.SingleSolution)
+				{
+					_progressionIndex++;
+
+					LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex);
+
+					_playedLevels.Enqueue(_levelCode);
+
+					if (_playedLevels.Count > _playedLevelQueueSize)
+					{
+						_playedLevels.Dequeue();
+					}
 				}
 			}
         }
-		/*else
-		{
-            
-		}*/
 
 		LevelPanel.Instance.UpdateHistoryButtons();
 	}
