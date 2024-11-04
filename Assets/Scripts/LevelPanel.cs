@@ -41,7 +41,6 @@ public class LevelPanel : MonoBehaviour
 	private Vector3 _nextLevelButtonNormalPosition;
 	private Color _clicksCounterNormalColor;
 	private Color _nextLevelButtonNormalOverlayColor;
-	private Dictionary<Solution, TextMeshProUGUI> _solutionClicksTexts;
 	private Image _resetArrow;
 	private Image _undoArrow;
 	private Image _redoArrow;
@@ -60,8 +59,6 @@ public class LevelPanel : MonoBehaviour
 
 		_solutionClicksBoxTemplate.SetActive(false);
 
-		_solutionClicksTexts = new Dictionary<Solution, TextMeshProUGUI>();
-
 		_resetArrow = _resetButton.transform.GetChild(0).GetComponent<Image>();
 		_undoArrow = _undoButton.transform.GetChild(0).GetComponent<Image>();
 		_redoArrow = _redoButton.transform.GetChild(0).GetComponent<Image>();
@@ -69,16 +66,6 @@ public class LevelPanel : MonoBehaviour
 
 	public void SetupSolutionBoxes(List<Solution> solutions)
 	{
-		if (_solutionClicksTexts.Count != 0)
-		{
-			foreach (var solutionClicksText in _solutionClicksTexts)
-			{
-				Destroy(solutionClicksText.Value.transform.parent.gameObject);
-			}
-		}
-
-		_solutionClicksTexts.Clear();
-
 		if (_level.SolutionType == SolutionType.SingleSolution)
 		{
 			//_clicksCounterText.gameObject.SetActive(true);
@@ -89,11 +76,11 @@ public class LevelPanel : MonoBehaviour
 
 			for (var i = 0; i < solutions.Count; i++)
 			{
-				var newSolutionClicksText = Instantiate(_solutionClicksBoxTemplate, _solutionClicksBoxTemplate.transform.parent).GetComponentInChildren<TextMeshProUGUI>();
-				newSolutionClicksText.text = solutions[i].Sequence.Length.ToString();
-				newSolutionClicksText.transform.parent.gameObject.SetActive(true);
+				var newSolutionClicksBox = Instantiate(_solutionClicksBoxTemplate, _solutionClicksBoxTemplate.transform.parent).GetComponentInChildren<SolutionClicksBox>();
+				newSolutionClicksBox.ClicksText.text = solutions[i].Sequence.Length.ToString();
+				newSolutionClicksBox.gameObject.SetActive(true);
 
-				_solutionClicksTexts.Add(solutions[i], newSolutionClicksText);
+				solutions[i].SolutionClicksBox = newSolutionClicksBox;
 			}
 		}
 	}
@@ -215,27 +202,6 @@ public class LevelPanel : MonoBehaviour
 			case SolutionType.MultipleSolutions:
 				//_clicksCounterText.gameObject.SetActive(_level.Clicks > 0);
 				numberToDisplay = _level.Clicks;
-
-				foreach(var solutionClicksText in _solutionClicksTexts)
-				{
-					if(solutionClicksText.Key.Solved)
-					{
-						continue;
-					}
-
-					var solutionClicks = int.Parse(solutionClicksText.Value.text);
-					var levelComplete = _level.GetLevelCompletion();
-
-					var solutionParent = solutionClicksText.Value.transform.parent;
-
-					solutionParent.GetChild(3).gameObject.SetActive(_level.Clicks > solutionClicks 
-						|| _level.Clicks == solutionClicks && !levelComplete);
-
-					solutionClicksText.Key.Solved = _level.Clicks == solutionClicks && levelComplete;
-
-					solutionParent.GetChild(1).gameObject.SetActive(solutionClicksText.Key.Solved);
-				}
-
 				break;
 		}
 

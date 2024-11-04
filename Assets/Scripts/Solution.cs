@@ -6,4 +6,5 @@ public class Solution
 {
     public int[] Sequence;
     public bool Solved;
+	public SolutionClicksBox SolutionClicksBox;
 }

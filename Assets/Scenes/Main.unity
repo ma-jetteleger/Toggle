@@ -1717,6 +1717,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 470247552}
+  - component: {fileID: 470247555}
   - component: {fileID: 470247554}
   - component: {fileID: 470247553}
   m_Layer: 5
@@ -1788,6 +1789,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 470247551}
   m_CullTransparentMesh: 1
+--- !u!114 &470247555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 470247551}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04f356631aac193469477276ec070497, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _clicksText: {fileID: 1113125116}
+  _solvedOverlay: {fileID: 1758475650}
+  _bustedOverlay: {fileID: 1932841233}
 --- !u!1001 &570975226
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2492,9 +2508,9 @@ MonoBehaviour:
     m_RotationOrder: 4
   _progression: 1
   _completedLevelsForExtraSquare: 2
-  _wrapAroundTogglesIndex: 5
+  _wrapAroundTogglesIndex: 4
   _leftRightTargetIndex: 2
-  _selfSideTargetIndex: 4
+  _selfSideTargetIndex: 3
   _selfLeftRightTargetIndex: 6
   _wrapAroundToggles: 1
   _leftRightTarget: 0

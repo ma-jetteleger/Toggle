@@ -79,7 +79,6 @@ public class Level : MonoBehaviour
 	public Square[] Squares { get; set; }
     public Square[] SolutionSquares { get; set; }
 	public List<Solution> Solutions { get; set; }
-	public List<Solution> PotentialSolutions { get; set; }
 
 	public int ClicksLeft => Solutions[0].Sequence.Length - _clicks;
     public int Clicks => _clicks;
@@ -307,6 +306,19 @@ public class Level : MonoBehaviour
 			}
 		}
 
+		if(Solutions != null)
+		{
+			foreach (var solution in Solutions)
+			{
+				if (solution.SolutionClicksBox != null)
+				{
+					Destroy(solution.SolutionClicksBox.gameObject);
+				}
+			}
+
+			Solutions.Clear();
+		}
+
 		var splitLevelCode = levelCode != null ? levelCode.Split(';') : null;
 		var splitSquaresCode = levelCode != null ? splitLevelCode[0].Split(',') : null;
 		var splitGoalCode = levelCode != null ? splitLevelCode[1].Split(',') : null;
@@ -436,11 +448,8 @@ public class Level : MonoBehaviour
 
 		foreach(var solutionstring in splitSolutionsCode)
 		{
-			var newSolution = new Solution
-			{
-				Sequence = new int[solutionstring.Length - 1],
-				Solved = false
-			};
+			var newSolution = new Solution();
+			var sequence = new List<int>();
 
 			for (var i = 0; i < solutionstring.Length; i++)
 			{
@@ -449,9 +458,11 @@ public class Level : MonoBehaviour
 
 				if(parsed)
 				{
-					newSolution.Sequence[i] = solutionInt;
+					sequence.Add(solutionInt);
 				}
 			}
+
+			newSolution.Sequence = sequence.ToArray();
 
 			Solutions.Add(newSolution);
 		}
@@ -1013,21 +1024,37 @@ public class Level : MonoBehaviour
 
 	public void CheckLevelCompletion()
 	{
-		//LevelPanel.Instance.UpdateClicksCounter(); ??
-		// Do this here instead of outside of it?
-		// It might be useful to check for already solved solution to not show the level clear animation if it's a repeat solution
-
 		var levelComplete = GetLevelCompletion();
-
 		var allSolutionsFound = true;
+		var solutionAlreadyFound = false;
 
-		foreach(var solution in Solutions)
+		if(_solutionType == SolutionType.MultipleSolutions)
 		{
-			if(!solution.Solved)
+			foreach (var solution in Solutions)
 			{
-				allSolutionsFound = false;
-				
-				break;
+				if (solution.Solved)
+				{
+					if(Clicks == solution.Sequence.Length)
+					{
+						solutionAlreadyFound = true;
+					}
+
+					continue;
+				}
+
+				var solutionClicks = int.Parse(solution.SolutionClicksBox.ClicksText.text);
+
+				solution.SolutionClicksBox.BustedOverlay.SetActive(Clicks > solutionClicks
+					|| Clicks == solutionClicks && !levelComplete);
+
+				solution.Solved = Clicks == solutionClicks && levelComplete;
+
+				if(!solution.Solved)
+				{
+					allSolutionsFound = false;
+				}
+
+				solution.SolutionClicksBox.SolvedOverlay.SetActive(solution.Solved);
 			}
 		}
 
@@ -1063,8 +1090,6 @@ public class Level : MonoBehaviour
                 LevelPanel.Instance.UpdateHistoryButtons(false);
             }*/
 
-			
-
 			if(!_trulyCompleted)
 			{
 				var trueCompletion = _solutionType == SolutionType.SingleSolution && ClicksLeft == 0
@@ -1075,7 +1100,10 @@ public class Level : MonoBehaviour
 					_trulyCompleted = true;
 				}
 
-				OnLevelCompletion(trueCompletion);
+				if(!solutionAlreadyFound)
+				{
+					ShowLevelCompleteAnimation(trueCompletion);
+				}
 
 				if ((_solutionType == SolutionType.MultipleSolutions && allSolutionsFound)
 					|| _solutionType == SolutionType.SingleSolution)
@@ -1097,7 +1125,7 @@ public class Level : MonoBehaviour
 		LevelPanel.Instance.UpdateHistoryButtons();
 	}
 
-    private void OnLevelCompletion(bool trueCompletion)
+    private void ShowLevelCompleteAnimation(bool trueCompletion)
 	{
         var levelCompletionFeedbackWidth = _levelCompletionFeedback.Width;
         var levelCompletionFeedbackHeight = _levelCompletionFeedback.Height;
