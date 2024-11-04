@@ -71,5 +71,6 @@
 
 - ~~[bug] Solutions are generated that have the same amount of clicks as the level length in single-solution mode (or at least they're displayed as such)~~
 - Save the progression + add a menu with the option to clear the saved progression
-- [bug] Prediction rectangles shake with the square when busting the clicks counter in single solution mode
+- ~~[bug] Prediction rectangles shake with the square when busting the clicks counter in single solution mode~~
 - [bug] SolutionClicksBoxes aren't destroyed, but only sometimes...
+- ? _Force_ the introduction of some progression features on specific progression indices, instead of _allowing_ their introduction?

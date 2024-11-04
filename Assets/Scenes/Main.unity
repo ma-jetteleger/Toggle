@@ -2510,8 +2510,8 @@ MonoBehaviour:
   _completedLevelsForExtraSquare: 2
   _wrapAroundTogglesIndex: 4
   _leftRightTargetIndex: 2
-  _selfSideTargetIndex: 3
-  _selfLeftRightTargetIndex: 6
+  _selfSideTargetIndex: 6
+  _selfLeftRightTargetIndex: 8
   _wrapAroundToggles: 1
   _leftRightTarget: 0
   _selfSideTarget: 0

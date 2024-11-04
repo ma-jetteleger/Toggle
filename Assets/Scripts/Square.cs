@@ -366,7 +366,7 @@ public class Square : MonoBehaviour
 			{
 				var target = Targets[i];
 
-				var newTargetPrediction = Instantiate(_targetPredictionTemplate, transform).GetComponent<Rectangle>();
+				var newTargetPrediction = Instantiate(_targetPredictionTemplate, _targetPredictionTemplate.transform.parent).GetComponent<Rectangle>();
 				newTargetPrediction.transform.position = new Vector3(target.transform.position.x, _targetPredictionTemplate.transform.position.y, 0f);
 
 				newTargetPrediction.gameObject.SetActive(false);
@@ -509,4 +509,18 @@ public class Square : MonoBehaviour
 
         _targetIndicator.sortingOrder += factor;
     }
+
+	private void OnDestroy()
+	{
+		if(_targetPredictions != null)
+		{
+			foreach (var targetPrediction in _targetPredictions)
+			{
+				if (targetPrediction.Value != null)
+				{
+					Destroy(targetPrediction.Value.gameObject);
+				}
+			}
+		}
+	}
 }
