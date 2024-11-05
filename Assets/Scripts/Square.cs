@@ -22,6 +22,8 @@ public class Square : MonoBehaviour
     [SerializeField] private Rectangle _noMoreClicksOverlay = null;
     [SerializeField] private Rectangle _uninteractableOverlay = null;
 	[SerializeField] private GameObject _targetPredictionTemplate = null;
+	[SerializeField] private SpriteRenderer _targetIndicator = null;
+	[SerializeField] private GameObject _cascadingIndicator = null;
 	[SerializeField] private Color _clickedOutlineColor = Color.black;
     [SerializeField] private Sprite[] _targetSchemeSprites = null;
     [SerializeField] private Color _toggledColor = Color.black;
@@ -53,6 +55,23 @@ public class Square : MonoBehaviour
         }
     }
 
+	public bool Cascading
+	{
+		get
+		{
+			return _cascading;
+		}
+		set
+		{
+			_cascading = value;
+
+			if (_cascadingIndicator != null)
+			{
+				_cascadingIndicator.SetActive(_cascading);
+			}
+		}
+	}
+
     public bool Toggled { get; set; }
     public bool Highlighted { get; set; }
     public bool SolutionSquare { get; set; }
@@ -66,17 +85,17 @@ public class Square : MonoBehaviour
     private Color _normalOutlineColor;
     private Rectangle _rectangle;
     private Rectangle _outlineRectangle;
-    private SpriteRenderer _targetIndicator;
     private Tweener _shake;
     private Tweener _colorChange;
     private Vector3 _normalPosition;
     private Color _normalOverlayColor;
 	private Dictionary<Square, Rectangle> _targetPredictions;
     private float _uninteractableOverlayAlpha;
-    private Square _referenceSquare;
+	private Square _referenceSquare;
+	private bool _cascading;
+	private bool _originallyCascading;
 
-
-    public void Initialize(int id, Level level, bool? toggle = null, TargetingScheme? targetingScheme = null, Square referenceSquare = null)
+    public void Initialize(int id, Level level, bool? toggle = null, TargetingScheme? targetingScheme = null, bool? cascading = null, Square referenceSquare = null)
 	{
 		SolutionSquare = referenceSquare != null;
 
@@ -168,10 +187,23 @@ public class Square : MonoBehaviour
                 TargetScheme = targetingScheme.Value;
             }
 
-            _targetIndicator = GetComponentInChildren<SpriteRenderer>(true);
             _targetIndicator.sprite = _targetSchemeSprites[(int)TargetScheme];
 
-            if(!toggle.HasValue)
+			if(!cascading.HasValue)
+			{
+				if (_level.CascadingToggles)
+				{
+					Cascading = Random.Range(0f, 1f) > 0.5f;
+				}
+			}
+			else
+			{
+				Cascading = cascading.Value;
+			}
+
+			_cascadingIndicator.SetActive(Cascading);
+
+			if (!toggle.HasValue)
 			{
                 if (Random.Range(0f, 1f) > 0.5f)
                 {
@@ -191,7 +223,9 @@ public class Square : MonoBehaviour
 
             TargetScheme = _referenceSquare.TargetScheme;
 
-            Toggle(_referenceSquare.Toggled);
+			Cascading = _referenceSquare.Cascading;
+
+			Toggle(_referenceSquare.Toggled);
         }
 	}
 
@@ -207,6 +241,7 @@ public class Square : MonoBehaviour
     public void Reinitialize()
 	{
         Toggle(_referenceSquare.Toggled);
+		Cascading = _referenceSquare.Cascading;
     }
 
     public void OnMouseOverEnter(bool showOutline)
@@ -376,11 +411,17 @@ public class Square : MonoBehaviour
 		}
 	}
 
-	public void ToggleTargets()
+	public void Click()
 	{
 		foreach (var target in Targets)
 		{
 			target.Toggle();
+
+			if(target.Cascading && target != this)
+			{
+				target.Cascading = false;
+				target.Click();
+			}
 		}
 	}
 

@@ -6,4 +6,5 @@ public class HistorySquare
 {
     public bool Toggled;
     public bool Interactable;
+    public bool Cascading;
 }

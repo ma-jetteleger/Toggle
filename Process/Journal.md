@@ -265,8 +265,42 @@ The reflection on minimalism that I want to materialize here is a big daunting s
 	- (Possibly and ideally even no numbers?)
 - No representation of outside "objects"
 
+# 2024-11-04
 
+I want to add a feature that's going to feel like a twist on the whole concept. In the "nice to have"s list of features that I wrote in here a while ago, I included "cascading toggles", meaning squares that, when clicked and toggling their target(s), will also trigger their target's like a click would, toggling their respective target(s) as well
 
+I feel like this kind of twist would be a very interesting evolution on the game's core mechanism, as well as being very minimalistic in nature since it doesn't change or add a new way to interact with the game. Rather, it changes how the game resolves the same mechanic. (That thought is an interesting way to think of minimalism: one mechanic but different ways the game reacts to the same mechanic)
+
+But there's an issue: how do we show that resolution of multiple simultaneous toggles? It has to be a chain of animated feedback, not just all happening at once. Otherwise, there's no way the player is going to understand the "chain" of toggles. I need to find a way to animate that chain minimalistically or drop that feature entirely
+
+## 2024-11-04.1
+
+I ended up implementing the cascading toggles immediately, and it works, although there is no animation or feedback yet. I still have no idea how to make this feature look and feel like what it does functionally but I at least wanted to test the functionality, to play with it and figure out if it was interesting or not.
+
+I feel like it's interesting enough to justify exploring this further. Many questions and design implications emerge from the initial prototying of this feature:
+
+- Do I need the animation/feedback? I got used to having none eventually... Will players also get used to it? We should at least try to add _some_ feedback
+- It makes the whole game a lot more complex, not just a little, especially without feedback. Is that level of complexity something that we want?
+- Should the cascading indicator be on the clicked square that triggers the cascade? Or on the toggled square that was triggered by a click from another one? 
+	- Right now it's the second option. Should we test both with a feature switch?
+	- On the second option, squares that can't receive a toggle from another shouldn't be allowed to be cascading
+- Not every square is cascading, just some random ones
+	- Should there be a random number of cascading squares (none is boring, all is excessive (maybe all is just super complex and good for later levels))? A random range that grows with progression?
+	- There should be some kind of progression to tie in the cascading toggles and the targeting schemes. Making the most complex arrows also cascading on the first levels that introduce cascading toggles is a bit much
+- We should make sure that the placement of the indicator dot looks good alongside every possible targeting scheme
+- Cascading toggles can trigger others in succession
+	- This is good. This is a piece of emergent design that I didn't anticipate and it opens up complex player anticipatory play without me planning for it
+	- This should be accounted for in the progression and "short" cascades should be generated/introduced before "long" ones
+- Should there be something in/around/near the prediction rectangle (or at least something that happens on hovering a square) when a cascade is predicted? 
+	- Clear and precise feedforward? Or some vague/simple indicator that something's about to happen
+		- This is a good question for the basic prediction as well, maybe the one we have now it "too" clear and informative
+	- Simply highlight the cascading indicator dot, maybe?
+- The cascade trigger stays active even if the square is uninteractable (after the square is clicked), should that be a thing? Can we test the "deactivation" of a cascade trigger?
+	- How can we communicate that (the fact that it stays active or that it goes inactive) as clearly as possible?
+	
+The design implications (and the questions that emerge from them) are a lot, but otherwise I'm really happy that this was a relatively simple addition the game and that it didn't blew up the scope even though it's a pretty huge change (at least in terms of complexity)
+
+The code was pretty much already all there, I just needed to add a line or two to re-call the "click" function on a toggled square to make the cascades happen, and some checks to make the level generation algorithm be able to anticipate the cascades. This is sort-of proof that this is a minimalist addition to the game: I was able to implement it without changing or adding an entire system, I just needed to extend one that already existed
 
 
 

@@ -60,10 +60,12 @@ public class Level : MonoBehaviour
 	[SerializeField] [ShowIf(nameof(_progression))] private int _leftRightTargetIndex = 0;
 	[SerializeField] [ShowIf(nameof(_progression))] private int _selfSideTargetIndex = 0;
 	[SerializeField] [ShowIf(nameof(_progression))] private int _selfLeftRightTargetIndex = 0;
+	[SerializeField] [ShowIf(nameof(_progression))] private int _cascadingTogglesIndex = 0;
 	[SerializeField] [HideIf(nameof(_progression))] private bool _wrapAroundToggles = false;
 	[SerializeField] [HideIf(nameof(_progression))] private bool _leftRightTarget = false;
 	[SerializeField] [HideIf(nameof(_progression))] private bool _selfSideTarget = false;
 	[SerializeField] [HideIf(nameof(_progression))] private bool _selfLeftRightTarget = false;
+	[SerializeField] [HideIf(nameof(_progression))] private bool _cascadingToggles = false;
     [SerializeField] private SolutionType _solutionType = SolutionType.SingleSolution;
     [SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private ClicksCountToNextLevelRestriction _clicksCountRestriction = ClicksCountToNextLevelRestriction.HardRestriction;
     [SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private bool _forceSingleSolution = false;
@@ -90,6 +92,7 @@ public class Level : MonoBehaviour
     public bool LeftRightTarget => _leftRightTarget;
     public bool SelfSideTarget => _selfSideTarget;
     public bool SelfLeftRightTarget => _selfLeftRightTarget;
+    public bool CascadingToggles => _cascadingToggles;
 
     private string _levelsFileName => _solutionType == SolutionType.SingleSolution? _singleSolutionLevelsFile : _multiSolutionsLevelsFile;
     private string _levelsFilePath => Application.persistentDataPath + "/" + _levelsFileName;
@@ -119,7 +122,6 @@ public class Level : MonoBehaviour
         _squareHistory = new List<HistorySquare[]>();
 
 		_playedLevels = new Queue<string>();
-
 	}
 
 	private void Start()
@@ -223,7 +225,7 @@ public class Level : MonoBehaviour
 				}
 				else
 				{
-					_lastSquareClickedDown.ToggleTargets();
+					_lastSquareClickedDown.Click();
 					//_lastSquareClickedDown.ShowTargetPredictions();
 					_lastSquareClickedDown.HideTargetPredictions();
 					_lastSquareClickedDown.Interactable = false;
@@ -277,6 +279,7 @@ public class Level : MonoBehaviour
 
 			firstHistorySnapshot[i].Toggled = Squares[i].Toggled;
 			firstHistorySnapshot[i].Interactable = true;
+			firstHistorySnapshot[i].Cascading = Squares[i].Cascading;
 		}
 
 		_squareHistory.Clear();
@@ -338,6 +341,7 @@ public class Level : MonoBehaviour
 			_leftRightTarget = _progressionIndex >= _leftRightTargetIndex;
 			_selfSideTarget = _progressionIndex >= _selfSideTargetIndex;
 			_selfLeftRightTarget = _progressionIndex >= _selfLeftRightTargetIndex;
+			_cascadingToggles = _progressionIndex >= _cascadingTogglesIndex;
 		}
 		
 		var indices = new int[squares];
@@ -365,6 +369,11 @@ public class Level : MonoBehaviour
 					? (Square.TargetingScheme)int.Parse(splitSquaresCode[i][1].ToString())
 					: (Square.TargetingScheme?)null
 				: null;
+			var squareCodeCascading = splitSquaresCode != null
+				? splitSquaresCode[i] != null && splitSquaresCode.Length > 2
+					? splitSquaresCode[i][2] == 't'
+					: (bool?)null
+				: null;
 
 			var newSquare = Instantiate(_squareTemplate, _squareTemplate.transform.parent).GetComponent<Square>();
 			newSquare.transform.localPosition = -(Vector3.right * (_squareTemplateRectangle.Width + _squaresDistance) * (squares - 1)) / 2f
@@ -374,7 +383,8 @@ public class Level : MonoBehaviour
 				i, 
 				this,
 				squareCodeToggle,
-				squareCodeTarget);
+				squareCodeTarget,
+				squareCodeCascading);
 
 			newSquare.gameObject.SetActive(true);
 
@@ -383,7 +393,8 @@ public class Level : MonoBehaviour
 			firstHistorySnapshot[i] = new HistorySquare()
 			{
 				Toggled = Squares[i].Toggled,
-				Interactable = true
+				Interactable = true,
+				Cascading = Squares[i].Cascading
 			};
 
 			indices[i] = i;
@@ -394,7 +405,13 @@ public class Level : MonoBehaviour
 			newSolutionSquare.transform.localPosition = -(Vector3.right * (_solutionSquareTemplateRectangle.Width + _solutionSquaresDistance) * (squares - 1)) / 2f
 				+ Vector3.right * (_solutionSquareTemplateRectangle.Width + _solutionSquaresDistance) * i;
 
-			newSolutionSquare.Initialize(i, this, null, null, newSquare);
+			newSolutionSquare.Initialize(
+				i, 
+				this, 
+				null, 
+				null,
+				null,
+				newSquare);
 
 			newSolutionSquare.gameObject.SetActive(true);
 
@@ -507,7 +524,7 @@ public class Level : MonoBehaviour
 			{
 				mainSolution.Sequence[j] = shuffledIndices[j];
 
-				SolutionSquares[mainSolution.Sequence[j]].ToggleTargets();
+				SolutionSquares[mainSolution.Sequence[j]].Click();
 			}
 
 			for (var j = 0; j < Squares.Length; j++)
@@ -674,6 +691,13 @@ public class Level : MonoBehaviour
 				var squareCode = splitSquaresCode[i];
 				var squareTargetingScheme = (Square.TargetingScheme)int.Parse(squareCode[1].ToString());
 
+				if(squareCode.Length > 2 && squareCode[2] == 'c' && !CascadingToggles)
+				{
+					validSquares = false;
+
+					break;
+				}
+
 				var first = i == 0;
 				var last = i == splitSquaresCode.Length - 1;
 
@@ -748,7 +772,7 @@ public class Level : MonoBehaviour
 		{
 			var square = Squares[i];
 
-			levelLine += $"{(square.Toggled ? "t" : "f")}{(int)square.TargetScheme}{(i < Squares.Length - 1 ? "," : string.Empty)}";
+			levelLine += $"{(square.Toggled ? "t" : "f")}{(int)square.TargetScheme}{(square.Cascading ? "c" : string.Empty)}{(i < Squares.Length - 1 ? "," : string.Empty)}";
 		}
 
 		levelLine += ";";
@@ -974,7 +998,8 @@ public class Level : MonoBehaviour
 			newHistorySnapshot[i] = new HistorySquare()
 			{
 				Toggled = Squares[i].Toggled,
-				Interactable = Squares[i].Interactable
+				Interactable = Squares[i].Interactable,
+				Cascading = Squares[i].Cascading
 			};
         }
 
@@ -991,6 +1016,7 @@ public class Level : MonoBehaviour
         {
             Squares[i].Toggle(historySnapshot[i].Toggled);
 			Squares[i].Interactable = historySnapshot[i].Interactable;
+			Squares[i].Cascading = historySnapshot[i].Cascading;
         }
 
         LevelPanel.Instance.UpdateClicksCounter();
