@@ -1216,5 +1216,24 @@ public class Level : MonoBehaviour
             _levelCompletionFeedback.Thickness = levelCompletionFeedbackThicknessBaseValue;
             _levelCompletionFeedback.Color = _levelCompletionFeedbackBaseColor;
         });
-    }
+	}
+
+#if UNITY_EDITOR
+	[Button("Sort levels in files")]
+	public void SortLevels()
+	{
+		var pathPrefix = Application.persistentDataPath + "/";
+
+		SortLevels(pathPrefix + _singleSolutionLevelsFile);
+		SortLevels(pathPrefix + _multiSolutionsLevelsFile);
+	}
+
+	private void SortLevels(string levelsFilePath)
+	{
+		var lines = File.ReadAllLines(levelsFilePath);
+		var sortedLines = lines.OrderBy(x => x.Split(';')[0].Split(',').Length);
+
+		File.WriteAllLines(levelsFilePath, sortedLines);
+	}
+#endif
 }
