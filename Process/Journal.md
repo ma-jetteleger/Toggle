@@ -298,7 +298,7 @@ I feel like it's interesting enough to justify exploring this further. Many ques
 - The cascade trigger stays active even if the square is uninteractable (after the square is clicked), should that be a thing? Can we test the "deactivation" of a cascade trigger?
 	- How can we communicate that (the fact that it stays active or that it goes inactive) as clearly as possible?
 	
-The design implications (and the questions that emerge from them) are a lot, but otherwise I'm really happy that this was a relatively simple addition the game and that it didn't blew up the scope even though it's a pretty huge change (at least in terms of complexity)
+The design implications (and the questions that emerge from them) are a lot, but otherwise I'm really happy that this was a relatively simple addition to the game and that it didn't blew up the scope even though it's a pretty huge change (at least in terms of complexity)
 
 The code was pretty much already all there, I just needed to add a line or two to re-call the "click" function on a toggled square to make the cascades happen, and some checks to make the level generation algorithm be able to anticipate the cascades. This is sort-of proof that this is a minimalist addition to the game: I was able to implement it without changing or adding an entire system, I just needed to extend one that already existed
 

@@ -286,8 +286,6 @@ public class Level : MonoBehaviour
 		_squareHistory.Add(firstHistorySnapshot);
 
 		GenerateSolution(splitGoalCode, splitSolutionsCode);
-
-		LevelPanel.Instance.SetupSolutionBoxes(Solutions);
 	}
 
     public void GenerateLevel(string levelCode = null)
@@ -559,6 +557,8 @@ public class Level : MonoBehaviour
 
 				OverwriteLevel(_levelCode);
 
+				//LevelPanel.Instance.SetupSolutionBoxes(Solutions);
+
 				return;
 			}
 			else
@@ -616,6 +616,8 @@ public class Level : MonoBehaviour
 
 				OverwriteLevel(_levelCode);
 
+				//LevelPanel.Instance.SetupSolutionBoxes(Solutions);
+
 				return;
 			}
 
@@ -647,6 +649,8 @@ public class Level : MonoBehaviour
 		// Feels like going from highest to lowest, in terms of gameplay, 
 		// makes for a bit more of a "climactic" progression/finish
 		Solutions = Solutions.OrderByDescending(x => x.Sequence.Length).ToList();
+
+		//LevelPanel.Instance.SetupSolutionBoxes(Solutions);
 
 		/*Debug.Log($"{Solutions.Count} possible solutions:");
 
@@ -1082,11 +1086,21 @@ public class Level : MonoBehaviour
 
 				solution.SolutionClicksBox.SolvedOverlay.SetActive(solution.Solved);
 			}
+
+			LevelPanel.Instance.UpdateNextLevelButton(_trulyCompleted || (levelComplete
+				&& (_completedSolutionsToNextLevelRestriction == CompletedSolutionsToNextLevelRestriction.AtLeastOneSolution && levelComplete
+					|| _completedSolutionsToNextLevelRestriction == CompletedSolutionsToNextLevelRestriction.AllSolutions && allSolutionsFound
+					)));
 		}
-
-        LevelPanel.Instance.UpdateNextLevelButton(_completedSolutionsToNextLevelRestriction == CompletedSolutionsToNextLevelRestriction.AtLeastOneSolution && levelComplete
-			|| _completedSolutionsToNextLevelRestriction == CompletedSolutionsToNextLevelRestriction.AllSolutions && allSolutionsFound);
-
+		else
+		{
+			LevelPanel.Instance.UpdateNextLevelButton(_trulyCompleted || (levelComplete 
+				&& (_clicksCountRestriction == ClicksCountToNextLevelRestriction.NoRestriction 
+					|| (_clicksCountRestriction == ClicksCountToNextLevelRestriction.SoftRestriction && ClicksLeft >= 0) 
+					|| (_clicksCountRestriction == ClicksCountToNextLevelRestriction.HardRestriction && ClicksLeft >= 0)
+					)));
+		}
+        
 		if (_solutionType == SolutionType.SingleSolution
 			&& (_clicksCountRestriction != ClicksCountToNextLevelRestriction.SoftRestriction || ClicksLeft >= 0))
 		{

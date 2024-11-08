@@ -19,3 +19,9 @@
 - ~~Solutions can be figured out "too linearly" by going from left to right~~
 	? ~~Introducing "wrap around toggles" for the end squares might be a solution~~
 ? Someone suggested to have mutliple "solution setup" for the same level
+
+## 2024-11-06
+
+- Levels are possible to solve using only combinatorics, making the player progress through levels without learning anything about the game
+? Would definitely like the option to easily revisit prior puzzles
+? Something inherently more satisfying in the red-shaking response in single-solution mode. More like there are some hard edges players can use to try to understand the "world"
