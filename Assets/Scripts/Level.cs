@@ -10,6 +10,27 @@ using System.IO;
 using UnityEditor;
 using System;
 
+[Serializable]
+public class ProgressionEntry
+{
+	public int Squares;
+	public bool LeftRightTargets;
+	public bool SelfSideTargets;
+	public bool SelfLeftRightTargets;
+	public bool WrapAroundToggles;
+	public int CascadingToggles;
+	//public Vector2Int AdjacentCascadingToggles;	
+	// This is more complex than originally thought of
+	// as it only impacts gameplay/complexity if two adjacent 
+	// cascading squares actually interact with each other through
+	// their targeting schemes. I'll ignore the adjacent cascading 
+	// toggle issue for now and think back on it later. 
+	// (the issue is that "chained" cascading 
+	// toggles are more complex but also maybe more interesting so
+	// it'd be nice if we were able to include them progressively 
+	// and control their introduction through the progression)
+}
+
 public enum SolutionType
 {
 	SingleSolution,
@@ -38,11 +59,15 @@ public class Level : MonoBehaviour
     [SerializeField] private Rectangle _solutionRectangle = null;
     [SerializeField] private Rectangle _levelCompletionFeedback = null;
 
+	[HorizontalLine(1)]
+
 	// Generation parameters
 	[SerializeField] private Vector2Int _squaresRange = Vector2Int.zero;
 	//[SerializeField] private int _minClicksForSolution = 0;
 	[SerializeField] private int _maxClicksBufferForSolution = 0;
 	[SerializeField] private int _solutionGenerationAttempts = 0;
+
+	[HorizontalLine(1)]
 
 	// Animation/visual parameters
 	[SerializeField] private float _squaresDistance = 0f;
@@ -52,15 +77,18 @@ public class Level : MonoBehaviour
     [SerializeField] private AnimationCurve _levelCompletionCurve = null;
     [SerializeField] private AnimationCurve _levelCompletionThicknessCurve = null;
     [SerializeField] private AnimationCurve _levelCompletionAlphaCurve = null;
-    
+
+	[HorizontalLine(1)]
+
 	// Features
-    [SerializeField] private bool _progression = false;
+	[SerializeField] private bool _progression = false;
 	[SerializeField] [ShowIf(nameof(_progression))] private int _completedLevelsForExtraSquare = 0;
 	[SerializeField] [ShowIf(nameof(_progression))] private int _wrapAroundTogglesIndex = 0;
 	[SerializeField] [ShowIf(nameof(_progression))] private int _leftRightTargetIndex = 0;
 	[SerializeField] [ShowIf(nameof(_progression))] private int _selfSideTargetIndex = 0;
 	[SerializeField] [ShowIf(nameof(_progression))] private int _selfLeftRightTargetIndex = 0;
 	[SerializeField] [ShowIf(nameof(_progression))] private int _cascadingTogglesIndex = 0;
+	[SerializeField] [ShowIf(nameof(_progression))] private List<ProgressionEntry> _progressionEntries = new List<ProgressionEntry>();
 	[SerializeField] [HideIf(nameof(_progression))] private bool _wrapAroundToggles = false;
 	[SerializeField] [HideIf(nameof(_progression))] private bool _leftRightTarget = false;
 	[SerializeField] [HideIf(nameof(_progression))] private bool _selfSideTarget = false;
@@ -71,6 +99,8 @@ public class Level : MonoBehaviour
     [SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private bool _forceSingleSolution = false;
 	[SerializeField] [ShowIf(nameof(_solutionType), SolutionType.MultipleSolutions)] private CompletedSolutionsToNextLevelRestriction _completedSolutionsToNextLevelRestriction = CompletedSolutionsToNextLevelRestriction.AllSolutions;
 	[SerializeField] [ShowIf(nameof(_solutionType), SolutionType.MultipleSolutions)] private bool _forceMultipleSolution = false;
+
+	[HorizontalLine(1)]
 
 	// File stuff
 	[SerializeField] private bool _saveLevelsToFile = false;
