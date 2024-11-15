@@ -2498,7 +2498,7 @@ MonoBehaviour:
   _rectangle: {fileID: 692212901}
   _solutionRectangle: {fileID: 1044517854}
   _levelCompletionFeedback: {fileID: 463101731}
-  _squaresRange: {x: 3, y: 9}
+  _squaresRange: {x: 4, y: 5}
   _maxClicksBufferForSolution: 1
   _solutionGenerationAttempts: 99
   _squaresDistance: 0.0625
@@ -2596,6 +2596,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   _progression: 1
+  _progressionFile: Progression.txt
   _completedLevelsForExtraSquare: 2
   _wrapAroundTogglesIndex: 4
   _leftRightTargetIndex: 2
@@ -2881,7 +2882,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 114.795, y: 0}
   m_SizeDelta: {x: 0, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &745161041

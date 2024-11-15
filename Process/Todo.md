@@ -83,7 +83,7 @@
 	- Maybe go back to shorter arrays to introduce cascading toggles and rebuild to longer arrays gradually 
 - [visual] ? Animate cascading toggles?
 - [visual] ? Highlight cascading toggles on hover?
-- [feat] Exclude squares that aren't toggled by others from being cascading
+- ~~[feat] Exclude squares that aren't toggled by others from being cascading~~
 - ~~[tech] Write a function to re-order/cleanup the pregenerated levels files in ascending order of level lengths~~ 
 
 ## 2024-11-06

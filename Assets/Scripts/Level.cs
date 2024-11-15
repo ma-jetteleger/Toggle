@@ -19,7 +19,7 @@ public class ProgressionEntry
 	public bool SelfLeftRightTargets;
 	public bool WrapAroundToggles;
 	public int CascadingToggles;
-	//public Vector2Int AdjacentCascadingToggles;	
+	public Vector2Int AdjacentCascadingToggles;	
 	// This is more complex than originally thought of
 	// as it only impacts gameplay/complexity if two adjacent 
 	// cascading squares actually interact with each other through
@@ -82,13 +82,13 @@ public class Level : MonoBehaviour
 
 	// Features
 	[SerializeField] private bool _progression = false;
+	[SerializeField] [ShowIf(nameof(_progression))] private string _progressionFile = string.Empty;
 	[SerializeField] [ShowIf(nameof(_progression))] private int _completedLevelsForExtraSquare = 0;
 	[SerializeField] [ShowIf(nameof(_progression))] private int _wrapAroundTogglesIndex = 0;
 	[SerializeField] [ShowIf(nameof(_progression))] private int _leftRightTargetIndex = 0;
 	[SerializeField] [ShowIf(nameof(_progression))] private int _selfSideTargetIndex = 0;
 	[SerializeField] [ShowIf(nameof(_progression))] private int _selfLeftRightTargetIndex = 0;
 	[SerializeField] [ShowIf(nameof(_progression))] private int _cascadingTogglesIndex = 0;
-	[SerializeField] [ShowIf(nameof(_progression))] private List<ProgressionEntry> _progressionEntries = new List<ProgressionEntry>();
 	[SerializeField] [HideIf(nameof(_progression))] private bool _wrapAroundToggles = false;
 	[SerializeField] [HideIf(nameof(_progression))] private bool _leftRightTarget = false;
 	[SerializeField] [HideIf(nameof(_progression))] private bool _selfSideTarget = false;
@@ -140,6 +140,7 @@ public class Level : MonoBehaviour
 	private Queue<string> _playedLevels;
 	private string _levelCode;
 	private bool _trulyCompleted;
+	private List<ProgressionEntry> _progressionEntries;
 
     private void Awake()
 	{
@@ -152,6 +153,8 @@ public class Level : MonoBehaviour
         _squareHistory = new List<HistorySquare[]>();
 
 		_playedLevels = new Queue<string>();
+
+		_progressionEntries = new List<ProgressionEntry>();
 	}
 
 	private void Start()
@@ -161,7 +164,8 @@ public class Level : MonoBehaviour
         _levelCompletionFeedback.Height = _levelCompletionFeedbackFinalSize.y / 100f;
         _levelCompletionFeedbackBaseColor = _levelCompletionFeedback.Color;
 
-        GenerateLevel();
+		LoadProgressionEntries();
+		GenerateLevel();
 
 		LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex);
 	}
@@ -297,8 +301,9 @@ public class Level : MonoBehaviour
 		{
 			var squareCodeToggle = splitSquaresCode[i][0] == 't';
 			var squareCodeTarget = (Square.TargetingScheme)int.Parse(splitSquaresCode[i][1].ToString());
+			var squareCodeCascading = splitSquaresCode[i].Length > 2 && splitSquaresCode[i][2] == 'c';
 
-			Squares[i].Overwrite(squareCodeToggle, squareCodeTarget);
+			Squares[i].Overwrite(squareCodeToggle, squareCodeTarget, squareCodeCascading);
 		}
 
 		var firstHistorySnapshot = _squareHistory[0];
@@ -460,6 +465,15 @@ public class Level : MonoBehaviour
 		for (var i = 0; i < SolutionSquares.Length; i++)
 		{
 			SolutionSquares[i].SetupTargetsAndPredictions(SolutionSquares);
+		}
+
+		for (var i = 0; i < Squares.Length; i++)
+		{
+			Squares[i].TurnOffUnnecessaryCascading();
+
+			SolutionSquares[i].Cascading = Squares[i].Cascading;
+			_testSquares[i].Cascading = Squares[i].Cascading;
+			firstHistorySnapshot[i].Cascading = Squares[i].Cascading;
 		}
 
 		_squareHistory.Add(firstHistorySnapshot);
@@ -682,12 +696,12 @@ public class Level : MonoBehaviour
 
 		//LevelPanel.Instance.SetupSolutionBoxes(Solutions);
 
-		/*Debug.Log($"{Solutions.Count} possible solutions:");
+		Debug.Log($"{Solutions.Count} possible solutions:");
 
 		for (var i = 0; i < Solutions.Count; i++)
 		{
 			Debug.Log(string.Join(", ", Solutions[i].Sequence));
-		}*/
+		}
 	}
 
 	private string GetValidPregeneratedLevel()
@@ -1193,6 +1207,33 @@ public class Level : MonoBehaviour
         }
 
 		LevelPanel.Instance.UpdateHistoryButtons();
+	}
+
+	private void LoadProgressionEntries()
+	{
+		var lines = Resources.Load<TextAsset>(_progressionFile.Split('.')[0]).text.Split('\n');
+
+		foreach(var line in lines)
+		{
+			var splitLine = line.Split(';');
+			var splitAdjacentCascadingTogglesVector = splitLine[6].Split(',');
+
+			var newProgressionEntry = new ProgressionEntry()
+			{
+				Squares = int.Parse(splitLine[0]),
+				LeftRightTargets = splitLine[1] == "1",
+				SelfSideTargets = splitLine[2] == "1",
+				SelfLeftRightTargets = splitLine[3] == "1",
+				WrapAroundToggles = splitLine[4] == "1",
+				CascadingToggles = int.Parse(splitLine[5]),
+				AdjacentCascadingToggles = new Vector2Int(
+					int.Parse(splitAdjacentCascadingTogglesVector[0]),
+					int.Parse(splitAdjacentCascadingTogglesVector[1])
+				)
+			};
+
+			_progressionEntries.Add(newProgressionEntry);
+		}
 	}
 
     private void ShowLevelCompleteAnimation(bool trueCompletion)

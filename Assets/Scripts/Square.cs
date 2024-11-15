@@ -65,6 +65,7 @@ public class Square : MonoBehaviour
 		{
 			_cascading = value;
 
+
 			if (_cascadingIndicator != null)
 			{
 				_cascadingIndicator.SetActive(_cascading);
@@ -195,13 +196,17 @@ public class Square : MonoBehaviour
 				{
 					Cascading = Random.Range(0f, 1f) > 0.5f;
 				}
+				else
+				{
+					Cascading = false;
+				}
 			}
 			else
 			{
 				Cascading = cascading.Value;
 			}
 
-			_cascadingIndicator.SetActive(Cascading);
+			//_cascadingIndicator.SetActive(Cascading);
 
 			if (!toggle.HasValue)
 			{
@@ -222,18 +227,18 @@ public class Square : MonoBehaviour
             _referenceSquare = referenceSquare;
 
             TargetScheme = _referenceSquare.TargetScheme;
-
 			Cascading = _referenceSquare.Cascading;
 
 			Toggle(_referenceSquare.Toggled);
         }
 	}
 
-	public void Overwrite(bool toggle, TargetingScheme targetingScheme)
+	public void Overwrite(bool toggle, TargetingScheme targetingScheme, bool cascading)
 	{
         Toggle(toggle);
 
         TargetScheme = targetingScheme;
+        Cascading = cascading;
 
         _targetIndicator.sprite = _targetSchemeSprites[(int)TargetScheme];
     }
@@ -408,6 +413,38 @@ public class Square : MonoBehaviour
 
 				_targetPredictions.Add(target, newTargetPrediction);
 			}
+		}
+	}
+
+	public void TurnOffUnnecessaryCascading()
+	{
+		if(!Cascading)
+		{
+			return;
+		}
+
+		var turnOffCascading = true;
+
+		foreach (var square in _level.Squares)
+		{
+			if(square == this)
+			{
+				continue;
+			}
+
+			if(square.Targets.Contains(this))
+			{
+				turnOffCascading = false;
+
+				break;
+			}
+		}
+
+		if(turnOffCascading)
+		{
+			Debug.Log("It happened");
+
+			Cascading = false;
 		}
 	}
 
