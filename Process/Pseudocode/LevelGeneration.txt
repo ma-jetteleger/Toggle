@@ -1,0 +1,91 @@
+// Generate the level
+
+Destroy the squares
+Destroy the solution squares
+Destroy the solution clicks boxes
+
+If there's a level code
+	Get the length in squares
+Otherwise
+	Get a random length within the possible range
+
+Get the allowed features from the progression file or the editor
+
+Setup a new empty array of squares, solution squares and test squares, and a new empty list of square history snapshots
+
+For each square
+	If there's a level code	(pulled from the prevalidated, pregenerated levels from file and used to overwrite the current level, following a failed goal configuration/solution sequence generation)
+		Get the square data from the code and store it
+	Otherwise
+		Set the data as null
+	Instantiate a square and set it up in the array
+		If data is stored for the square's targeting scheme
+			Use it to set its targeting scheme and target indicator
+		Otherwise
+			Build of list of possible targeting schemes according to its position in the array and the allowed progression features
+			Choose one targeting scheme at random from the list
+			Setup its target indicator
+		If data is stored for whether the square has cascading toggle behaviour or not
+			Use it to setup its cascading value and its cascading indicator
+		Otherwise
+			If cascading toggles are not allowed from progression
+				Set it's cascading behaviour as false
+			Otherwise
+				There's a 50% chance to turn on its cascading behaviour 
+		If data is stored for its initial toggled state
+			Use it to setup its toggled state
+		Otherwise
+			There's a 50% chance to toggle it on or off
+	Include its initial state information in the first square history snapshot
+	Setup its associated solution square's targeting scheme and cascading behaviour to copy its own
+	Setup its associated test square's targeting scheme and cascading behaviour to copy its own
+	
+For each square
+	Bind its target(s) according to the target scheme generated in the previous loop
+	Do the same for its associated solution square
+	Do the same for its associated test square
+	Choose the right targeting sprite
+	
+For each square
+	Turn off its cascading behaviour if it's on but the square is not targeted by another square
+	
+Add the first history snapshot to the square history
+
+
+// Generate the goal configuration and solution sequence(s)
+
+Try (a set amount of times, using the solution squares, resetting them between each try) to generate a sequence of clicks that produces a valid goal confguration
+If impossible
+	The level/goal/solution generation algorithm failed 
+	Load a prevalidated pregenerated level code from file
+		Iterate through the prevalidated levels files 
+		Find one that fits the same progression parameters from above
+	Overwrite the generated array of squares with the data from the loaded level code
+	Use the solution and goal data from the loaded level code to setup the solutions(s), the goal configuration and the solutions squares 
+If a valid sequence of clicks + goal configuration is found
+	Try (a set amount of times, using the test squares, resetting them between each try) to find all other possible solutions (sequences of clicks) that make the level reach the same goal configuration
+	If we can't find others and we are in multi-solution mode OR if we find at least one other and we are in single-solution mode
+		The level/goal/solution generation algorithm failed
+		Load a prevalidated pregenerated level code from file to overwrite the squares and setup the goal configuration, solution(s) and solution squares as above
+	If the number of possible solutions respects the game mode
+		Save level to the prevalidated pregenerated levels file
+		Move on to the finishing steps
+
+Setup the solution clicks boxes and the rest of the UI
+
+The level is ready to be played
+	
+	
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

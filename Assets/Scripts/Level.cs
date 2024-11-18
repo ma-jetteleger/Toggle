@@ -108,6 +108,12 @@ public class Level : MonoBehaviour
 	[SerializeField] private string _multiSolutionsLevelsFile = string.Empty;
 	[SerializeField] private int _playedLevelQueueSize = 0;
 
+	[HorizontalLine(1)]
+	[SerializeField] private bool _printSolutions = false;
+
+	// Debug
+
+
 	public Square[] Squares { get; set; }
     public Square[] SolutionSquares { get; set; }
 	public List<Solution> Solutions { get; set; }
@@ -458,13 +464,9 @@ public class Level : MonoBehaviour
 		for (var i = 0; i < Squares.Length; i++)
 		{
 			Squares[i].SetupTargetsAndPredictions(Squares);
+			SolutionSquares[i].SetupTargetsAndPredictions(SolutionSquares);
 
 			_testSquares[i].SetupTargets(Squares[i]);
-		}
-
-		for (var i = 0; i < SolutionSquares.Length; i++)
-		{
-			SolutionSquares[i].SetupTargetsAndPredictions(SolutionSquares);
 		}
 
 		for (var i = 0; i < Squares.Length; i++)
@@ -696,13 +698,18 @@ public class Level : MonoBehaviour
 
 		//LevelPanel.Instance.SetupSolutionBoxes(Solutions);
 
-		Debug.Log($"{Solutions.Count} possible solutions:");
-
-		for (var i = 0; i < Solutions.Count; i++)
+#if UNITY_EDITOR
+		if (_printSolutions)
 		{
-			Debug.Log(string.Join(", ", Solutions[i].Sequence));
+			Debug.Log($"{Solutions.Count} possible solutions:");
+
+			for (var i = 0; i < Solutions.Count; i++)
+			{
+				Debug.Log(string.Join(", ", Solutions[i].Sequence));
+			}
 		}
 	}
+#endif
 
 	private string GetValidPregeneratedLevel()
 	{

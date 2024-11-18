@@ -442,7 +442,7 @@ public class Square : MonoBehaviour
 
 		if(turnOffCascading)
 		{
-			Debug.Log("It happened");
+			//Debug.Log("It happened");
 
 			Cascading = false;
 		}

@@ -90,3 +90,7 @@
 
 - ~~[bug] Next level button never hides on single solution mode~~
 - [feat] Include number of solutions in the progression
+
+## 2024-11-15
+
+- [???] ? Try solutions that have an amount of clicks that is different (fewer than) the amount of squares - 1?
