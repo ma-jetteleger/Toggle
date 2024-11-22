@@ -65,7 +65,6 @@ public class Square : MonoBehaviour
 		{
 			_cascading = value;
 
-
 			if (_cascadingIndicator != null)
 			{
 				_cascadingIndicator.SetActive(_cascading);
@@ -73,10 +72,30 @@ public class Square : MonoBehaviour
 		}
 	}
 
-    public bool Toggled { get; set; }
+	public TargetingScheme TargetScheme
+	{
+		get
+		{
+			return _targetingScheme; 
+		}
+		set
+		{
+			_targetingScheme = value;
+
+			if(!SolutionSquare)
+			{
+				_targetIndicator.sprite = _targetSchemeSprites[(int)_targetingScheme];
+			}
+		}
+	}
+
+	public bool SolutionSquare => _referenceSquare != null;
+	public Square PreviousSquare => _level.Squares[Id > 0 ? Id - 1 : _level.Squares.Length - 1];
+	public Square NextSquare => _level.Squares[Id < _level.Squares.Length - 1 ? Id + 1 : 0];
+
+	public bool Toggled { get; set; }
     public bool Highlighted { get; set; }
-    public bool SolutionSquare { get; set; }
-    public TargetingScheme TargetScheme { get; set; }
+
 	public List<Square> Targets { get; set; }
 	public int Id { get; set; }
 
@@ -94,143 +113,144 @@ public class Square : MonoBehaviour
     private float _uninteractableOverlayAlpha;
 	private Square _referenceSquare;
 	private bool _cascading;
-	private bool _originallyCascading;
+	private TargetingScheme _targetingScheme;
 
-    public void Initialize(int id, Level level, bool? toggle = null, TargetingScheme? targetingScheme = null, bool? cascading = null, Square referenceSquare = null)
+    public void Initialize(
+		int id, 
+		Level level)
 	{
-		SolutionSquare = referenceSquare != null;
-
 		_rectangle = GetComponent<Rectangle>();
         _normalColor = _rectangle.Color;
         
         Id = id;
         _level = level;
 
-		gameObject.name = $"{(SolutionSquare ? "Solution" : "")}Square({Id})";
+		gameObject.name = $"Square({Id})";
 
-		if (!SolutionSquare)
+		_targetPredictionTemplate.SetActive(false);
+
+		_outlineRectangle = _outline.GetComponent<Rectangle>();
+        _normalOutlineColor = _outlineRectangle.Color;
+        _normalPosition = transform.position;
+        _normalOverlayColor = _noMoreClicksOverlay.Color;
+        _uninteractableOverlayAlpha = _uninteractableOverlay.Color.a;
+
+        _outline.SetActive(false);
+
+        /*if(!targetingScheme.HasValue)
 		{
-			_targetPredictionTemplate.SetActive(false);
+            var first = Id == 0;
+            var last = Id == _level.Squares.Length - 1;
 
-			_outlineRectangle = _outline.GetComponent<Rectangle>();
-            _normalOutlineColor = _outlineRectangle.Color;
-            _normalPosition = transform.position;
-            _normalOverlayColor = _noMoreClicksOverlay.Color;
-            _uninteractableOverlayAlpha = _uninteractableOverlay.Color.a;
+            var possibleTargetSchemes = new List<TargetingScheme>();
+            var targetSchemes = (TargetingScheme[])System.Enum.GetValues(typeof(TargetingScheme));
 
-            _outline.SetActive(false);
-
-            if(!targetingScheme.HasValue)
+            for (var i = 0; i < targetSchemes.Length; i++)
 			{
-                var first = Id == 0;
-                var last = Id == _level.Squares.Length - 1;
+                var targetScheme = targetSchemes[i];
 
-                var possibleTargetSchemes = new List<TargetingScheme>();
-                var targetSchemes = (TargetingScheme[])System.Enum.GetValues(typeof(TargetingScheme));
-
-                for (var i = 0; i < targetSchemes.Length; i++)
+				switch (targetScheme)
 				{
-                    var targetScheme = targetSchemes[i];
-
-					switch (targetScheme)
-					{
-						case TargetingScheme.Self:
-                            break;
-						case TargetingScheme.Left:
-                            if(!level.WrapAroundToggles && first)
-							{
-                                continue;
-							}
-							break;
-						case TargetingScheme.Right:
-                            if (!level.WrapAroundToggles && last)
-                            {
-                                continue;
-                            }
-                            break;
-						case TargetingScheme.SelfLeft:
-                            if ((!level.WrapAroundToggles && first)
-                                || !level.SelfSideTarget)
-                            {
-                                continue;
-                            }
-                            break;
-						case TargetingScheme.SelfRight:
-                            if ((!level.WrapAroundToggles && last)
-                                || !level.SelfSideTarget)
-                            {
-                                continue;
-                            }
-                            break;
-						case TargetingScheme.LeftRight:
-                            if ((!level.WrapAroundToggles && (first || last))
-                                || !level.LeftRightTarget)
-                            {
-                                continue;
-                            }
-                            break;
-						case TargetingScheme.SelfLeftRight:
-                            if ((!level.WrapAroundToggles && (first || last))
-                                || !level.SelfLeftRightTarget)
-                            {
-                                continue;
-                            }
-                            break;
-					}
-
-                    possibleTargetSchemes.Add(targetScheme);
-                }
-
-                TargetScheme = possibleTargetSchemes[Random.Range(0, possibleTargetSchemes.Count)];
-			}
-			else
-			{
-                TargetScheme = targetingScheme.Value;
-            }
-
-            _targetIndicator.sprite = _targetSchemeSprites[(int)TargetScheme];
-
-			if(!cascading.HasValue)
-			{
-				if (_level.CascadingToggles)
-				{
-					Cascading = Random.Range(0f, 1f) > 0.5f;
+					case TargetingScheme.Self:
+                        break;
+					case TargetingScheme.Left:
+                        if(!level.WrapAroundToggles && first)
+						{
+                            continue;
+						}
+						break;
+					case TargetingScheme.Right:
+                        if (!level.WrapAroundToggles && last)
+                        {
+                            continue;
+                        }
+                        break;
+					case TargetingScheme.SelfLeft:
+                        if ((!level.WrapAroundToggles && first)
+                            || !level.SelfSideTarget)
+                        {
+                            continue;
+                        }
+                        break;
+					case TargetingScheme.SelfRight:
+                        if ((!level.WrapAroundToggles && last)
+                            || !level.SelfSideTarget)
+                        {
+                            continue;
+                        }
+                        break;
+					case TargetingScheme.LeftRight:
+                        if ((!level.WrapAroundToggles && (first || last))
+                            || !level.LeftRightTarget)
+                        {
+                            continue;
+                        }
+                        break;
+					case TargetingScheme.SelfLeftRight:
+                        if ((!level.WrapAroundToggles && (first || last))
+                            || !level.SelfLeftRightTarget)
+                        {
+                            continue;
+                        }
+                        break;
 				}
-				else
-				{
-					Cascading = false;
-				}
-			}
-			else
-			{
-				Cascading = cascading.Value;
-			}
 
-			//_cascadingIndicator.SetActive(Cascading);
-
-			if (!toggle.HasValue)
-			{
-                if (Random.Range(0f, 1f) > 0.5f)
-                {
-                    Toggle();
-                }
-            }
-			else
-			{
-                Toggle(toggle.Value);
+                possibleTargetSchemes.Add(targetScheme);
             }
 
-            Interactable = true;
+            TargetScheme = possibleTargetSchemes[Random.Range(0, possibleTargetSchemes.Count)];
 		}
 		else
 		{
-            _referenceSquare = referenceSquare;
-
-            TargetScheme = _referenceSquare.TargetScheme;
-			Cascading = _referenceSquare.Cascading;
-
-			Toggle(_referenceSquare.Toggled);
+            TargetScheme = targetingScheme.Value;
         }
+
+        _targetIndicator.sprite = _targetSchemeSprites[(int)TargetScheme];
+
+		if(!cascading.HasValue)
+		{
+			if (_level.CascadingToggles)
+			{
+				Cascading = Random.Range(0f, 1f) > 0.5f;
+			}
+			else
+			{
+				Cascading = false;
+			}
+		}
+		else
+		{
+			Cascading = cascading.Value;
+		}
+
+		//_cascadingIndicator.SetActive(Cascading);
+
+		if (!toggle.HasValue)
+		{
+            if (Random.Range(0f, 1f) > 0.5f)
+            {
+                Toggle();
+            }
+        }
+		else
+		{
+            Toggle(toggle.Value);
+        }*/
+
+        Interactable = true;
+	}
+
+	public void Initialize(Level level, Square referenceSquare)
+	{
+		_referenceSquare = referenceSquare;
+
+		Id = _referenceSquare.Id;
+		_level = level;
+
+		_rectangle = GetComponent<Rectangle>();
+		_normalColor = _rectangle.Color;
+
+		gameObject.name = $"{(SolutionSquare ? "Solution" : "")}Square({Id})";
 	}
 
 	public void Overwrite(bool toggle, TargetingScheme targetingScheme, bool cascading)

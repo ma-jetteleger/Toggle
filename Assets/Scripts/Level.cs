@@ -13,13 +13,14 @@ using System;
 [Serializable]
 public class ProgressionEntry
 {
-	public int Squares;
-	public bool LeftRightTargets;
-	public bool SelfSideTargets;
-	public bool SelfLeftRightTargets;
-	public bool WrapAroundToggles;
-	public int CascadingToggles;
-	public Vector2Int AdjacentCascadingToggles;	
+	public int Squares;								// Fixed int value, -1: random from inspector range
+	public int LeftRightTargets;					// At least the int value, -1: random including none
+	public int SelfLeftTargets;                     // At least the int value, -1: random including none
+	public int SelfRightTargets;                    // At least the int value, -1: random including none
+	public int SelfLeftRightTargets;                // At least the int value, -1: random including none
+	public int WrapAroundToggles;                   // At least the int value, -1: random including none
+	public int CascadingToggles;                    // ...
+	public Vector2Int AdjacentCascadingToggles;		// ...
 	// This is more complex than originally thought of
 	// as it only impacts gameplay/complexity if two adjacent 
 	// cascading squares actually interact with each other through
@@ -63,7 +64,6 @@ public class Level : MonoBehaviour
 
 	// Generation parameters
 	[SerializeField] private Vector2Int _squaresRange = Vector2Int.zero;
-	//[SerializeField] private int _minClicksForSolution = 0;
 	[SerializeField] private int _maxClicksBufferForSolution = 0;
 	[SerializeField] private int _solutionGenerationAttempts = 0;
 
@@ -83,17 +83,14 @@ public class Level : MonoBehaviour
 	// Features
 	[SerializeField] private bool _progression = false;
 	[SerializeField] [ShowIf(nameof(_progression))] private string _progressionFile = string.Empty;
-	[SerializeField] [ShowIf(nameof(_progression))] private int _completedLevelsForExtraSquare = 0;
-	[SerializeField] [ShowIf(nameof(_progression))] private int _wrapAroundTogglesIndex = 0;
-	[SerializeField] [ShowIf(nameof(_progression))] private int _leftRightTargetIndex = 0;
-	[SerializeField] [ShowIf(nameof(_progression))] private int _selfSideTargetIndex = 0;
-	[SerializeField] [ShowIf(nameof(_progression))] private int _selfLeftRightTargetIndex = 0;
-	[SerializeField] [ShowIf(nameof(_progression))] private int _cascadingTogglesIndex = 0;
-	[SerializeField] [HideIf(nameof(_progression))] private bool _wrapAroundToggles = false;
-	[SerializeField] [HideIf(nameof(_progression))] private bool _leftRightTarget = false;
-	[SerializeField] [HideIf(nameof(_progression))] private bool _selfSideTarget = false;
-	[SerializeField] [HideIf(nameof(_progression))] private bool _selfLeftRightTarget = false;
-	[SerializeField] [HideIf(nameof(_progression))] private bool _cascadingToggles = false;
+	[SerializeField] [HideIf(nameof(_progression))] private int _squares = -1;
+	[SerializeField] [HideIf(nameof(_progression))] private int _wrapAroundToggles = -1;
+	[SerializeField] [HideIf(nameof(_progression))] private int _leftRightTargets = -1;
+	[SerializeField] [HideIf(nameof(_progression))] private int _selfRightTargets = -1;
+	[SerializeField] [HideIf(nameof(_progression))] private int _selfLeftTargets = -1;
+	[SerializeField] [HideIf(nameof(_progression))] private int _selfLeftRightTargets = -1;
+	[SerializeField] [HideIf(nameof(_progression))] private int _cascadingToggles = -1;
+	[SerializeField] [HideIf(nameof(_progression))] private Vector2Int _adjacentCascadingToggles = Vector2Int.zero;
     [SerializeField] private SolutionType _solutionType = SolutionType.SingleSolution;
     [SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private ClicksCountToNextLevelRestriction _clicksCountRestriction = ClicksCountToNextLevelRestriction.HardRestriction;
     [SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private bool _forceSingleSolution = false;
@@ -108,38 +105,33 @@ public class Level : MonoBehaviour
 	[SerializeField] private string _multiSolutionsLevelsFile = string.Empty;
 	[SerializeField] private int _playedLevelQueueSize = 0;
 
+	// Debug
 	[HorizontalLine(1)]
 	[SerializeField] private bool _printSolutions = false;
-
-	// Debug
-
 
 	public Square[] Squares { get; set; }
     public Square[] SolutionSquares { get; set; }
 	public List<Solution> Solutions { get; set; }
+	public int Clicks { get; set; }
 
-	public int ClicksLeft => Solutions[0].Sequence.Length - _clicks;
-    public int Clicks => _clicks;
+	public int ClicksLeft => Solutions[0].Sequence.Length - Clicks;
     public bool EmptyHistory => _squareHistory.Count == 1;
-    public bool TopOfHistory => _clicks == _squareHistory.Count - 1;
-    public bool BottomOfHistory => _clicks == 0;
+    public bool TopOfHistory => Clicks == _squareHistory.Count - 1;
+    public bool BottomOfHistory => Clicks == 0;
     public SolutionType SolutionType => _solutionType;
-    public bool WrapAroundToggles => _wrapAroundToggles;
-    public bool LeftRightTarget => _leftRightTarget;
-    public bool SelfSideTarget => _selfSideTarget;
-    public bool SelfLeftRightTarget => _selfLeftRightTarget;
-    public bool CascadingToggles => _cascadingToggles;
 
     private string _levelsFileName => _solutionType == SolutionType.SingleSolution? _singleSolutionLevelsFile : _multiSolutionsLevelsFile;
     private string _levelsFilePath => Application.persistentDataPath + "/" + _levelsFileName;
+	private ProgressionEntry _currentProgressionEntry => _progression 
+		? _progressionEntries[_progressionIndex]
+		: _nonProgressionFakeProgressionEntry;
 
-    private Square _previousHoveredSquare;
+	private Square _previousHoveredSquare;
     private Rectangle _squareTemplateRectangle;
     private Rectangle _solutionSquareTemplateRectangle;
     private Square _lastSquareClickedDown;
     private Vector2 _levelCompletionFeedbackFinalSize;
     private Color _levelCompletionFeedbackBaseColor;
-    private int _clicks;
     private int _progressionIndex;
     private List<HistorySquare[]> _squareHistory;
 	private TestSquare[] _testSquares;
@@ -147,6 +139,7 @@ public class Level : MonoBehaviour
 	private string _levelCode;
 	private bool _trulyCompleted;
 	private List<ProgressionEntry> _progressionEntries;
+	private ProgressionEntry _nonProgressionFakeProgressionEntry;
 
     private void Awake()
 	{
@@ -270,7 +263,7 @@ public class Level : MonoBehaviour
 					_lastSquareClickedDown.HideTargetPredictions();
 					_lastSquareClickedDown.Interactable = false;
 
-					_clicks++;
+					Clicks++;
 
 					AddNewHistorySnapshot();
 
@@ -368,105 +361,278 @@ public class Level : MonoBehaviour
 
 		// Generation
 
+		_nonProgressionFakeProgressionEntry = new ProgressionEntry()
+		{
+			Squares = _squares,
+			LeftRightTargets = _leftRightTargets,
+			SelfRightTargets = _selfRightTargets,
+			SelfLeftTargets = _selfLeftTargets,
+			SelfLeftRightTargets = _selfLeftRightTargets,
+			WrapAroundToggles = _wrapAroundToggles,
+			CascadingToggles = _cascadingToggles,
+			AdjacentCascadingToggles = _adjacentCascadingToggles
+		};
+
 		var squares = levelCode != null
 			? splitSquaresCode.Length
-			: _progression
-				? (int)Mathf.Min(_squaresRange.x + Mathf.Floor(_progressionIndex / (float)_completedLevelsForExtraSquare), _squaresRange.y)
+			: _currentProgressionEntry.Squares > 0
+				? _currentProgressionEntry.Squares
 				: UnityEngine.Random.Range(_squaresRange.x, _squaresRange.y + 1);
 
-		if(_progression)
-		{
-			_wrapAroundToggles = _progressionIndex >= _wrapAroundTogglesIndex;
-			_leftRightTarget = _progressionIndex >= _leftRightTargetIndex;
-			_selfSideTarget = _progressionIndex >= _selfSideTargetIndex;
-			_selfLeftRightTarget = _progressionIndex >= _selfLeftRightTargetIndex;
-			_cascadingToggles = _progressionIndex >= _cascadingTogglesIndex;
-		}
-		
 		var indices = new int[squares];
 
 		Squares = new Square[squares];
 		SolutionSquares = new Square[squares];
 
-		_testSquares = new TestSquare[squares];
-
-		_squareHistory.Clear();
-
-		var firstHistorySnapshot = new HistorySquare[Squares.Length];
-
 		for (var i = 0; i < squares; i++)
-		{
-			// Square
-
-			var squareCodeToggle = splitSquaresCode != null
-				? splitSquaresCode[i] != null
-					? splitSquaresCode[i][0] == 't'
-					: (bool?)null
-				: null;
-			var squareCodeTarget = splitSquaresCode != null
-				? splitSquaresCode[i] != null
-					? (Square.TargetingScheme)int.Parse(splitSquaresCode[i][1].ToString())
-					: (Square.TargetingScheme?)null
-				: null;
-			var squareCodeCascading = splitSquaresCode != null
-				? splitSquaresCode[i] != null && splitSquaresCode.Length > 2
-					? splitSquaresCode[i][2] == 't'
-					: (bool?)null
-				: null;
-
+		{ 
 			var newSquare = Instantiate(_squareTemplate, _squareTemplate.transform.parent).GetComponent<Square>();
 			newSquare.transform.localPosition = -(Vector3.right * (_squareTemplateRectangle.Width + _squaresDistance) * (squares - 1)) / 2f
 				+ Vector3.right * (_squareTemplateRectangle.Width + _squaresDistance) * i;
 
-			newSquare.Initialize(
-				i, 
-				this,
-				squareCodeToggle,
-				squareCodeTarget,
-				squareCodeCascading);
+			newSquare.Initialize(i, this);
 
 			newSquare.gameObject.SetActive(true);
-
-			Squares[i] = newSquare;
-
-			firstHistorySnapshot[i] = new HistorySquare()
-			{
-				Toggled = Squares[i].Toggled,
-				Interactable = true,
-				Cascading = Squares[i].Cascading
-			};
-
-			indices[i] = i;
-
-			// Solution square
 
 			var newSolutionSquare = Instantiate(_solutionSquareTemplate, _solutionSquareTemplate.transform.parent).GetComponent<Square>();
 			newSolutionSquare.transform.localPosition = -(Vector3.right * (_solutionSquareTemplateRectangle.Width + _solutionSquaresDistance) * (squares - 1)) / 2f
 				+ Vector3.right * (_solutionSquareTemplateRectangle.Width + _solutionSquaresDistance) * i;
 
-			newSolutionSquare.Initialize(
-				i, 
-				this, 
-				null, 
-				null,
-				null,
-				newSquare);
-
 			newSolutionSquare.gameObject.SetActive(true);
 
 			SolutionSquares[i] = newSolutionSquare;
 
-			// Test square
+			Squares[i] = newSquare;
 
-			_testSquares[i] = new TestSquare(newSquare);
+			indices[i] = i;
 		}
+
+		if(splitSquaresCode != null)
+		{
+			for (var i = 0; i < Squares.Length; i++)
+			{
+				var square = Squares[i];
+
+				square.TargetScheme = (Square.TargetingScheme)int.Parse(splitSquaresCode[i][1].ToString());
+				square.Cascading = splitSquaresCode.Length > 2 && splitSquaresCode[i][2] == 'c';
+
+				if (splitSquaresCode[i][0] == 't')
+				{
+					square.Toggle();
+				}
+			}
+		}
+		else
+		{
+			var squaresForWrapAround = new List<Square>();
+
+			if (_currentProgressionEntry.WrapAroundToggles != 0)
+			{
+				var numWrapAroundToggles = _currentProgressionEntry.WrapAroundToggles < 0
+					? UnityEngine.Random.Range(0, 3)
+					: UnityEngine.Random.Range(_currentProgressionEntry.WrapAroundToggles, 3);
+
+				switch (numWrapAroundToggles)
+				{
+					case 1:
+						squaresForWrapAround.Add(UnityEngine.Random.Range(0f, 1f) > 0.5f ? Squares[0] : Squares[Squares.Length - 1]);
+						break;
+					case 2:
+						squaresForWrapAround.Add(Squares[0]);
+						squaresForWrapAround.Add(Squares[Squares.Length - 1]);
+						break;
+				}
+			}
+			
+			var shuffledSquares = new List<Square>(Squares).OrderBy(x => new System.Random().Next()).ToList();
+
+			var targetingSchemes = new List<Square.TargetingScheme>();
+			var orderedTargetingSchemes = new List<Square.TargetingScheme>();
+
+			var targetingSchemeToProgressionEntryTargetsMap = new Dictionary<Square.TargetingScheme, int>
+				{
+					{ Square.TargetingScheme.SelfLeftRight, _currentProgressionEntry.SelfLeftRightTargets },
+					{ Square.TargetingScheme.SelfLeft, _currentProgressionEntry.SelfLeftTargets },
+					{ Square.TargetingScheme.SelfRight, _currentProgressionEntry.SelfRightTargets },
+					{ Square.TargetingScheme.LeftRight, _currentProgressionEntry.LeftRightTargets }
+				};
+
+			foreach (var targetingSchemeToProgressionEntryTargetsItem in targetingSchemeToProgressionEntryTargetsMap)
+			{
+				if (targetingSchemeToProgressionEntryTargetsItem.Value > 0)
+				{
+					targetingSchemes.Add(targetingSchemeToProgressionEntryTargetsItem.Key);
+
+					for (var i = 0; i < targetingSchemeToProgressionEntryTargetsItem.Value; i++)
+					{
+						orderedTargetingSchemes.Add(targetingSchemeToProgressionEntryTargetsItem.Key);
+					}
+				}
+				else if(targetingSchemeToProgressionEntryTargetsItem.Value < 0)
+				{
+					targetingSchemes.Add(targetingSchemeToProgressionEntryTargetsItem.Key);
+				}
+			}
+
+			targetingSchemes.Add(Square.TargetingScheme.Left);
+			orderedTargetingSchemes.Add(Square.TargetingScheme.Left);
+
+			targetingSchemes.Add(Square.TargetingScheme.Right);
+			orderedTargetingSchemes.Add(Square.TargetingScheme.Right);
+
+			targetingSchemes.Add(Square.TargetingScheme.Self);
+			orderedTargetingSchemes.Add(Square.TargetingScheme.Self);
+
+			foreach (var squareForWrapAround in squaresForWrapAround)
+			{
+				var possibleTargetingSchemes = (squareForWrapAround.Id == 0
+					? orderedTargetingSchemes.Where(x => x != Square.TargetingScheme.SelfRight && x != Square.TargetingScheme.Right && x != Square.TargetingScheme.Self)
+					: orderedTargetingSchemes.Where(x => x != Square.TargetingScheme.SelfLeft && x != Square.TargetingScheme.Left && x != Square.TargetingScheme.Self))
+					.ToList();
+
+				foreach (var targetingSchemeToProgressionEntryTargetsItem in targetingSchemeToProgressionEntryTargetsMap)
+				{
+					if (targetingSchemeToProgressionEntryTargetsItem.Value >= 0
+						|| (squareForWrapAround.Id == 0 && targetingSchemeToProgressionEntryTargetsItem.Key == Square.TargetingScheme.SelfRight) 
+						|| (squareForWrapAround.Id == Squares.Length - 1 && targetingSchemeToProgressionEntryTargetsItem.Key == Square.TargetingScheme.SelfLeft))
+					{
+						continue;
+					}
+
+					possibleTargetingSchemes.Add(targetingSchemeToProgressionEntryTargetsItem.Key);
+				}
+
+				squareForWrapAround.TargetScheme = possibleTargetingSchemes[UnityEngine.Random.Range(0, possibleTargetingSchemes.Count)];
+
+				if(orderedTargetingSchemes.Contains(squareForWrapAround.TargetScheme))
+				{
+					orderedTargetingSchemes.Remove(squareForWrapAround.TargetScheme);
+				}
+				
+				shuffledSquares.Remove(squareForWrapAround);
+
+				// The random assignment of possible targeting schemes for wrap around squares might make it so
+				// "mandatory" targeting schemes aren't assigned to any square. This can happen because the wrap around
+				// squares "take up space" that is reserved for random assignment, not priority assignment.
+				// Maybe we can solve this by doing a "final pass" to change the non-mandatory targeting schemes of edge 
+				// squares to "mandatory" targeting schemes that haven't been assigned to any square yet because there 
+				// wasn't enough space for them because of the wrap around toggles
+			}
+
+			for (var i = 0; i < shuffledSquares.Count; i++)
+			{
+				var shuffledSquare = shuffledSquares[i];
+				var possibleOrderedTargetingSchemes = new List<Square.TargetingScheme>();
+				var possibleTargetingSchemes = new List<Square.TargetingScheme>();
+
+				if (shuffledSquare.Id == 0)
+				{
+					Func<Square.TargetingScheme, bool> condition = x =>
+					x != Square.TargetingScheme.Left &&
+					x != Square.TargetingScheme.LeftRight &&
+					x != Square.TargetingScheme.SelfLeft &&
+					x != Square.TargetingScheme.SelfLeftRight;
+
+					possibleOrderedTargetingSchemes = orderedTargetingSchemes.Where(condition).ToList();
+					possibleTargetingSchemes = targetingSchemes.Where(condition).ToList();
+				}
+				else if(shuffledSquare.Id == Squares.Length - 1)
+				{
+					Func<Square.TargetingScheme, bool> condition = x =>
+					x != Square.TargetingScheme.Right &&
+					x != Square.TargetingScheme.LeftRight &&
+					x != Square.TargetingScheme.SelfRight &&
+					x != Square.TargetingScheme.SelfLeftRight;
+
+					possibleOrderedTargetingSchemes = orderedTargetingSchemes.Where(condition).ToList();
+					possibleTargetingSchemes = targetingSchemes.Where(condition).ToList();
+				}
+				else
+				{
+					possibleOrderedTargetingSchemes = orderedTargetingSchemes;
+					possibleTargetingSchemes = targetingSchemes;
+				}
+
+				var targetingSchemesToRemove = new[]
+				{
+					Square.TargetingScheme.Self,
+					Square.TargetingScheme.Left,
+					Square.TargetingScheme.Right
+				};
+
+				foreach(var targetingSchemeToRemove in targetingSchemesToRemove)
+				{
+					if (possibleOrderedTargetingSchemes.Contains(targetingSchemeToRemove))
+					{
+						possibleOrderedTargetingSchemes.Remove(targetingSchemeToRemove);
+					}
+				}
+
+				// TODO: the correct targeting schemes are not copied into the temp (possible) list correctly in this loop...
+				// Enforcing a targeting scheme with a 1 doesn't work all the time...
+
+				if(possibleOrderedTargetingSchemes.Count > 0)
+				{
+					shuffledSquare.TargetScheme = possibleOrderedTargetingSchemes[0];
+				}
+				else
+				{
+					shuffledSquare.TargetScheme = possibleTargetingSchemes[UnityEngine.Random.Range(0, possibleTargetingSchemes.Count)];
+				}
+
+				if (orderedTargetingSchemes.Contains(shuffledSquare.TargetScheme))
+				{
+					orderedTargetingSchemes.Remove(shuffledSquare.TargetScheme);
+				}
+				
+				/*shuffledSquare.TargetScheme = i <= possibleOrderedTargetingSchemes.Count - 1
+					? possibleOrderedTargetingSchemes[i]
+					: possibleTargetingSchemes[UnityEngine.Random.Range(0, possibleTargetingSchemes.Count)];*/
+			}
+
+			/*var numCascadingToggles = _currentProgressionEntry.CascadingToggles < 0
+				? UnityEngine.Random.Range(0, Squares.Length - 1)
+				: _currentProgressionEntry.CascadingToggles;
+
+			if (numCascadingToggles > 0)
+			{
+				var shuffledSquares = Squares.OrderBy(x => new System.Random().Next()).ToArray();
+
+				for (var i = 0; i < numCascadingToggles; i++)
+				{
+					shuffledSquares[i].Cascading = true;
+				}
+			}*/
+		}
+
+		_squareHistory.Clear();
+
+		var firstHistorySnapshot = new HistorySquare[Squares.Length];
+
+		_testSquares = new TestSquare[squares];
 
 		for (var i = 0; i < Squares.Length; i++)
 		{
-			Squares[i].SetupTargetsAndPredictions(Squares);
+			var square = Squares[i];
+
+			firstHistorySnapshot[i] = new HistorySquare()
+			{
+				Toggled = square.Toggled,
+				Interactable = true,
+				Cascading = square.Cascading
+			};
+
+			SolutionSquares[i].Initialize(this, square);
+			SolutionSquares[i].TargetScheme = square.TargetScheme;
+			SolutionSquares[i].Cascading = square.Cascading;
+			SolutionSquares[i].Toggle(square.Toggled);
+
+			_testSquares[i] = new TestSquare(square);
+
+			square.SetupTargetsAndPredictions(Squares);
 			SolutionSquares[i].SetupTargetsAndPredictions(SolutionSquares);
 
-			_testSquares[i].SetupTargets(Squares[i]);
+			_testSquares[i].SetupTargets(square);
 		}
 
 		for (var i = 0; i < Squares.Length; i++)
@@ -486,7 +652,7 @@ public class Level : MonoBehaviour
 		_solutionRectangle.Width = (_solutionSquareTemplateRectangle.Width + _solutionSquaresDistance) * squares + _solutionSquaresDistance/* * 2*/;
 		_solutionRectangle.Height = _solutionSquareTemplateRectangle.Height + _solutionSquaresDistance * 2;
 
-		if(levelCode != null)
+		if (splitGoalCode != null && splitSolutionsCode != null)
 		{
 			GenerateSolution(splitGoalCode, splitSolutionsCode);
 		}
@@ -495,7 +661,7 @@ public class Level : MonoBehaviour
 			GenerateSolution(indices, 0);
 		}
 
-		_clicks = 0;
+		Clicks = 0;
 
 		LevelPanel.Instance.SetupSolutionBoxes(Solutions);
 		LevelPanel.Instance.UpdateClicksCounter();
@@ -713,8 +879,12 @@ public class Level : MonoBehaviour
 
 	private string GetValidPregeneratedLevel()
 	{
+		Debug.Log("Fuck it for now");
+
+		return null;
+
 		//var lines = File.ReadAllLines(_levelsFilePath);
-		var lines = Resources.Load<TextAsset>(_levelsFileName.Split('.')[0]).text.Split('\n');
+		/*var lines = Resources.Load<TextAsset>(_levelsFileName.Split('.')[0]).text.Split('\n');
 
 		var possibleLines = new List<string>();
 
@@ -746,7 +916,7 @@ public class Level : MonoBehaviour
 				var squareCode = splitSquaresCode[i];
 				var squareTargetingScheme = (Square.TargetingScheme)int.Parse(squareCode[1].ToString());
 
-				if(squareCode.Length > 2 && squareCode[2] == 'c' && !CascadingToggles)
+				if(squareCode.Length > 2 && squareCode[2] == 'c' && _)
 				{
 					validSquares = false;
 
@@ -816,7 +986,7 @@ public class Level : MonoBehaviour
 			possibleLines.Add(line);
 		}
 
-		return possibleLines.Count > 0 ? possibleLines[UnityEngine.Random.Range(0, possibleLines.Count)] : null;
+		return possibleLines.Count > 0 ? possibleLines[UnityEngine.Random.Range(0, possibleLines.Count)] : null;*/
 	}
 
 	private string GetCurrentLevelCode()
@@ -1017,31 +1187,31 @@ public class Level : MonoBehaviour
 
     public void Undo()
 	{
-        if(_clicks == 0)
+        if(Clicks == 0)
 		{
             return;
         }
 
-        LoadHistorySnapshot(_clicks - 1);
+        LoadHistorySnapshot(Clicks - 1);
 
 		CheckLevelCompletion();
 	}
 
     public void Redo()
     {
-        if (_clicks >= _squareHistory.Count - 1)
+        if (Clicks >= _squareHistory.Count - 1)
         {
             return;
         }
 
-        LoadHistorySnapshot(_clicks + 1);
+        LoadHistorySnapshot(Clicks + 1);
 
 		CheckLevelCompletion();
 	}
 
     private void AddNewHistorySnapshot()
 	{
-        for(var i = _squareHistory.Count - 1; i >= _clicks; i--)
+        for(var i = _squareHistory.Count - 1; i >= Clicks; i--)
 		{
             _squareHistory.RemoveAt(i); 
         }
@@ -1063,9 +1233,9 @@ public class Level : MonoBehaviour
 
     private void LoadHistorySnapshot(int index)
 	{
-        _clicks = index;
+        Clicks = index;
 
-        var historySnapshot = _squareHistory[_clicks];
+        var historySnapshot = _squareHistory[Clicks];
 
         for (var i = 0; i < Squares.Length; i++)
         {
@@ -1215,7 +1385,7 @@ public class Level : MonoBehaviour
 
 		LevelPanel.Instance.UpdateHistoryButtons();
 	}
-
+	
 	private void LoadProgressionEntries()
 	{
 		var lines = Resources.Load<TextAsset>(_progressionFile.Split('.')[0]).text.Split('\n');
@@ -1223,16 +1393,17 @@ public class Level : MonoBehaviour
 		foreach(var line in lines)
 		{
 			var splitLine = line.Split(';');
-			var splitAdjacentCascadingTogglesVector = splitLine[6].Split(',');
+			var splitAdjacentCascadingTogglesVector = splitLine[7].Split(',');
 
 			var newProgressionEntry = new ProgressionEntry()
 			{
 				Squares = int.Parse(splitLine[0]),
-				LeftRightTargets = splitLine[1] == "1",
-				SelfSideTargets = splitLine[2] == "1",
-				SelfLeftRightTargets = splitLine[3] == "1",
-				WrapAroundToggles = splitLine[4] == "1",
-				CascadingToggles = int.Parse(splitLine[5]),
+				LeftRightTargets = int.Parse(splitLine[1]),
+				SelfRightTargets = int.Parse(splitLine[2]),
+				SelfLeftTargets = int.Parse(splitLine[3]),
+				SelfLeftRightTargets = int.Parse(splitLine[4]),
+				WrapAroundToggles = int.Parse(splitLine[5]),
+				CascadingToggles = int.Parse(splitLine[6]),
 				AdjacentCascadingToggles = new Vector2Int(
 					int.Parse(splitAdjacentCascadingTogglesVector[0]),
 					int.Parse(splitAdjacentCascadingTogglesVector[1])

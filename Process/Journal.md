@@ -302,8 +302,13 @@ The design implications (and the questions that emerge from them) are a lot, but
 
 The code was pretty much already all there, I just needed to add a line or two to re-call the "click" function on a toggled square to make the cascades happen, and some checks to make the level generation algorithm be able to anticipate the cascades. This is sort-of proof that this is a minimalist addition to the game: I was able to implement it without changing or adding an entire system, I just needed to extend one that already existed
 
+## 2024-11-18
 
+Forcing the level generation algorithm to output specific features doesn't work. The conditions under which some features are valid are too specific and ensuring the generation of those features makes it so other features (or possible combinations/configurations of features) will be ignored. I'm tempted to go another route: to pre-generate as many levels purely randomly like before at edit-time, and to drop the use of the level generation algorithm at runtime altogether. Instead, I'll write a search algorithm that will crawl through the list of pregenerated levels and pool the ones that fit the specific progression requirements. Then the search algorithm will select one of those at random for the player to play. This is basically what's already happening when the generation algorithm fails, but I want to lean into this approach and pivot to using it more deliberately and reliably as the main way levels are provided to the player
 
+## 2024-11-22
+
+I powered through and managed to find a way to make my "ideal algorithm" work... I haven't included every feature in it yet and it's definitely not bug-free as of now, but I'm hopeful...
 
 
 
