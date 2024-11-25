@@ -137,7 +137,9 @@ public class Square : MonoBehaviour
 
         _outline.SetActive(false);
 
-        /*if(!targetingScheme.HasValue)
+		Cascading = false;
+
+		/*if(!targetingScheme.HasValue)
 		{
             var first = Id == 0;
             var last = Id == _level.Squares.Length - 1;
@@ -237,7 +239,7 @@ public class Square : MonoBehaviour
             Toggle(toggle.Value);
         }*/
 
-        Interactable = true;
+		Interactable = true;
 	}
 
 	public void Initialize(Level level, Square referenceSquare)

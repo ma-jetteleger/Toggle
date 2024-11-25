@@ -76,11 +76,10 @@
 - [tech/feat] Save the progression + add a menu with the option to clear the saved progression
 - ~~[bug] Prediction rectangles shake with the square when busting the clicks counter in single solution mode~~
 - ~~[bug] SolutionClicksBoxes aren't destroyed sometimes...~~
-- [tech/feat] ? Rewrite the progression system to _force_ the introduction of some progression features on specific progression indices instead of _allowing_ their introduction?
-	(Idea on how to do this: Get a list of squares. Start with the "top-most" progression feature, and assign that feature to a random square. Remove that square from the list. Repeat thos steps with every progression features from top to bottom. When done with distributing progression features to random squares, the rest of the squares get full random assignations (or restart from the top of the list? That would make sure that, as the player progresses, the levels are mostly filled with the more complex features))
+- ~~[tech/feat] ? Rewrite the progression system to _force_ the introduction of some progression features on specific progression indices instead of _allowing_ their introduction?~~
 - ~~[feat] Implement cascading toggles~~
-- [feat] Gradually introduce cascading toggles in the progression
-	- Maybe go back to shorter arrays to introduce cascading toggles and rebuild to longer arrays gradually 
+- ~~[feat] Gradually introduce cascading toggles in the progression~~
+	- ~~Maybe go back to shorter arrays to introduce cascading toggles and rebuild to longer arrays gradually~~
 - [visual] ? Animate cascading toggles?
 - [visual] ? Highlight cascading toggles on hover?
 - ~~[feat] Exclude squares that aren't toggled by others from being cascading~~

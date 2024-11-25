@@ -13,23 +13,26 @@ using System;
 [Serializable]
 public class ProgressionEntry
 {
-	public int Squares;								// Fixed int value, -1: random from inspector range
-	public int LeftRightTargets;					// At least the int value, -1: random including none
-	public int SelfLeftTargets;                     // At least the int value, -1: random including none
-	public int SelfRightTargets;                    // At least the int value, -1: random including none
-	public int SelfLeftRightTargets;                // At least the int value, -1: random including none
-	public int WrapAroundToggles;                   // At least the int value, -1: random including none
-	public int CascadingToggles;                    // ...
-	public Vector2Int AdjacentCascadingToggles;		// ...
+	public int Squares;							// Fixed int value, -1: random from inspector range
+	public int LeftRightTargets;                // At least the int value, -1: random including none
+	public int SelfLeftTargets;					// At least the int value, -1: random including none
+	public int SelfRightTargets;                // At least the int value, -1: random including none
+	public int SelfLeftRightTargets;            // At least the int value, -1: random including none
+	public int WrapAroundToggles;               // At least the int value, -1: random including none
+	public int CascadingToggles;                // Fixed int value, -1: random including none
+	public bool AdjacentCascadingToggles;		// Allowed or not 
 	// This is more complex than originally thought of
 	// as it only impacts gameplay/complexity if two adjacent 
 	// cascading squares actually interact with each other through
 	// their targeting schemes. I'll ignore the adjacent cascading 
 	// toggle issue for now and think back on it later. 
 	// (the issue is that "chained" cascading 
-	// toggles are more complex but also maybe more interesting so
+	// toggles are more complex but also _maybe_ more interesting so
 	// it'd be nice if we were able to include them progressively 
 	// and control their introduction through the progression)
+	// I decided to include them in the progression but also chose
+	// to ignore the issue of "how many" to include and how
+	// progressively they are introduced
 }
 
 public enum SolutionType
@@ -90,7 +93,7 @@ public class Level : MonoBehaviour
 	[SerializeField] [HideIf(nameof(_progression))] private int _selfLeftTargets = -1;
 	[SerializeField] [HideIf(nameof(_progression))] private int _selfLeftRightTargets = -1;
 	[SerializeField] [HideIf(nameof(_progression))] private int _cascadingToggles = -1;
-	[SerializeField] [HideIf(nameof(_progression))] private Vector2Int _adjacentCascadingToggles = Vector2Int.zero;
+	[SerializeField] [HideIf(nameof(_progression))] private bool _adjacentCascadingToggles = false;
     [SerializeField] private SolutionType _solutionType = SolutionType.SingleSolution;
     [SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private ClicksCountToNextLevelRestriction _clicksCountRestriction = ClicksCountToNextLevelRestriction.HardRestriction;
     [SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private bool _forceSingleSolution = false;
@@ -517,6 +520,9 @@ public class Level : MonoBehaviour
 				// Maybe we can solve this by doing a "final pass" to change the non-mandatory targeting schemes of edge 
 				// squares to "mandatory" targeting schemes that haven't been assigned to any square yet because there 
 				// wasn't enough space for them because of the wrap around toggles
+				// This only happens in very small arrays and might not even occur in the final progression 
+				// where small arrays only have a limited number of features so we'll ignore it for now and revisit
+				// this only if it actually proves to be an issue
 			}
 
 			for (var i = 0; i < shuffledSquares.Count; i++)
@@ -570,39 +576,131 @@ public class Level : MonoBehaviour
 
 				// TODO: the correct targeting schemes are not copied into the temp (possible) list correctly in this loop...
 				// Enforcing a targeting scheme with a 1 doesn't work all the time...
+				// ...Can we reproduce this? It seems like it's fixed?
 
-				if(possibleOrderedTargetingSchemes.Count > 0)
-				{
-					shuffledSquare.TargetScheme = possibleOrderedTargetingSchemes[0];
-				}
-				else
-				{
-					shuffledSquare.TargetScheme = possibleTargetingSchemes[UnityEngine.Random.Range(0, possibleTargetingSchemes.Count)];
-				}
+				shuffledSquare.TargetScheme = possibleOrderedTargetingSchemes.Count > 0
+					? possibleOrderedTargetingSchemes[0]
+					: possibleTargetingSchemes[UnityEngine.Random.Range(0, possibleTargetingSchemes.Count)];
 
 				if (orderedTargetingSchemes.Contains(shuffledSquare.TargetScheme))
 				{
 					orderedTargetingSchemes.Remove(shuffledSquare.TargetScheme);
 				}
-				
-				/*shuffledSquare.TargetScheme = i <= possibleOrderedTargetingSchemes.Count - 1
-					? possibleOrderedTargetingSchemes[i]
-					: possibleTargetingSchemes[UnityEngine.Random.Range(0, possibleTargetingSchemes.Count)];*/
 			}
 
-			/*var numCascadingToggles = _currentProgressionEntry.CascadingToggles < 0
-				? UnityEngine.Random.Range(0, Squares.Length - 1)
-				: _currentProgressionEntry.CascadingToggles;
-
-			if (numCascadingToggles > 0)
+			/*foreach(var targetingSchemeToProgressionEntryTargetsItem in targetingSchemeToProgressionEntryTargetsMap)
 			{
-				var shuffledSquares = Squares.OrderBy(x => new System.Random().Next()).ToArray();
-
-				for (var i = 0; i < numCascadingToggles; i++)
+				if(targetingSchemeToProgressionEntryTargetsItem.Value > 0
+					&& Squares.Count(x => x.TargetScheme == targetingSchemeToProgressionEntryTargetsItem.Key) < targetingSchemeToProgressionEntryTargetsItem.Value)
 				{
-					shuffledSquares[i].Cascading = true;
+					var possibleSquares = new List<Square>();
+
+					switch (targetingSchemeToProgressionEntryTargetsItem.Key)
+					{
+						case Square.TargetingScheme.SelfLeft:
+							break;
+						case Square.TargetingScheme.SelfRight:
+							break;
+						case Square.TargetingScheme.LeftRight:
+							break;
+						case Square.TargetingScheme.SelfLeftRight:
+							break;
+					}
 				}
 			}*/
+
+			// Up here is an attempt at solving the "wrap around squares overtaking priority assignment with random
+			// assignment" issue. We're ignoring it until it proves to be an actual problem instead of an hypothetical one
+
+			var squaresThatCanBeCascading = new List<Square>();
+
+			foreach(var square in Squares)
+			{
+				if(!squaresThatCanBeCascading.Contains(square.PreviousSquare) 
+					&& (square.TargetScheme == Square.TargetingScheme.Left 
+					|| square.TargetScheme == Square.TargetingScheme.LeftRight
+					|| square.TargetScheme == Square.TargetingScheme.SelfLeft
+					|| square.TargetScheme == Square.TargetingScheme.SelfLeftRight))
+				{
+					squaresThatCanBeCascading.Add(square.PreviousSquare);
+				}
+
+				if (!squaresThatCanBeCascading.Contains(square.NextSquare)
+					&& (square.TargetScheme == Square.TargetingScheme.Right
+					|| square.TargetScheme == Square.TargetingScheme.LeftRight
+					|| square.TargetScheme == Square.TargetingScheme.SelfRight
+					|| square.TargetScheme == Square.TargetingScheme.SelfLeftRight))
+				{
+					squaresThatCanBeCascading.Add(square.NextSquare);
+				}
+			}
+
+			squaresThatCanBeCascading = squaresThatCanBeCascading.OrderBy(x => new System.Random().Next()).ToList();
+
+			var numCascadingToggles = _currentProgressionEntry.CascadingToggles < 0
+				? UnityEngine.Random.Range(0, squaresThatCanBeCascading.Count + 1)
+				: _currentProgressionEntry.CascadingToggles;
+
+			var assignedCascadingToggles = 0;
+
+			for(var i = 0; i < squaresThatCanBeCascading.Count; i++)
+			{
+				var square = squaresThatCanBeCascading[i];
+
+				if(!_currentProgressionEntry.AdjacentCascadingToggles)
+				{
+					if (square.NextSquare.Cascading
+						&& (square.NextSquare.TargetScheme == Square.TargetingScheme.Left
+						|| square.NextSquare.TargetScheme == Square.TargetingScheme.LeftRight
+						|| square.NextSquare.TargetScheme == Square.TargetingScheme.SelfLeft
+						|| square.NextSquare.TargetScheme == Square.TargetingScheme.SelfLeftRight))
+					{
+						continue;
+					}
+
+					if (square.NextSquare.Cascading
+						&& (square.TargetScheme == Square.TargetingScheme.Right
+						|| square.TargetScheme == Square.TargetingScheme.LeftRight
+						|| square.TargetScheme == Square.TargetingScheme.SelfRight
+						|| square.TargetScheme == Square.TargetingScheme.SelfLeftRight))
+					{
+						continue;
+					}
+
+					if (square.PreviousSquare.Cascading
+						&& (square.PreviousSquare.TargetScheme == Square.TargetingScheme.Right
+						|| square.PreviousSquare.TargetScheme == Square.TargetingScheme.LeftRight
+						|| square.PreviousSquare.TargetScheme == Square.TargetingScheme.SelfRight
+						|| square.PreviousSquare.TargetScheme == Square.TargetingScheme.SelfLeftRight))
+					{
+						continue;
+					}
+
+					if (square.PreviousSquare.Cascading
+						&& (square.TargetScheme == Square.TargetingScheme.Left
+						|| square.TargetScheme == Square.TargetingScheme.LeftRight
+						|| square.TargetScheme == Square.TargetingScheme.SelfLeft
+						|| square.TargetScheme == Square.TargetingScheme.SelfLeftRight))
+					{
+						continue;
+					}
+				}
+				
+				squaresThatCanBeCascading[i].Cascading = true;
+
+				assignedCascadingToggles++;
+
+				if (assignedCascadingToggles >= numCascadingToggles)
+				{
+					break;
+				}
+			}
+
+			if (_currentProgressionEntry.CascadingToggles > 0
+				&& assignedCascadingToggles < _currentProgressionEntry.CascadingToggles)
+			{
+				Debug.Log("Couldn't assign the specified number of cascading toggles, not enough squares are targeted by others");
+			}
 		}
 
 		_squareHistory.Clear();
@@ -1393,7 +1491,6 @@ public class Level : MonoBehaviour
 		foreach(var line in lines)
 		{
 			var splitLine = line.Split(';');
-			var splitAdjacentCascadingTogglesVector = splitLine[7].Split(',');
 
 			var newProgressionEntry = new ProgressionEntry()
 			{
@@ -1404,10 +1501,7 @@ public class Level : MonoBehaviour
 				SelfLeftRightTargets = int.Parse(splitLine[4]),
 				WrapAroundToggles = int.Parse(splitLine[5]),
 				CascadingToggles = int.Parse(splitLine[6]),
-				AdjacentCascadingToggles = new Vector2Int(
-					int.Parse(splitAdjacentCascadingTogglesVector[0]),
-					int.Parse(splitAdjacentCascadingTogglesVector[1])
-				)
+				AdjacentCascadingToggles = splitLine[7] == "1"
 			};
 
 			_progressionEntries.Add(newProgressionEntry);

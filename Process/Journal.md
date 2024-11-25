@@ -310,6 +310,26 @@ Forcing the level generation algorithm to output specific features doesn't work.
 
 I powered through and managed to find a way to make my "ideal algorithm" work... I haven't included every feature in it yet and it's definitely not bug-free as of now, but I'm hopeful...
 
+This is requiring a lot of work but I can't seem to prioritize anything other than consistency right now. Consistency in the progression, that is. And that can only be achieved by an level generation algorithm that is supported by a progression system which allows for inputing and choosing which features are introduced, and when, without fail
+
+## 2024-11-25
+
+I managed to get all the features supported by the new and improved progression system + level generation algorithm. Even the cascading toggles and whether or not they are adjacent to other cascading toggles. However, there are limitations:
+
+- For most features, I can only control the minimum number of that particular feature that is included in a level. So for any particular targeting scheme, and for wrap around toggles, I can only set it to "fully random (including none)" or "at least this number"
+- For the cascading toggles, it's either fully random or a fixed number
+- For adjacent cascades, they are either allowed (not forced) or disallowed (forced not to appear in the level)
+
+Having full control of a numbered range for all features, including the possibility of random within flexible lower and upper bounds, proved to be too complex for the scope of this overhaul
+
+- There is also an issue with the wrap around toggles' targeting schemes being set at random between all the possibly valid targeting scheme for the square, not prioritizing any targeting scheme over others. This makes it so that, in very small arrays: a random, not prioritized targeting scheme might take the place of a supposedly prioritized one. I haven't found a fix for that and it will only ever happen in small arrays, so I'm treating it as a very minor, and therefore ignorable, concern for now
+
+The only thing that's left to be done about this whole task is to re-work the "get level from file" part of the algorithm to fetch and overwrite a failed attempt at generating a new level from scratch with the new rules for generation
+
+With this complete, I think I'll be ready to consider this game mechanically feature-complete. I'll work on the UX and finally choose what to do with the two different modes, but I won't consider adding any new mechanic to the gameplay loop
+
+
+
 
 
 

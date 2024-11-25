@@ -2597,14 +2597,14 @@ MonoBehaviour:
     m_RotationOrder: 4
   _progression: 0
   _progressionFile: Progression.txt
-  _squares: -1
-  _wrapAroundToggles: -1
-  _leftRightTargets: -1
+  _squares: 5
+  _wrapAroundToggles: 1
+  _leftRightTargets: 1
   _selfRightTargets: -1
   _selfLeftTargets: -1
   _selfLeftRightTargets: 1
-  _cascadingToggles: -1
-  _adjacentCascadingToggles: {x: 0, y: 0}
+  _cascadingToggles: 2
+  _adjacentCascadingToggles: 0
   _solutionType: 1
   _clicksCountRestriction: 0
   _forceSingleSolution: 1
@@ -2880,7 +2880,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 114.795, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &745161041
