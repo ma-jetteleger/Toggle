@@ -92,4 +92,9 @@
 
 ## 2024-11-15
 
-- [???] ? Try solutions that have an amount of clicks that is different (fewer than) the amount of squares - 1?
+- [feat] ? Try solutions that have an amount of clicks that is different (fewer than) the amount of squares - 1?
+
+## 2024-12-02
+
+- [feat] Include the self targeting scheme in the progression
+- [visual] Try a less explicit feedback for the toggle predictions

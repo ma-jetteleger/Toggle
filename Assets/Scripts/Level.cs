@@ -126,7 +126,9 @@ public class Level : MonoBehaviour
     private string _levelsFileName => _solutionType == SolutionType.SingleSolution? _singleSolutionLevelsFile : _multiSolutionsLevelsFile;
     private string _levelsFilePath => Application.persistentDataPath + "/" + _levelsFileName;
 	private ProgressionEntry _currentProgressionEntry => _progression 
-		? _progressionEntries[_progressionIndex]
+		? _progressionIndex <= _progressionEntries.Count - 1 
+			? _progressionEntries[_progressionIndex]
+			: _progressionEntries[_progressionEntries.Count - 1]
 		: _nonProgressionFakeProgressionEntry;
 
 	private Square _previousHoveredSquare;
@@ -427,6 +429,14 @@ public class Level : MonoBehaviour
 		}
 		else
 		{
+			for (var i = 0; i < Squares.Length; i++)
+			{
+				if (UnityEngine.Random.Range(0f, 1f) > 0.5f)
+				{
+					Squares[i].Toggle();
+				}
+			}
+
 			var squaresForWrapAround = new List<Square>();
 
 			if (_currentProgressionEntry.WrapAroundToggles != 0)
@@ -612,94 +622,97 @@ public class Level : MonoBehaviour
 			// Up here is an attempt at solving the "wrap around squares overtaking priority assignment with random
 			// assignment" issue. We're ignoring it until it proves to be an actual problem instead of an hypothetical one
 
-			var squaresThatCanBeCascading = new List<Square>();
-
-			foreach(var square in Squares)
+			if(_currentProgressionEntry.CascadingToggles != 0)
 			{
-				if(!squaresThatCanBeCascading.Contains(square.PreviousSquare) 
-					&& (square.TargetScheme == Square.TargetingScheme.Left 
-					|| square.TargetScheme == Square.TargetingScheme.LeftRight
-					|| square.TargetScheme == Square.TargetingScheme.SelfLeft
-					|| square.TargetScheme == Square.TargetingScheme.SelfLeftRight))
+				var squaresThatCanBeCascading = new List<Square>();
+
+				foreach (var square in Squares)
 				{
-					squaresThatCanBeCascading.Add(square.PreviousSquare);
-				}
-
-				if (!squaresThatCanBeCascading.Contains(square.NextSquare)
-					&& (square.TargetScheme == Square.TargetingScheme.Right
-					|| square.TargetScheme == Square.TargetingScheme.LeftRight
-					|| square.TargetScheme == Square.TargetingScheme.SelfRight
-					|| square.TargetScheme == Square.TargetingScheme.SelfLeftRight))
-				{
-					squaresThatCanBeCascading.Add(square.NextSquare);
-				}
-			}
-
-			squaresThatCanBeCascading = squaresThatCanBeCascading.OrderBy(x => new System.Random().Next()).ToList();
-
-			var numCascadingToggles = _currentProgressionEntry.CascadingToggles < 0
-				? UnityEngine.Random.Range(0, squaresThatCanBeCascading.Count + 1)
-				: _currentProgressionEntry.CascadingToggles;
-
-			var assignedCascadingToggles = 0;
-
-			for(var i = 0; i < squaresThatCanBeCascading.Count; i++)
-			{
-				var square = squaresThatCanBeCascading[i];
-
-				if(!_currentProgressionEntry.AdjacentCascadingToggles)
-				{
-					if (square.NextSquare.Cascading
-						&& (square.NextSquare.TargetScheme == Square.TargetingScheme.Left
-						|| square.NextSquare.TargetScheme == Square.TargetingScheme.LeftRight
-						|| square.NextSquare.TargetScheme == Square.TargetingScheme.SelfLeft
-						|| square.NextSquare.TargetScheme == Square.TargetingScheme.SelfLeftRight))
-					{
-						continue;
-					}
-
-					if (square.NextSquare.Cascading
-						&& (square.TargetScheme == Square.TargetingScheme.Right
-						|| square.TargetScheme == Square.TargetingScheme.LeftRight
-						|| square.TargetScheme == Square.TargetingScheme.SelfRight
-						|| square.TargetScheme == Square.TargetingScheme.SelfLeftRight))
-					{
-						continue;
-					}
-
-					if (square.PreviousSquare.Cascading
-						&& (square.PreviousSquare.TargetScheme == Square.TargetingScheme.Right
-						|| square.PreviousSquare.TargetScheme == Square.TargetingScheme.LeftRight
-						|| square.PreviousSquare.TargetScheme == Square.TargetingScheme.SelfRight
-						|| square.PreviousSquare.TargetScheme == Square.TargetingScheme.SelfLeftRight))
-					{
-						continue;
-					}
-
-					if (square.PreviousSquare.Cascading
+					if (!squaresThatCanBeCascading.Contains(square.PreviousSquare)
 						&& (square.TargetScheme == Square.TargetingScheme.Left
 						|| square.TargetScheme == Square.TargetingScheme.LeftRight
 						|| square.TargetScheme == Square.TargetingScheme.SelfLeft
 						|| square.TargetScheme == Square.TargetingScheme.SelfLeftRight))
 					{
-						continue;
+						squaresThatCanBeCascading.Add(square.PreviousSquare);
+					}
+
+					if (!squaresThatCanBeCascading.Contains(square.NextSquare)
+						&& (square.TargetScheme == Square.TargetingScheme.Right
+						|| square.TargetScheme == Square.TargetingScheme.LeftRight
+						|| square.TargetScheme == Square.TargetingScheme.SelfRight
+						|| square.TargetScheme == Square.TargetingScheme.SelfLeftRight))
+					{
+						squaresThatCanBeCascading.Add(square.NextSquare);
 					}
 				}
-				
-				squaresThatCanBeCascading[i].Cascading = true;
 
-				assignedCascadingToggles++;
+				squaresThatCanBeCascading = squaresThatCanBeCascading.OrderBy(x => new System.Random().Next()).ToList();
 
-				if (assignedCascadingToggles >= numCascadingToggles)
+				var numCascadingToggles = _currentProgressionEntry.CascadingToggles < 0
+					? UnityEngine.Random.Range(0, squaresThatCanBeCascading.Count + 1)
+					: _currentProgressionEntry.CascadingToggles;
+
+				var assignedCascadingToggles = 0;
+
+				for (var i = 0; i < squaresThatCanBeCascading.Count; i++)
 				{
-					break;
-				}
-			}
+					var square = squaresThatCanBeCascading[i];
 
-			if (_currentProgressionEntry.CascadingToggles > 0
-				&& assignedCascadingToggles < _currentProgressionEntry.CascadingToggles)
-			{
-				Debug.Log("Couldn't assign the specified number of cascading toggles, not enough squares are targeted by others");
+					if (!_currentProgressionEntry.AdjacentCascadingToggles)
+					{
+						if (square.NextSquare.Cascading
+							&& (square.NextSquare.TargetScheme == Square.TargetingScheme.Left
+							|| square.NextSquare.TargetScheme == Square.TargetingScheme.LeftRight
+							|| square.NextSquare.TargetScheme == Square.TargetingScheme.SelfLeft
+							|| square.NextSquare.TargetScheme == Square.TargetingScheme.SelfLeftRight))
+						{
+							continue;
+						}
+
+						if (square.NextSquare.Cascading
+							&& (square.TargetScheme == Square.TargetingScheme.Right
+							|| square.TargetScheme == Square.TargetingScheme.LeftRight
+							|| square.TargetScheme == Square.TargetingScheme.SelfRight
+							|| square.TargetScheme == Square.TargetingScheme.SelfLeftRight))
+						{
+							continue;
+						}
+
+						if (square.PreviousSquare.Cascading
+							&& (square.PreviousSquare.TargetScheme == Square.TargetingScheme.Right
+							|| square.PreviousSquare.TargetScheme == Square.TargetingScheme.LeftRight
+							|| square.PreviousSquare.TargetScheme == Square.TargetingScheme.SelfRight
+							|| square.PreviousSquare.TargetScheme == Square.TargetingScheme.SelfLeftRight))
+						{
+							continue;
+						}
+
+						if (square.PreviousSquare.Cascading
+							&& (square.TargetScheme == Square.TargetingScheme.Left
+							|| square.TargetScheme == Square.TargetingScheme.LeftRight
+							|| square.TargetScheme == Square.TargetingScheme.SelfLeft
+							|| square.TargetScheme == Square.TargetingScheme.SelfLeftRight))
+						{
+							continue;
+						}
+					}
+
+					squaresThatCanBeCascading[i].Cascading = true;
+
+					assignedCascadingToggles++;
+
+					if (assignedCascadingToggles >= numCascadingToggles)
+					{
+						break;
+					}
+				}
+
+				if (_currentProgressionEntry.CascadingToggles > 0
+					&& assignedCascadingToggles < _currentProgressionEntry.CascadingToggles)
+				{
+					Debug.Log("Couldn't assign the specified number of cascading toggles, not enough squares are targeted by others");
+				}
 			}
 		}
 
@@ -733,14 +746,14 @@ public class Level : MonoBehaviour
 			_testSquares[i].SetupTargets(square);
 		}
 
-		for (var i = 0; i < Squares.Length; i++)
+		/*for (var i = 0; i < Squares.Length; i++)
 		{
 			Squares[i].TurnOffUnnecessaryCascading();
 
 			SolutionSquares[i].Cascading = Squares[i].Cascading;
 			_testSquares[i].Cascading = Squares[i].Cascading;
 			firstHistorySnapshot[i].Cascading = Squares[i].Cascading;
-		}
+		}*/
 
 		_squareHistory.Add(firstHistorySnapshot);
 
@@ -977,12 +990,7 @@ public class Level : MonoBehaviour
 
 	private string GetValidPregeneratedLevel()
 	{
-		Debug.Log("Fuck it for now");
-
-		return null;
-
-		//var lines = File.ReadAllLines(_levelsFilePath);
-		/*var lines = Resources.Load<TextAsset>(_levelsFileName.Split('.')[0]).text.Split('\n');
+		var lines = Resources.Load<TextAsset>(_levelsFileName.Split('.')[0]).text.Split('\n');
 
 		var possibleLines = new List<string>();
 
@@ -1007,18 +1015,27 @@ public class Level : MonoBehaviour
 				break;
 			}
 
-			var validSquares = true;
+			var tentativeLevelProgression = new ProgressionEntry();
 
 			for (var i = 0; i < splitSquaresCode.Length; i++)
 			{
 				var squareCode = splitSquaresCode[i];
+
+				var previousSquareCode = i > 0 ? splitSquaresCode[i - 1] : string.Empty;
+				var nextSquareCode = i < splitSquaresCode.Length - 1 ? splitSquaresCode[i + 1] : string.Empty;
+
 				var squareTargetingScheme = (Square.TargetingScheme)int.Parse(squareCode[1].ToString());
 
-				if(squareCode.Length > 2 && squareCode[2] == 'c' && _)
+				if (squareCode.Length > 2 && squareCode[2] == 'c')
 				{
-					validSquares = false;
+					tentativeLevelProgression.CascadingToggles++;
 
-					break;
+					if (!tentativeLevelProgression.AdjacentCascadingToggles &&
+						((!string.IsNullOrEmpty(previousSquareCode) && previousSquareCode.Length > 2 && previousSquareCode[2] == 'c')
+						|| (!string.IsNullOrEmpty(nextSquareCode) && nextSquareCode.Length > 2 && nextSquareCode[2] == 'c')))
+					{
+						tentativeLevelProgression.AdjacentCascadingToggles = true;
+					}
 				}
 
 				var first = i == 0;
@@ -1027,56 +1044,85 @@ public class Level : MonoBehaviour
 				switch (squareTargetingScheme)
 				{
 					case Square.TargetingScheme.Self:
-						break;
-					case Square.TargetingScheme.Left:
-						if (!WrapAroundToggles && first)
-						{
-							validSquares = false;
-						}
-						break;
-					case Square.TargetingScheme.Right:
-						if (!WrapAroundToggles && last)
-						{
-							validSquares = false;
-						}
-						break;
-					case Square.TargetingScheme.SelfLeft:
-						if ((!WrapAroundToggles && first)
-							|| !SelfSideTarget)
-						{
-							validSquares = false;
-						}
-						break;
-					case Square.TargetingScheme.SelfRight:
-						if ((!WrapAroundToggles && last)
-							|| !SelfSideTarget)
-						{
-							validSquares = false;
-						}
-						break;
-					case Square.TargetingScheme.LeftRight:
-						if ((!WrapAroundToggles && (first || last))
-							|| !LeftRightTarget)
-						{
-							validSquares = false;
-						}
-						break;
-					case Square.TargetingScheme.SelfLeftRight:
-						if ((!WrapAroundToggles && (first || last))
-							|| !SelfLeftRightTarget)
-						{
-							validSquares = false;
-						}
-						break;
-				}
 
-				if(!validSquares)
-				{
-					break;
+						break;
+
+					case Square.TargetingScheme.Left:
+
+						if (first)
+						{
+							tentativeLevelProgression.WrapAroundToggles++;
+						}
+
+						break;
+
+					case Square.TargetingScheme.Right:
+
+						if (last)
+						{
+							tentativeLevelProgression.WrapAroundToggles++;
+						}
+
+						break;
+
+					case Square.TargetingScheme.SelfLeft:
+
+						if (first)
+						{
+							tentativeLevelProgression.WrapAroundToggles++;
+						}
+
+						tentativeLevelProgression.SelfLeftTargets++;
+
+						break;
+
+					case Square.TargetingScheme.SelfRight:
+
+						if (last)
+						{
+							tentativeLevelProgression.WrapAroundToggles++;
+						}
+
+						tentativeLevelProgression.SelfRightTargets++;
+
+						break;
+
+					case Square.TargetingScheme.LeftRight:
+
+						if (first || last)
+						{
+							tentativeLevelProgression.WrapAroundToggles++;
+						}
+
+						tentativeLevelProgression.LeftRightTargets++;
+
+						break;
+
+					case Square.TargetingScheme.SelfLeftRight:
+
+						if (first || last)
+						{
+							tentativeLevelProgression.WrapAroundToggles++;
+						}
+
+						tentativeLevelProgression.SelfLeftRightTargets++;
+
+						break;
 				}
 			}
 
-			if(!validSquares)
+			if ((_currentProgressionEntry.WrapAroundToggles == 0 && tentativeLevelProgression.WrapAroundToggles > 0)
+				|| (_currentProgressionEntry.WrapAroundToggles > 0 && _currentProgressionEntry.WrapAroundToggles > tentativeLevelProgression.WrapAroundToggles)
+				|| (_currentProgressionEntry.LeftRightTargets == 0 && tentativeLevelProgression.LeftRightTargets > 0)
+				|| (_currentProgressionEntry.LeftRightTargets >= 0 && _currentProgressionEntry.LeftRightTargets > tentativeLevelProgression.LeftRightTargets)
+				|| (_currentProgressionEntry.SelfRightTargets == 0 && tentativeLevelProgression.SelfRightTargets > 0)
+				|| (_currentProgressionEntry.SelfRightTargets >= 0 && _currentProgressionEntry.SelfRightTargets != tentativeLevelProgression.SelfRightTargets)
+				|| (_currentProgressionEntry.SelfLeftTargets == 0 && tentativeLevelProgression.SelfLeftTargets > 0)
+				|| (_currentProgressionEntry.SelfLeftTargets >= 0 && _currentProgressionEntry.SelfLeftTargets != tentativeLevelProgression.SelfLeftTargets)
+				|| (_currentProgressionEntry.SelfLeftRightTargets == 0 && tentativeLevelProgression.SelfLeftRightTargets > 0)
+				|| (_currentProgressionEntry.SelfLeftRightTargets >= 0 && _currentProgressionEntry.SelfLeftRightTargets != tentativeLevelProgression.SelfLeftRightTargets)
+				|| (_currentProgressionEntry.CascadingToggles != tentativeLevelProgression.CascadingToggles)
+				|| (_currentProgressionEntry.AdjacentCascadingToggles != tentativeLevelProgression.AdjacentCascadingToggles))
 			{
 				continue;
 			}
@@ -1084,7 +1130,7 @@ public class Level : MonoBehaviour
 			possibleLines.Add(line);
 		}
 
-		return possibleLines.Count > 0 ? possibleLines[UnityEngine.Random.Range(0, possibleLines.Count)] : null;*/
+		return possibleLines.Count > 0 ? possibleLines[UnityEngine.Random.Range(0, possibleLines.Count)] : null;
 	}
 
 	private string GetCurrentLevelCode()
@@ -1501,7 +1547,7 @@ public class Level : MonoBehaviour
 				SelfLeftRightTargets = int.Parse(splitLine[4]),
 				WrapAroundToggles = int.Parse(splitLine[5]),
 				CascadingToggles = int.Parse(splitLine[6]),
-				AdjacentCascadingToggles = splitLine[7] == "1"
+				AdjacentCascadingToggles = splitLine[7].Contains("1")
 			};
 
 			_progressionEntries.Add(newProgressionEntry);

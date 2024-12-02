@@ -438,7 +438,7 @@ public class Square : MonoBehaviour
 		}
 	}
 
-	public void TurnOffUnnecessaryCascading()
+	/*public void TurnOffUnnecessaryCascading()
 	{
 		if(!Cascading)
 		{
@@ -469,7 +469,7 @@ public class Square : MonoBehaviour
 			Cascading = false;
 		}
 	}
-
+    */
 	public void Click()
 	{
 		foreach (var target in Targets)
