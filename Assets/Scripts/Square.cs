@@ -68,6 +68,45 @@ public class Square : MonoBehaviour
 			if (_cascadingIndicator != null)
 			{
 				_cascadingIndicator.SetActive(_cascading);
+
+                if(_cascading)
+				{
+                    var position = _cascadingIndicator.transform.localPosition;
+
+					switch (_targetingScheme)
+					{
+						case TargetingScheme.Self:
+                            position.y = 0.3125f;
+                            position.x = 0f;
+                            break;
+						case TargetingScheme.Left:
+                            position.y = 0.1875f;
+                            position.x = 0.1875f;
+                            break;
+						case TargetingScheme.Right:
+                            position.y = 0.1875f;
+                            position.x = -0.1875f;
+                            break;
+						case TargetingScheme.SelfLeft:
+                            position.y = 0.375f;
+                            position.x = 0.1875f;
+                            break;
+						case TargetingScheme.SelfRight:
+                            position.y = 0.375f;
+                            position.x = -0.1875f;
+                            break;
+						case TargetingScheme.LeftRight:
+                            position.y = 0.1875f;
+                            position.x = 0f;
+                            break;
+						case TargetingScheme.SelfLeftRight:
+                            position.y = 0.375f;
+                            position.x = 0f;
+                            break;
+					}
+
+                    _cascadingIndicator.transform.localPosition = position;
+				}
 			}
 		}
 	}
@@ -85,7 +124,7 @@ public class Square : MonoBehaviour
 			if(!SolutionSquare)
 			{
 				_targetIndicator.sprite = _targetSchemeSprites[(int)_targetingScheme];
-			}
+            }
 		}
 	}
 
