@@ -96,5 +96,7 @@
 
 ## 2024-12-02
 
-- [feat] Include the self targeting scheme in the progression
+- ~~[feat] Include the basic targeting schemes (self-targeting and side-targeting) in the progression~~
 - [visual] Try a less explicit feedback for the toggle predictions
+- ~~[feat] Don't generate levels with all self targeting schemes~~
+- ~~[tech] Don't save level to file if it already exists in file~~

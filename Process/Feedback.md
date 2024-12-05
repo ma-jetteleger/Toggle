@@ -24,20 +24,20 @@
 
 - Levels are possible to solve using only combinatorics, making the player progress through levels without learning anything about the game
 ? Would definitely like the option to easily revisit prior puzzles
-? Something inherently more satisfying in the red-shaking response in single-solution mode. More like there are some hard edges players can use to try to understand the "world"
+? ~~Something inherently more satisfying in the red-shaking response in single-solution mode. More like there are some hard edges players can use to try to understand the "world"~~
 
 ## 2024-11-08
 
 ? The two modes (multi-solution and single-solution) don't have to be mutually exclusive
 	? The game could progress from single-solution to multi-solution levels (this suggests that multi-solution mode is generally harder than single-solution)
 		? For doing this, it could be a good idea to reduce the number of squares at that point in the progression
-- Multi-solution mode is mostly frustrating/requires more uninteresting mental gymnastics
-	- Specifically to solve the levels in "more clicks than the optimal way"
-	- More clicks =/= more interesting levels
-	- It feels more like busywork
-	- It doesn't feel great to keep playing the same puzzle over and over for different solutions
+- ~~Multi-solution mode is mostly frustrating/requires more uninteresting mental gymnastics~~
+	- ~~Specifically to solve the levels in "more clicks than the optimal way"~~
+	- ~~More clicks =/= more interesting levels~~
+	- ~~It feels more like busywork~~
+	- ~~It doesn't feel great to keep playing the same puzzle over and over for different solutions~~
 + Multi-solution mode creates some tension and "teasing" sort of engagement
 + Multi-solution mode is more accessible
 	+ Allows for flexibility/more options in goal selection
-+ Single-solution mode has great feedback when busting the clicks counter
++ ~~Single-solution mode has great feedback when busting the clicks counter~~
 + Squares being "spent" in multi-solution mode (only able to be clicked once) feels good and captures the puzzly feeling

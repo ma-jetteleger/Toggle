@@ -211,6 +211,10 @@ public class Level : MonoBehaviour
 
 				LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex);
 			}
+			if (Input.GetKeyDown(KeyCode.Space))
+			{
+				PrintSolutions();
+			}
 
 			var squareHovered = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero).collider?.GetComponent<Square>();
 
@@ -275,6 +279,8 @@ public class Level : MonoBehaviour
 					LevelPanel.Instance.UpdateClicksCounter();
 
 					CheckLevelCompletion();
+
+					LevelPanel.Instance.UpdateHistoryButtons();
 				}
 			}
 
@@ -437,32 +443,49 @@ public class Level : MonoBehaviour
 				}
 			}
 
-			var squaresForWrapAround = new List<Square>();
-
-			if (_currentProgressionEntry.WrapAroundToggles != 0)
+			if(Squares.Length == 1)
 			{
-				var numWrapAroundToggles = _currentProgressionEntry.WrapAroundToggles < 0
-					? UnityEngine.Random.Range(0, 3)
-					: UnityEngine.Random.Range(_currentProgressionEntry.WrapAroundToggles, 3);
+				var square = Squares[0];
 
-				switch (numWrapAroundToggles)
-				{
-					case 1:
-						squaresForWrapAround.Add(UnityEngine.Random.Range(0f, 1f) > 0.5f ? Squares[0] : Squares[Squares.Length - 1]);
-						break;
-					case 2:
-						squaresForWrapAround.Add(Squares[0]);
-						squaresForWrapAround.Add(Squares[Squares.Length - 1]);
-						break;
-				}
+				square.TargetScheme = Square.TargetingScheme.Self;
+				square.Cascading = false;
 			}
-			
-			var shuffledSquares = new List<Square>(Squares).OrderBy(x => new System.Random().Next()).ToList();
+			else if(Squares.Length == 2)
+			{
+				var firstSquare = Squares[UnityEngine.Random.Range(0, 2)];
+				var otherSquare = firstSquare.PreviousSquare;
 
-			var targetingSchemes = new List<Square.TargetingScheme>();
-			var orderedTargetingSchemes = new List<Square.TargetingScheme>();
+				firstSquare.TargetScheme = firstSquare.Id == 0 ? Square.TargetingScheme.Right : Square.TargetingScheme.Left;
+				otherSquare.TargetScheme = Square.TargetingScheme.Self;
+			}
+			else
+			{
+				var squaresForWrapAround = new List<Square>();
 
-			var targetingSchemeToProgressionEntryTargetsMap = new Dictionary<Square.TargetingScheme, int>
+				if (_currentProgressionEntry.WrapAroundToggles != 0)
+				{
+					var numWrapAroundToggles = _currentProgressionEntry.WrapAroundToggles < 0
+						? UnityEngine.Random.Range(0, 3)
+						: UnityEngine.Random.Range(_currentProgressionEntry.WrapAroundToggles, 3);
+
+					switch (numWrapAroundToggles)
+					{
+						case 1:
+							squaresForWrapAround.Add(UnityEngine.Random.Range(0f, 1f) > 0.5f ? Squares[0] : Squares[Squares.Length - 1]);
+							break;
+						case 2:
+							squaresForWrapAround.Add(Squares[0]);
+							squaresForWrapAround.Add(Squares[Squares.Length - 1]);
+							break;
+					}
+				}
+
+				var shuffledSquares = new List<Square>(Squares).OrderBy(x => new System.Random().Next()).ToList();
+
+				var targetingSchemes = new List<Square.TargetingScheme>();
+				var orderedTargetingSchemes = new List<Square.TargetingScheme>();
+
+				var targetingSchemeToProgressionEntryTargetsMap = new Dictionary<Square.TargetingScheme, int>
 				{
 					{ Square.TargetingScheme.SelfLeftRight, _currentProgressionEntry.SelfLeftRightTargets },
 					{ Square.TargetingScheme.SelfLeft, _currentProgressionEntry.SelfLeftTargets },
@@ -470,248 +493,256 @@ public class Level : MonoBehaviour
 					{ Square.TargetingScheme.LeftRight, _currentProgressionEntry.LeftRightTargets }
 				};
 
-			foreach (var targetingSchemeToProgressionEntryTargetsItem in targetingSchemeToProgressionEntryTargetsMap)
-			{
-				if (targetingSchemeToProgressionEntryTargetsItem.Value > 0)
-				{
-					targetingSchemes.Add(targetingSchemeToProgressionEntryTargetsItem.Key);
-
-					for (var i = 0; i < targetingSchemeToProgressionEntryTargetsItem.Value; i++)
-					{
-						orderedTargetingSchemes.Add(targetingSchemeToProgressionEntryTargetsItem.Key);
-					}
-				}
-				else if(targetingSchemeToProgressionEntryTargetsItem.Value < 0)
-				{
-					targetingSchemes.Add(targetingSchemeToProgressionEntryTargetsItem.Key);
-				}
-			}
-
-			targetingSchemes.Add(Square.TargetingScheme.Left);
-			orderedTargetingSchemes.Add(Square.TargetingScheme.Left);
-
-			targetingSchemes.Add(Square.TargetingScheme.Right);
-			orderedTargetingSchemes.Add(Square.TargetingScheme.Right);
-
-			targetingSchemes.Add(Square.TargetingScheme.Self);
-			orderedTargetingSchemes.Add(Square.TargetingScheme.Self);
-
-			foreach (var squareForWrapAround in squaresForWrapAround)
-			{
-				var possibleTargetingSchemes = (squareForWrapAround.Id == 0
-					? orderedTargetingSchemes.Where(x => x != Square.TargetingScheme.SelfRight && x != Square.TargetingScheme.Right && x != Square.TargetingScheme.Self)
-					: orderedTargetingSchemes.Where(x => x != Square.TargetingScheme.SelfLeft && x != Square.TargetingScheme.Left && x != Square.TargetingScheme.Self))
-					.ToList();
-
 				foreach (var targetingSchemeToProgressionEntryTargetsItem in targetingSchemeToProgressionEntryTargetsMap)
 				{
-					if (targetingSchemeToProgressionEntryTargetsItem.Value >= 0
-						|| (squareForWrapAround.Id == 0 && targetingSchemeToProgressionEntryTargetsItem.Key == Square.TargetingScheme.SelfRight) 
-						|| (squareForWrapAround.Id == Squares.Length - 1 && targetingSchemeToProgressionEntryTargetsItem.Key == Square.TargetingScheme.SelfLeft))
+					if (targetingSchemeToProgressionEntryTargetsItem.Value > 0)
 					{
-						continue;
+						targetingSchemes.Add(targetingSchemeToProgressionEntryTargetsItem.Key);
+
+						for (var i = 0; i < targetingSchemeToProgressionEntryTargetsItem.Value; i++)
+						{
+							orderedTargetingSchemes.Add(targetingSchemeToProgressionEntryTargetsItem.Key);
+						}
 					}
-
-					possibleTargetingSchemes.Add(targetingSchemeToProgressionEntryTargetsItem.Key);
-				}
-
-				squareForWrapAround.TargetScheme = possibleTargetingSchemes[UnityEngine.Random.Range(0, possibleTargetingSchemes.Count)];
-
-				if(orderedTargetingSchemes.Contains(squareForWrapAround.TargetScheme))
-				{
-					orderedTargetingSchemes.Remove(squareForWrapAround.TargetScheme);
-				}
-				
-				shuffledSquares.Remove(squareForWrapAround);
-
-				// The random assignment of possible targeting schemes for wrap around squares might make it so
-				// "mandatory" targeting schemes aren't assigned to any square. This can happen because the wrap around
-				// squares "take up space" that is reserved for random assignment, not priority assignment.
-				// Maybe we can solve this by doing a "final pass" to change the non-mandatory targeting schemes of edge 
-				// squares to "mandatory" targeting schemes that haven't been assigned to any square yet because there 
-				// wasn't enough space for them because of the wrap around toggles
-				// This only happens in very small arrays and might not even occur in the final progression 
-				// where small arrays only have a limited number of features so we'll ignore it for now and revisit
-				// this only if it actually proves to be an issue
-			}
-
-			for (var i = 0; i < shuffledSquares.Count; i++)
-			{
-				var shuffledSquare = shuffledSquares[i];
-				var possibleOrderedTargetingSchemes = new List<Square.TargetingScheme>();
-				var possibleTargetingSchemes = new List<Square.TargetingScheme>();
-
-				if (shuffledSquare.Id == 0)
-				{
-					Func<Square.TargetingScheme, bool> condition = x =>
-					x != Square.TargetingScheme.Left &&
-					x != Square.TargetingScheme.LeftRight &&
-					x != Square.TargetingScheme.SelfLeft &&
-					x != Square.TargetingScheme.SelfLeftRight;
-
-					possibleOrderedTargetingSchemes = orderedTargetingSchemes.Where(condition).ToList();
-					possibleTargetingSchemes = targetingSchemes.Where(condition).ToList();
-				}
-				else if(shuffledSquare.Id == Squares.Length - 1)
-				{
-					Func<Square.TargetingScheme, bool> condition = x =>
-					x != Square.TargetingScheme.Right &&
-					x != Square.TargetingScheme.LeftRight &&
-					x != Square.TargetingScheme.SelfRight &&
-					x != Square.TargetingScheme.SelfLeftRight;
-
-					possibleOrderedTargetingSchemes = orderedTargetingSchemes.Where(condition).ToList();
-					possibleTargetingSchemes = targetingSchemes.Where(condition).ToList();
-				}
-				else
-				{
-					possibleOrderedTargetingSchemes = orderedTargetingSchemes;
-					possibleTargetingSchemes = targetingSchemes;
-				}
-
-				var targetingSchemesToRemove = new[]
-				{
-					Square.TargetingScheme.Self,
-					Square.TargetingScheme.Left,
-					Square.TargetingScheme.Right
-				};
-
-				foreach(var targetingSchemeToRemove in targetingSchemesToRemove)
-				{
-					if (possibleOrderedTargetingSchemes.Contains(targetingSchemeToRemove))
+					else if (targetingSchemeToProgressionEntryTargetsItem.Value < 0)
 					{
-						possibleOrderedTargetingSchemes.Remove(targetingSchemeToRemove);
+						targetingSchemes.Add(targetingSchemeToProgressionEntryTargetsItem.Key);
 					}
 				}
 
-				// TODO: the correct targeting schemes are not copied into the temp (possible) list correctly in this loop...
-				// Enforcing a targeting scheme with a 1 doesn't work all the time...
-				// ...Can we reproduce this? It seems like it's fixed?
+				targetingSchemes.Add(Square.TargetingScheme.Left);
+				orderedTargetingSchemes.Add(Square.TargetingScheme.Left);
 
-				shuffledSquare.TargetScheme = possibleOrderedTargetingSchemes.Count > 0
-					? possibleOrderedTargetingSchemes[0]
-					: possibleTargetingSchemes[UnityEngine.Random.Range(0, possibleTargetingSchemes.Count)];
+				targetingSchemes.Add(Square.TargetingScheme.Right);
+				orderedTargetingSchemes.Add(Square.TargetingScheme.Right);
 
-				if (orderedTargetingSchemes.Contains(shuffledSquare.TargetScheme))
+				targetingSchemes.Add(Square.TargetingScheme.Self);
+				orderedTargetingSchemes.Add(Square.TargetingScheme.Self);
+
+				foreach (var squareForWrapAround in squaresForWrapAround)
 				{
-					orderedTargetingSchemes.Remove(shuffledSquare.TargetScheme);
-				}
-			}
+					var possibleTargetingSchemes = (squareForWrapAround.Id == 0
+						? orderedTargetingSchemes.Where(x => x != Square.TargetingScheme.SelfRight && x != Square.TargetingScheme.Right && x != Square.TargetingScheme.Self)
+						: orderedTargetingSchemes.Where(x => x != Square.TargetingScheme.SelfLeft && x != Square.TargetingScheme.Left && x != Square.TargetingScheme.Self))
+						.ToList();
 
-			/*foreach(var targetingSchemeToProgressionEntryTargetsItem in targetingSchemeToProgressionEntryTargetsMap)
-			{
-				if(targetingSchemeToProgressionEntryTargetsItem.Value > 0
-					&& Squares.Count(x => x.TargetScheme == targetingSchemeToProgressionEntryTargetsItem.Key) < targetingSchemeToProgressionEntryTargetsItem.Value)
-				{
-					var possibleSquares = new List<Square>();
-
-					switch (targetingSchemeToProgressionEntryTargetsItem.Key)
+					foreach (var targetingSchemeToProgressionEntryTargetsItem in targetingSchemeToProgressionEntryTargetsMap)
 					{
-						case Square.TargetingScheme.SelfLeft:
-							break;
-						case Square.TargetingScheme.SelfRight:
-							break;
-						case Square.TargetingScheme.LeftRight:
-							break;
-						case Square.TargetingScheme.SelfLeftRight:
-							break;
-					}
-				}
-			}*/
-
-			// Up here is an attempt at solving the "wrap around squares overtaking priority assignment with random
-			// assignment" issue. We're ignoring it until it proves to be an actual problem instead of an hypothetical one
-
-			if(_currentProgressionEntry.CascadingToggles != 0)
-			{
-				var squaresThatCanBeCascading = new List<Square>();
-
-				foreach (var square in Squares)
-				{
-					if (!squaresThatCanBeCascading.Contains(square.PreviousSquare)
-						&& (square.TargetScheme == Square.TargetingScheme.Left
-						|| square.TargetScheme == Square.TargetingScheme.LeftRight
-						|| square.TargetScheme == Square.TargetingScheme.SelfLeft
-						|| square.TargetScheme == Square.TargetingScheme.SelfLeftRight))
-					{
-						squaresThatCanBeCascading.Add(square.PreviousSquare);
-					}
-
-					if (!squaresThatCanBeCascading.Contains(square.NextSquare)
-						&& (square.TargetScheme == Square.TargetingScheme.Right
-						|| square.TargetScheme == Square.TargetingScheme.LeftRight
-						|| square.TargetScheme == Square.TargetingScheme.SelfRight
-						|| square.TargetScheme == Square.TargetingScheme.SelfLeftRight))
-					{
-						squaresThatCanBeCascading.Add(square.NextSquare);
-					}
-				}
-
-				squaresThatCanBeCascading = squaresThatCanBeCascading.OrderBy(x => new System.Random().Next()).ToList();
-
-				var numCascadingToggles = _currentProgressionEntry.CascadingToggles < 0
-					? UnityEngine.Random.Range(0, squaresThatCanBeCascading.Count + 1)
-					: _currentProgressionEntry.CascadingToggles;
-
-				var assignedCascadingToggles = 0;
-
-				for (var i = 0; i < squaresThatCanBeCascading.Count; i++)
-				{
-					var square = squaresThatCanBeCascading[i];
-
-					if (!_currentProgressionEntry.AdjacentCascadingToggles)
-					{
-						if (square.NextSquare.Cascading
-							&& (square.NextSquare.TargetScheme == Square.TargetingScheme.Left
-							|| square.NextSquare.TargetScheme == Square.TargetingScheme.LeftRight
-							|| square.NextSquare.TargetScheme == Square.TargetingScheme.SelfLeft
-							|| square.NextSquare.TargetScheme == Square.TargetingScheme.SelfLeftRight))
+						if (targetingSchemeToProgressionEntryTargetsItem.Value >= 0
+							|| (squareForWrapAround.Id == 0 && targetingSchemeToProgressionEntryTargetsItem.Key == Square.TargetingScheme.SelfRight)
+							|| (squareForWrapAround.Id == Squares.Length - 1 && targetingSchemeToProgressionEntryTargetsItem.Key == Square.TargetingScheme.SelfLeft))
 						{
 							continue;
 						}
 
-						if (square.NextSquare.Cascading
-							&& (square.TargetScheme == Square.TargetingScheme.Right
-							|| square.TargetScheme == Square.TargetingScheme.LeftRight
-							|| square.TargetScheme == Square.TargetingScheme.SelfRight
-							|| square.TargetScheme == Square.TargetingScheme.SelfLeftRight))
-						{
-							continue;
-						}
+						possibleTargetingSchemes.Add(targetingSchemeToProgressionEntryTargetsItem.Key);
+					}
 
-						if (square.PreviousSquare.Cascading
-							&& (square.PreviousSquare.TargetScheme == Square.TargetingScheme.Right
-							|| square.PreviousSquare.TargetScheme == Square.TargetingScheme.LeftRight
-							|| square.PreviousSquare.TargetScheme == Square.TargetingScheme.SelfRight
-							|| square.PreviousSquare.TargetScheme == Square.TargetingScheme.SelfLeftRight))
-						{
-							continue;
-						}
+					squareForWrapAround.TargetScheme = possibleTargetingSchemes[UnityEngine.Random.Range(0, possibleTargetingSchemes.Count)];
 
-						if (square.PreviousSquare.Cascading
+					if (orderedTargetingSchemes.Contains(squareForWrapAround.TargetScheme))
+					{
+						orderedTargetingSchemes.Remove(squareForWrapAround.TargetScheme);
+					}
+
+					shuffledSquares.Remove(squareForWrapAround);
+
+					// The random assignment of possible targeting schemes for wrap around squares might make it so
+					// "mandatory" targeting schemes aren't assigned to any square. This can happen because the wrap around
+					// squares "take up space" that is reserved for random assignment, not priority assignment.
+					// Maybe we can solve this by doing a "final pass" to change the non-mandatory targeting schemes of edge 
+					// squares to "mandatory" targeting schemes that haven't been assigned to any square yet because there 
+					// wasn't enough space for them because of the wrap around toggles
+					// This only happens in very small arrays and might not even occur in the final progression 
+					// where small arrays only have a limited number of features so we'll ignore it for now and revisit
+					// this only if it actually proves to be an issue
+				}
+
+				for (var i = 0; i < shuffledSquares.Count; i++)
+				{
+					var shuffledSquare = shuffledSquares[i];
+					var possibleOrderedTargetingSchemes = new List<Square.TargetingScheme>();
+					var possibleTargetingSchemes = new List<Square.TargetingScheme>();
+
+					if (shuffledSquare.Id == 0)
+					{
+						Func<Square.TargetingScheme, bool> condition = x =>
+						x != Square.TargetingScheme.Left &&
+						x != Square.TargetingScheme.LeftRight &&
+						x != Square.TargetingScheme.SelfLeft &&
+						x != Square.TargetingScheme.SelfLeftRight;
+
+						possibleOrderedTargetingSchemes = orderedTargetingSchemes.Where(condition).ToList();
+						possibleTargetingSchemes = targetingSchemes.Where(condition).ToList();
+					}
+					else if (shuffledSquare.Id == Squares.Length - 1)
+					{
+						Func<Square.TargetingScheme, bool> condition = x =>
+						x != Square.TargetingScheme.Right &&
+						x != Square.TargetingScheme.LeftRight &&
+						x != Square.TargetingScheme.SelfRight &&
+						x != Square.TargetingScheme.SelfLeftRight;
+
+						possibleOrderedTargetingSchemes = orderedTargetingSchemes.Where(condition).ToList();
+						possibleTargetingSchemes = targetingSchemes.Where(condition).ToList();
+					}
+					else
+					{
+						possibleOrderedTargetingSchemes = orderedTargetingSchemes;
+						possibleTargetingSchemes = targetingSchemes;
+					}
+
+					var targetingSchemesToRemove = new[]
+					{
+						Square.TargetingScheme.Self,
+						Square.TargetingScheme.Left,
+						Square.TargetingScheme.Right
+					};
+
+					foreach (var targetingSchemeToRemove in targetingSchemesToRemove)
+					{
+						if (possibleOrderedTargetingSchemes.Contains(targetingSchemeToRemove))
+						{
+							possibleOrderedTargetingSchemes.Remove(targetingSchemeToRemove);
+						}
+					}
+
+					// TODO: the correct targeting schemes are not copied into the temp (possible) list correctly in this loop...
+					// Enforcing a targeting scheme with a 1 doesn't work all the time...
+					// ...Can we reproduce this? It seems like it's fixed?
+
+					shuffledSquare.TargetScheme = possibleOrderedTargetingSchemes.Count > 0
+						? possibleOrderedTargetingSchemes[0]
+						: possibleTargetingSchemes[UnityEngine.Random.Range(0, possibleTargetingSchemes.Count)];
+
+					if (orderedTargetingSchemes.Contains(shuffledSquare.TargetScheme))
+					{
+						orderedTargetingSchemes.Remove(shuffledSquare.TargetScheme);
+					}
+				}
+
+				if(Squares.Length == 3 && Squares.All(x => x.TargetScheme == Square.TargetingScheme.Self))
+				{
+					Debug.Log("Ended up generating a level with all three squares self targeting, correcting this");
+
+					Squares[1].TargetScheme = UnityEngine.Random.Range(0f, 1f) > 0.5f ? Square.TargetingScheme.Left : Square.TargetingScheme.Right;
+				}
+
+				/*foreach(var targetingSchemeToProgressionEntryTargetsItem in targetingSchemeToProgressionEntryTargetsMap)
+				{
+					if(targetingSchemeToProgressionEntryTargetsItem.Value > 0
+						&& Squares.Count(x => x.TargetScheme == targetingSchemeToProgressionEntryTargetsItem.Key) < targetingSchemeToProgressionEntryTargetsItem.Value)
+					{
+						var possibleSquares = new List<Square>();
+
+						switch (targetingSchemeToProgressionEntryTargetsItem.Key)
+						{
+							case Square.TargetingScheme.SelfLeft:
+								break;
+							case Square.TargetingScheme.SelfRight:
+								break;
+							case Square.TargetingScheme.LeftRight:
+								break;
+							case Square.TargetingScheme.SelfLeftRight:
+								break;
+						}
+					}
+				}*/
+
+				// Up here is an attempt at solving the "wrap around squares overtaking priority assignment with random
+				// assignment" issue. We're ignoring it until it proves to be an actual problem instead of an hypothetical one
+
+				if (_currentProgressionEntry.CascadingToggles != 0)
+				{
+					var squaresThatCanBeCascading = new List<Square>();
+
+					foreach (var square in Squares)
+					{
+						if (!squaresThatCanBeCascading.Contains(square.PreviousSquare)
 							&& (square.TargetScheme == Square.TargetingScheme.Left
 							|| square.TargetScheme == Square.TargetingScheme.LeftRight
 							|| square.TargetScheme == Square.TargetingScheme.SelfLeft
 							|| square.TargetScheme == Square.TargetingScheme.SelfLeftRight))
 						{
-							continue;
+							squaresThatCanBeCascading.Add(square.PreviousSquare);
+						}
+
+						if (!squaresThatCanBeCascading.Contains(square.NextSquare)
+							&& (square.TargetScheme == Square.TargetingScheme.Right
+							|| square.TargetScheme == Square.TargetingScheme.LeftRight
+							|| square.TargetScheme == Square.TargetingScheme.SelfRight
+							|| square.TargetScheme == Square.TargetingScheme.SelfLeftRight))
+						{
+							squaresThatCanBeCascading.Add(square.NextSquare);
 						}
 					}
 
-					squaresThatCanBeCascading[i].Cascading = true;
+					squaresThatCanBeCascading = squaresThatCanBeCascading.OrderBy(x => new System.Random().Next()).ToList();
 
-					assignedCascadingToggles++;
+					var numCascadingToggles = _currentProgressionEntry.CascadingToggles < 0
+						? UnityEngine.Random.Range(0, squaresThatCanBeCascading.Count + 1)
+						: _currentProgressionEntry.CascadingToggles;
 
-					if (assignedCascadingToggles >= numCascadingToggles)
+					var assignedCascadingToggles = 0;
+
+					for (var i = 0; i < squaresThatCanBeCascading.Count; i++)
 					{
-						break;
-					}
-				}
+						var square = squaresThatCanBeCascading[i];
 
-				if (_currentProgressionEntry.CascadingToggles > 0
-					&& assignedCascadingToggles < _currentProgressionEntry.CascadingToggles)
-				{
-					Debug.Log("Couldn't assign the specified number of cascading toggles, not enough squares are targeted by others");
+						if (!_currentProgressionEntry.AdjacentCascadingToggles)
+						{
+							if (square.NextSquare.Cascading
+								&& (square.NextSquare.TargetScheme == Square.TargetingScheme.Left
+								|| square.NextSquare.TargetScheme == Square.TargetingScheme.LeftRight
+								|| square.NextSquare.TargetScheme == Square.TargetingScheme.SelfLeft
+								|| square.NextSquare.TargetScheme == Square.TargetingScheme.SelfLeftRight))
+							{
+								continue;
+							}
+
+							if (square.NextSquare.Cascading
+								&& (square.TargetScheme == Square.TargetingScheme.Right
+								|| square.TargetScheme == Square.TargetingScheme.LeftRight
+								|| square.TargetScheme == Square.TargetingScheme.SelfRight
+								|| square.TargetScheme == Square.TargetingScheme.SelfLeftRight))
+							{
+								continue;
+							}
+
+							if (square.PreviousSquare.Cascading
+								&& (square.PreviousSquare.TargetScheme == Square.TargetingScheme.Right
+								|| square.PreviousSquare.TargetScheme == Square.TargetingScheme.LeftRight
+								|| square.PreviousSquare.TargetScheme == Square.TargetingScheme.SelfRight
+								|| square.PreviousSquare.TargetScheme == Square.TargetingScheme.SelfLeftRight))
+							{
+								continue;
+							}
+
+							if (square.PreviousSquare.Cascading
+								&& (square.TargetScheme == Square.TargetingScheme.Left
+								|| square.TargetScheme == Square.TargetingScheme.LeftRight
+								|| square.TargetScheme == Square.TargetingScheme.SelfLeft
+								|| square.TargetScheme == Square.TargetingScheme.SelfLeftRight))
+							{
+								continue;
+							}
+						}
+
+						squaresThatCanBeCascading[i].Cascading = true;
+
+						assignedCascadingToggles++;
+
+						if (assignedCascadingToggles >= numCascadingToggles)
+						{
+							break;
+						}
+					}
+
+					if (_currentProgressionEntry.CascadingToggles > 0
+						&& assignedCascadingToggles < _currentProgressionEntry.CascadingToggles)
+					{
+						Debug.Log("Couldn't assign the specified number of cascading toggles, not enough squares are targeted by others");
+					}
 				}
 			}
 		}
@@ -778,6 +809,8 @@ public class Level : MonoBehaviour
 		LevelPanel.Instance.UpdateClicksCounter();
 
 		CheckLevelCompletion();
+
+		LevelPanel.Instance.UpdateHistoryButtons();
 	}
 
 	private void GenerateSolution(string[] splitGoalCode, string[] splitSolutionsCode)
@@ -836,7 +869,9 @@ public class Level : MonoBehaviour
 			//_solutionSequence = new int[Random.Range(_minClicksForSolution, squares - _maxClicksBufferForSolution)];
 			mainSolution = new Solution
 			{
-				Sequence = new int[indices.Length - _maxClicksBufferForSolution]
+				Sequence = indices.Length > 2
+					? new int[indices.Length - _maxClicksBufferForSolution]
+					: new int[indices.Length]
 			};
 
 			var shuffledIndices = indices.OrderBy(a => System.Guid.NewGuid()).ToArray();
@@ -848,13 +883,36 @@ public class Level : MonoBehaviour
 				SolutionSquares[mainSolution.Sequence[j]].Click();
 			}
 
-			for (var j = 0; j < Squares.Length; j++)
+			if(indices.Length <= 2)
 			{
-				if (Squares[j].Toggled != SolutionSquares[j].Toggled)
+				validSolutionSequence = true;
+			}
+			else
+			{
+				for (var j = 0; j < Squares.Length; j++)
 				{
-					validSolutionSequence = true;
+					if (Squares[j].Toggled != SolutionSquares[j].Toggled)
+					{
+						validSolutionSequence = true;
 
-					//Debug.Log($"Generated a valid solution sequence in {i + 1} attempt(s)");
+						//Debug.Log($"Generated a valid solution sequence in {i + 1} attempt(s)");
+
+						break;
+					}
+				}
+			}
+
+			var tentativeLevelCode = GetCurrentLevelCode();
+			var splitTentativeLevelCode = tentativeLevelCode.Split(';');
+
+			foreach (var _playedLevel in _playedLevels)
+			{
+				var splitPlayedLevelLine = _playedLevel.Split(';');
+
+				if (splitTentativeLevelCode[0].Equals(splitPlayedLevelLine[0], StringComparison.OrdinalIgnoreCase)
+					&& splitTentativeLevelCode[1].Equals(splitPlayedLevelLine[1], StringComparison.OrdinalIgnoreCase))
+				{
+					validSolutionSequence = false;
 
 					break;
 				}
@@ -960,8 +1018,24 @@ public class Level : MonoBehaviour
 			var levelLine = _levelCode + "\n";
 
 			var lines = File.ReadAllLines(_levelsFilePath);
+			var save = true;
 
-			if (!lines.Any(x => x.Equals(levelLine, StringComparison.OrdinalIgnoreCase)))
+			foreach(var line in lines)
+			{
+				var splitLine = line.Split(';');
+				var splitLevelCode = _levelCode.Split(';');
+
+				if (splitLine[0].Equals(splitLevelCode[0], StringComparison.OrdinalIgnoreCase)
+					&& splitLine[1].Equals(splitLevelCode[1], StringComparison.OrdinalIgnoreCase)
+					&& splitLine[2].Length == splitLevelCode[2].Length)
+				{
+					save = false;
+
+					break;
+				}
+			}
+
+			if (save)
 			{
 				File.AppendAllText(_levelsFilePath, levelLine);
 			}
@@ -978,15 +1052,20 @@ public class Level : MonoBehaviour
 #if UNITY_EDITOR
 		if (_printSolutions)
 		{
-			Debug.Log($"{Solutions.Count} possible solutions:");
-
-			for (var i = 0; i < Solutions.Count; i++)
-			{
-				Debug.Log(string.Join(", ", Solutions[i].Sequence));
-			}
+			PrintSolutions();
 		}
 	}
 #endif
+
+	private void PrintSolutions()
+	{
+		Debug.Log($"{Solutions.Count} possible solutions:");
+
+		for (var i = 0; i < Solutions.Count; i++)
+		{
+			Debug.Log(string.Join(", ", Solutions[i].Sequence));
+		}
+	}
 
 	private string GetValidPregeneratedLevel()
 	{
@@ -996,15 +1075,36 @@ public class Level : MonoBehaviour
 
 		foreach(var line in lines)
 		{
-			if(_playedLevels.Any(x => x.Equals(line)))
+			/*if (_playedLevels.Any(x => x.Equals(line)))
 			{
 				continue;
-			}
+			}*/
 
 			var splitLevelCode = line.Split(';');
 			var splitSquaresCode = splitLevelCode[0].Split(',');
 
 			if (splitSquaresCode.Length < Squares.Length)
+			{
+				continue;
+			}
+
+			var alreadyPlayed = false;
+
+			foreach (var _playedLevel in _playedLevels)
+			{
+				var splitPlayedLevelLine = _playedLevel.Split(';');
+
+				if (splitLevelCode[0].Equals(splitPlayedLevelLine[0], StringComparison.OrdinalIgnoreCase)
+					&& splitLevelCode[1].Equals(splitPlayedLevelLine[1], StringComparison.OrdinalIgnoreCase)
+					&& splitLevelCode[2].Length == splitPlayedLevelLine[2].Length)
+				{
+					alreadyPlayed = true;
+
+					break;
+				}
+			}
+
+			if (alreadyPlayed)
 			{
 				continue;
 			}
@@ -1327,7 +1427,9 @@ public class Level : MonoBehaviour
         LoadHistorySnapshot(0);
 
 		CheckLevelCompletion();
-    }
+
+		LevelPanel.Instance.UpdateHistoryButtons();
+	}
 
     public void Undo()
 	{
@@ -1338,7 +1440,12 @@ public class Level : MonoBehaviour
 
         LoadHistorySnapshot(Clicks - 1);
 
-		CheckLevelCompletion();
+		if (!BottomOfHistory)
+		{
+			CheckLevelCompletion();
+		}
+
+		LevelPanel.Instance.UpdateHistoryButtons();
 	}
 
     public void Redo()
@@ -1350,7 +1457,12 @@ public class Level : MonoBehaviour
 
         LoadHistorySnapshot(Clicks + 1);
 
-		CheckLevelCompletion();
+		if(!BottomOfHistory)
+		{
+			CheckLevelCompletion();
+		}
+
+		LevelPanel.Instance.UpdateHistoryButtons();
 	}
 
     private void AddNewHistorySnapshot()
@@ -1419,7 +1531,9 @@ public class Level : MonoBehaviour
 
 	public void CheckLevelCompletion()
 	{
-		var levelComplete = GetLevelCompletion();
+		var startOfLevelTwo = Squares.Length == 2 && BottomOfHistory;
+
+		var levelComplete = startOfLevelTwo ? false : GetLevelCompletion();
 		var allSolutionsFound = true;
 		var solutionAlreadyFound = false;
 
@@ -1526,8 +1640,6 @@ public class Level : MonoBehaviour
 				}
 			}
         }
-
-		LevelPanel.Instance.UpdateHistoryButtons();
 	}
 	
 	private void LoadProgressionEntries()
@@ -1620,7 +1732,38 @@ public class Level : MonoBehaviour
 	private void SortLevels(string levelsFilePath)
 	{
 		var lines = File.ReadAllLines(levelsFilePath);
-		var sortedLines = lines.OrderBy(x => x.Split(';')[0].Split(',').Length);
+
+		var newLines = new List<string>();
+
+		foreach(var line in lines)
+		{
+			var squareCodes = line.Split(';')[0].Split(',');
+
+			if (squareCodes.Length > 1 && squareCodes.All(x => x.Contains("0")))
+			{
+				continue;
+			}
+
+			var splitLine = line.Split(';');
+
+			var duplicate = newLines.Any(x =>
+			{
+				var otherSplitLine = x.Split(';');
+
+				return splitLine[0].Equals(otherSplitLine[0], StringComparison.OrdinalIgnoreCase) 
+				&& splitLine[1].Equals(otherSplitLine[1], StringComparison.OrdinalIgnoreCase) 
+				&& splitLine[2].Length == otherSplitLine[2].Length;
+			});
+
+			if (duplicate)
+			{
+				continue;
+			}
+
+			newLines.Add(line);
+		}
+
+		var sortedLines = newLines.OrderBy(x => x.Split(';')[0].Split(',').Length);
 
 		File.WriteAllLines(levelsFilePath, sortedLines);
 	}

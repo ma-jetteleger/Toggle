@@ -328,6 +328,18 @@ The only thing that's left to be done about this whole task is to re-work the "g
 
 With this complete, I think I'll be ready to consider this game mechanically feature-complete. I'll work on the UX and finally choose what to do with the two different modes, but I won't consider adding any new mechanic to the gameplay loop
 
+# 2024-12-05
+
+The game is feature complete! Both in terms of the features/mechanics included and the progression system through which these features are introduced to the players. 
+
+Of course there are many many many things I could have added, as it is always the case in game development, but I'm going to stop there. The work that's left to be done resides now in tweaks in values and parameters here and there, in some visual/presentation choices and in the flow of the game (menus, saving and loading, that sort of things)
+
+Note that the progression "values" themselves are not in their final states. Also, I had a player test the game for their first time today and the progression was very satisfying up until the cascading squares were introduced! That point is a way too steep difficulty spike, especially because the cascading squares can be of any targeting scheme, making it way harder to understand the feature if it's introduced on a complex targeting scheme rather than a simple one. I just said that the game is system-complete, but I might go and try to revisit that quickly before calling it really done...
+
+A visual indication for the cascading mechanism could also help a lot... This is the last work to be done, I promise...
+
+I also chose to go with the single-solution mode as the main mode of the game. Even though I really liked the multi-solution approach conceptually, the feedback I received made it clear that it was superior in terms of player experience and flow. I might offer the multi-solution mode as an alternative way to play the game (through a menu option or something similar) as it's still fun and some players might enjoy it.
+
 
 
 
