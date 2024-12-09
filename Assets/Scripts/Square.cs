@@ -8,7 +8,7 @@ using System.Linq;
 public class Square : MonoBehaviour
 {
     public enum TargetingScheme
-	{
+    {
         Self,
         Left,
         Right,
@@ -16,15 +16,15 @@ public class Square : MonoBehaviour
         SelfRight,
         LeftRight,
         SelfLeftRight
-	}
+    }
 
     [SerializeField] private GameObject _outline = null;
     [SerializeField] private Rectangle _noMoreClicksOverlay = null;
     [SerializeField] private Rectangle _uninteractableOverlay = null;
-	[SerializeField] private GameObject _targetPredictionTemplate = null;
-	[SerializeField] private SpriteRenderer _targetIndicator = null;
-	[SerializeField] private GameObject _cascadingIndicator = null;
-	[SerializeField] private Color _clickedOutlineColor = Color.black;
+    [SerializeField] private GameObject _targetPredictionTemplate = null;
+    [SerializeField] private SpriteRenderer _targetIndicator = null;
+    [SerializeField] private GameObject _cascadingIndicator = null;
+    [SerializeField] private Color _clickedOutlineColor = Color.black;
     [SerializeField] private Sprite[] _targetSchemeSprites = null;
     [SerializeField] private Color _toggledColor = Color.black;
     [SerializeField] private Gradient _shakeGradient = null;
@@ -35,19 +35,19 @@ public class Square : MonoBehaviour
     [SerializeField] private bool _shakeSnapping = false;
     [SerializeField] private bool _shakeFadeOut = false;
 
-    public bool Interactable 
+    public bool Interactable
     {
-        get 
-        { 
-            return _interactable; 
+        get
+        {
+            return _interactable;
         }
 
-        set 
-        { 
+        set
+        {
             _interactable = value;
 
-            if(_uninteractableOverlay.gameObject.activeSelf == _interactable)
-			{
+            if (_uninteractableOverlay.gameObject.activeSelf == _interactable)
+            {
                 MatchUninteractableOverlayColorWithRectangle();
 
                 _uninteractableOverlay.gameObject.SetActive(!_interactable);
@@ -55,91 +55,91 @@ public class Square : MonoBehaviour
         }
     }
 
-	public bool Cascading
-	{
-		get
-		{
-			return _cascading;
-		}
-		set
-		{
-			_cascading = value;
+    public bool Cascading
+    {
+        get
+        {
+            return _cascading;
+        }
+        set
+        {
+            _cascading = value;
 
-			if (_cascadingIndicator != null)
-			{
-				_cascadingIndicator.SetActive(_cascading);
+            if (_cascadingIndicator != null)
+            {
+                _cascadingIndicator.SetActive(_cascading);
 
-                if(_cascading)
-				{
+                if (_cascading)
+                {
                     var position = _cascadingIndicator.transform.localPosition;
 
-					switch (_targetingScheme)
-					{
-						case TargetingScheme.Self:
+                    switch (_targetingScheme)
+                    {
+                        case TargetingScheme.Self:
                             position.y = 0.3125f;
                             position.x = 0f;
                             break;
-						case TargetingScheme.Left:
+                        case TargetingScheme.Left:
                             position.y = 0.1875f;
                             position.x = 0.1875f;
                             break;
-						case TargetingScheme.Right:
+                        case TargetingScheme.Right:
                             position.y = 0.1875f;
                             position.x = -0.1875f;
                             break;
-						case TargetingScheme.SelfLeft:
+                        case TargetingScheme.SelfLeft:
                             position.y = 0.375f;
                             position.x = 0.1875f;
                             break;
-						case TargetingScheme.SelfRight:
+                        case TargetingScheme.SelfRight:
                             position.y = 0.375f;
                             position.x = -0.1875f;
                             break;
-						case TargetingScheme.LeftRight:
+                        case TargetingScheme.LeftRight:
                             position.y = 0.1875f;
                             position.x = 0f;
                             break;
-						case TargetingScheme.SelfLeftRight:
+                        case TargetingScheme.SelfLeftRight:
                             position.y = 0.375f;
                             position.x = 0f;
                             break;
-					}
+                    }
 
                     _cascadingIndicator.transform.localPosition = position;
-				}
-			}
-		}
-	}
-
-	public TargetingScheme TargetScheme
-	{
-		get
-		{
-			return _targetingScheme; 
-		}
-		set
-		{
-			_targetingScheme = value;
-
-			if(!SolutionSquare)
-			{
-				_targetIndicator.sprite = _targetSchemeSprites[(int)_targetingScheme];
+                }
             }
-		}
-	}
+        }
+    }
 
-	public bool SolutionSquare => _referenceSquare != null;
-	public Square PreviousSquare => _level.Squares[Id > 0 ? Id - 1 : _level.Squares.Length - 1];
-	public Square NextSquare => _level.Squares[Id < _level.Squares.Length - 1 ? Id + 1 : 0];
+    public TargetingScheme TargetScheme
+    {
+        get
+        {
+            return _targetingScheme;
+        }
+        set
+        {
+            _targetingScheme = value;
 
-	public bool Toggled { get; set; }
+            if (!SolutionSquare)
+            {
+                _targetIndicator.sprite = _targetSchemeSprites[(int)_targetingScheme];
+            }
+        }
+    }
+
+    public bool SolutionSquare => _referenceSquare != null;
+    public Square PreviousSquare => _level.Squares[Id > 0 ? Id - 1 : _level.Squares.Length - 1];
+    public Square NextSquare => _level.Squares[Id < _level.Squares.Length - 1 ? Id + 1 : 0];
+
+    public bool Toggled { get; set; }
     public bool Highlighted { get; set; }
 
-	public List<Square> Targets { get; set; }
-	public int Id { get; set; }
+    public List<Square> Targets { get; set; }
+    public int Id { get; set; }
 
     private bool _interactable;
-	private Level _level;
+    private Level _level;
     private Color _normalColor;
     private Color _normalOutlineColor;
     private Rectangle _rectangle;
@@ -148,27 +148,30 @@ public class Square : MonoBehaviour
     private Tweener _colorChange;
     private Vector3 _normalPosition;
     private Color _normalOverlayColor;
-	private Dictionary<Square, Rectangle> _targetPredictions;
+    private Dictionary<Square, List<ShapeRenderer>> _targetPredictions;
     private float _uninteractableOverlayAlpha;
-	private Square _referenceSquare;
-	private bool _cascading;
-	private TargetingScheme _targetingScheme;
+    private Square _referenceSquare;
+    private bool _cascading;
+    private TargetingScheme _targetingScheme;
+    private bool _coloredTargetPrediction;
 
     public void Initialize(
-		int id, 
-		Level level)
-	{
-		_rectangle = GetComponent<Rectangle>();
+        int id,
+        Level level)
+    {
+        _rectangle = GetComponent<Rectangle>();
         _normalColor = _rectangle.Color;
-        
+
         Id = id;
         _level = level;
 
-		gameObject.name = $"Square({Id})";
+        gameObject.name = $"Square({Id})";
 
-		_targetPredictionTemplate.SetActive(false);
+        _coloredTargetPrediction = _targetPredictionTemplate.GetComponent<Rectangle>() != null;
 
-		_outlineRectangle = _outline.GetComponent<Rectangle>();
+        _targetPredictionTemplate.SetActive(false);
+
+        _outlineRectangle = _outline.GetComponent<Rectangle>();
         _normalOutlineColor = _outlineRectangle.Color;
         _normalPosition = transform.position;
         _normalOverlayColor = _noMoreClicksOverlay.Color;
@@ -176,126 +179,26 @@ public class Square : MonoBehaviour
 
         _outline.SetActive(false);
 
-		Cascading = false;
+        Cascading = false;
 
-		/*if(!targetingScheme.HasValue)
-		{
-            var first = Id == 0;
-            var last = Id == _level.Squares.Length - 1;
+        Interactable = true;
+    }
 
-            var possibleTargetSchemes = new List<TargetingScheme>();
-            var targetSchemes = (TargetingScheme[])System.Enum.GetValues(typeof(TargetingScheme));
+    public void Initialize(Level level, Square referenceSquare)
+    {
+        _referenceSquare = referenceSquare;
 
-            for (var i = 0; i < targetSchemes.Length; i++)
-			{
-                var targetScheme = targetSchemes[i];
+        Id = _referenceSquare.Id;
+        _level = level;
 
-				switch (targetScheme)
-				{
-					case TargetingScheme.Self:
-                        break;
-					case TargetingScheme.Left:
-                        if(!level.WrapAroundToggles && first)
-						{
-                            continue;
-						}
-						break;
-					case TargetingScheme.Right:
-                        if (!level.WrapAroundToggles && last)
-                        {
-                            continue;
-                        }
-                        break;
-					case TargetingScheme.SelfLeft:
-                        if ((!level.WrapAroundToggles && first)
-                            || !level.SelfSideTarget)
-                        {
-                            continue;
-                        }
-                        break;
-					case TargetingScheme.SelfRight:
-                        if ((!level.WrapAroundToggles && last)
-                            || !level.SelfSideTarget)
-                        {
-                            continue;
-                        }
-                        break;
-					case TargetingScheme.LeftRight:
-                        if ((!level.WrapAroundToggles && (first || last))
-                            || !level.LeftRightTarget)
-                        {
-                            continue;
-                        }
-                        break;
-					case TargetingScheme.SelfLeftRight:
-                        if ((!level.WrapAroundToggles && (first || last))
-                            || !level.SelfLeftRightTarget)
-                        {
-                            continue;
-                        }
-                        break;
-				}
+        _rectangle = GetComponent<Rectangle>();
+        _normalColor = _rectangle.Color;
 
-                possibleTargetSchemes.Add(targetScheme);
-            }
+        gameObject.name = $"{(SolutionSquare ? "Solution" : "")}Square({Id})";
+    }
 
-            TargetScheme = possibleTargetSchemes[Random.Range(0, possibleTargetSchemes.Count)];
-		}
-		else
-		{
-            TargetScheme = targetingScheme.Value;
-        }
-
-        _targetIndicator.sprite = _targetSchemeSprites[(int)TargetScheme];
-
-		if(!cascading.HasValue)
-		{
-			if (_level.CascadingToggles)
-			{
-				Cascading = Random.Range(0f, 1f) > 0.5f;
-			}
-			else
-			{
-				Cascading = false;
-			}
-		}
-		else
-		{
-			Cascading = cascading.Value;
-		}
-
-		//_cascadingIndicator.SetActive(Cascading);
-
-		if (!toggle.HasValue)
-		{
-            if (Random.Range(0f, 1f) > 0.5f)
-            {
-                Toggle();
-            }
-        }
-		else
-		{
-            Toggle(toggle.Value);
-        }*/
-
-		Interactable = true;
-	}
-
-	public void Initialize(Level level, Square referenceSquare)
-	{
-		_referenceSquare = referenceSquare;
-
-		Id = _referenceSquare.Id;
-		_level = level;
-
-		_rectangle = GetComponent<Rectangle>();
-		_normalColor = _rectangle.Color;
-
-		gameObject.name = $"{(SolutionSquare ? "Solution" : "")}Square({Id})";
-	}
-
-	public void Overwrite(bool toggle, TargetingScheme targetingScheme, bool cascading)
-	{
+    public void Overwrite(bool toggle, TargetingScheme targetingScheme, bool cascading)
+    {
         Toggle(toggle);
 
         TargetScheme = targetingScheme;
@@ -305,37 +208,37 @@ public class Square : MonoBehaviour
     }
 
     public void Reinitialize()
-	{
+    {
         Toggle(_referenceSquare.Toggled);
-		Cascading = _referenceSquare.Cascading;
+        Cascading = _referenceSquare.Cascading;
     }
 
     public void OnMouseOverEnter(bool showOutline)
     {
-        if(showOutline && !_outline.activeSelf)
-		{
+        if (showOutline && !_outline.activeSelf)
+        {
             _outline.SetActive(true);
         }
-        
+
         Highlighted = true;
 
-		ShowTargetPredictions();
-	}
+        ShowTargetPredictions();
+    }
 
     public void OnMouseOverExit()
     {
-        if(_outline.activeSelf)
-		{
+        if (_outline.activeSelf)
+        {
             _outline.SetActive(false);
         }
-        
+
         Highlighted = false;
 
-		HideTargetPredictions();
-	}
+        HideTargetPredictions();
+    }
 
     public void OnMouseClickDown()
-	{
+    {
         _outlineRectangle.Color = _clickedOutlineColor;
     }
 
@@ -344,47 +247,19 @@ public class Square : MonoBehaviour
         _outlineRectangle.Color = _normalOutlineColor;
     }
 
-    public void SetupTargetsAndPredictions(Square[] targetArray)
-	{
-		Targets = new List<Square>();
+    public void SetupTargets(Square[] targetArray)
+    {
+        Targets = new List<Square>();
 
-		switch (TargetScheme)
-		{
-			case TargetingScheme.Self:
+        switch (TargetScheme)
+        {
+            case TargetingScheme.Self:
 
-				Targets.Add(this);
-
-                break;
-
-			case TargetingScheme.Left:
-
-                if(Id > 0)
-				{
-                    Targets.Add(targetArray[Id - 1]);
-                }
-				else
-				{
-                    Targets.Add(targetArray[targetArray.Length - 1]);
-                }
+                Targets.Add(this);
 
                 break;
 
-			case TargetingScheme.Right:
-
-                if (Id < targetArray.Length - 1)
-				{
-                    Targets.Add(targetArray[Id + 1]);
-                }
-				else
-				{
-                    Targets.Add(targetArray[0]);
-                }
-
-                break;
-
-			case TargetingScheme.SelfLeft:
-
-				Targets.Add(this);
+            case TargetingScheme.Left:
 
                 if (Id > 0)
                 {
@@ -397,9 +272,7 @@ public class Square : MonoBehaviour
 
                 break;
 
-			case TargetingScheme.SelfRight:
-
-				Targets.Add(this);
+            case TargetingScheme.Right:
 
                 if (Id < targetArray.Length - 1)
                 {
@@ -412,30 +285,8 @@ public class Square : MonoBehaviour
 
                 break;
 
-			case TargetingScheme.LeftRight:
+            case TargetingScheme.SelfLeft:
 
-                if (Id > 0)
-                {
-                    Targets.Add(targetArray[Id - 1]);
-                }
-                else
-                {
-                    Targets.Add(targetArray[targetArray.Length - 1]);
-                }
-
-                if (Id < targetArray.Length - 1)
-                {
-                    Targets.Add(targetArray[Id + 1]);
-                }
-                else
-                {
-                    Targets.Add(targetArray[0]);
-                }
-
-                break;
-
-			case TargetingScheme.SelfLeftRight:
-				
                 Targets.Add(this);
 
                 if (Id > 0)
@@ -446,7 +297,13 @@ public class Square : MonoBehaviour
                 {
                     Targets.Add(targetArray[targetArray.Length - 1]);
                 }
-                
+
+                break;
+
+            case TargetingScheme.SelfRight:
+
+                Targets.Add(this);
+
                 if (Id < targetArray.Length - 1)
                 {
                     Targets.Add(targetArray[Id + 1]);
@@ -457,77 +314,166 @@ public class Square : MonoBehaviour
                 }
 
                 break;
-		}
 
-		if(!SolutionSquare)
-		{
-			_targetPredictions = new Dictionary<Square, Rectangle>();
+            case TargetingScheme.LeftRight:
 
-			for (var i = 0; i < Targets.Count; i++)
-			{
-				var target = Targets[i];
+                if (Id > 0)
+                {
+                    Targets.Add(targetArray[Id - 1]);
+                }
+                else
+                {
+                    Targets.Add(targetArray[targetArray.Length - 1]);
+                }
 
-				var newTargetPrediction = Instantiate(_targetPredictionTemplate, _targetPredictionTemplate.transform.parent).GetComponent<Rectangle>();
-				newTargetPrediction.transform.position = new Vector3(target.transform.position.x, _targetPredictionTemplate.transform.position.y, 0f);
+                if (Id < targetArray.Length - 1)
+                {
+                    Targets.Add(targetArray[Id + 1]);
+                }
+                else
+                {
+                    Targets.Add(targetArray[0]);
+                }
 
-				newTargetPrediction.gameObject.SetActive(false);
+                break;
 
-				_targetPredictions.Add(target, newTargetPrediction);
-			}
-		}
-	}
+            case TargetingScheme.SelfLeftRight:
 
-	/*public void TurnOffUnnecessaryCascading()
+                Targets.Add(this);
+
+                if (Id > 0)
+                {
+                    Targets.Add(targetArray[Id - 1]);
+                }
+                else
+                {
+                    Targets.Add(targetArray[targetArray.Length - 1]);
+                }
+
+                if (Id < targetArray.Length - 1)
+                {
+                    Targets.Add(targetArray[Id + 1]);
+                }
+                else
+                {
+                    Targets.Add(targetArray[0]);
+                }
+
+                break;
+        }
+    }
+
+    public void SetupPredictions(bool originalSetup)
 	{
-		if(!Cascading)
+		if (SolutionSquare)
 		{
 			return;
 		}
 
-		var turnOffCascading = true;
-
-		foreach (var square in _level.Squares)
+        if(!originalSetup && _coloredTargetPrediction)
 		{
-			if(square == this)
-			{
-				continue;
-			}
+            return;
+        }
 
-			if(square.Targets.Contains(this))
-			{
-				turnOffCascading = false;
-
-				break;
-			}
-		}
-
-		if(turnOffCascading)
+		if (_targetPredictions != null)
 		{
-			//Debug.Log("It happened");
-
-			Cascading = false;
-		}
-	}
-    */
-	public void Click()
-	{
-		foreach (var target in Targets)
-		{
-			target.Toggle();
-
-			if(target.Cascading && target != this)
+			foreach (var targetPredictionEntry in _targetPredictions)
 			{
-				target.Cascading = false;
-				target.Click();
+				if (targetPredictionEntry.Value != null)
+				{
+					foreach (var targetPrediction in targetPredictionEntry.Value)
+					{
+						if (targetPrediction != null)
+						{
+							Destroy(targetPrediction.gameObject);
+						}
+					}
+				}
 			}
 		}
+
+		_targetPredictions = new Dictionary<Square, List<ShapeRenderer>>();
+
+		var cascadingFlags = new bool[_level.Squares.Length];
+
+		for (var i = 0; i < _level.Squares.Length; i++)
+		{
+			cascadingFlags[i] = _level.Squares[i].Cascading;
+		}
+
+		InstantiatePredictionIndicator(cascadingFlags, Targets, true);
 	}
 
-	public void Toggle()
-	{
+	private void InstantiatePredictionIndicator(bool[] cascadingFlags, List<Square> targets, bool originalClick)
+    {
+        for (var i = 0; i < targets.Count; i++)
+        {
+            var target = targets[i];
+
+            var newTargetPrediction = Instantiate(_targetPredictionTemplate, _targetPredictionTemplate.transform.parent).GetComponent<ShapeRenderer>();
+
+            newTargetPrediction.gameObject.SetActive(false);
+
+            if (_targetPredictions.ContainsKey(target))
+            {
+                _targetPredictions[target].Add(newTargetPrediction);
+            }
+            else
+            {
+                var newTargetPredictionList = new List<ShapeRenderer>();
+                newTargetPredictionList.Add(newTargetPrediction);
+
+                _targetPredictions.Add(target, newTargetPredictionList);
+            }
+
+            var yOffset = -0.3f * (_targetPredictions[target].Count - 1);
+            newTargetPrediction.transform.position = new Vector3(target.transform.position.x, _targetPredictionTemplate.transform.position.y + yOffset, 0f);
+
+            if (!_coloredTargetPrediction)
+            {
+                var targetTargets = new List<Square>(target.Targets);
+
+                if (originalClick && target == this && targetTargets.Contains(this))
+                {
+                    continue;
+
+                    //targetTargets.Remove(this);
+                }
+
+                if (cascadingFlags[target.Id])
+                {
+                    cascadingFlags[target.Id] = false;
+
+                    InstantiatePredictionIndicator(cascadingFlags, targetTargets, false);
+                }
+            }
+        }
+    }
+
+    public void Click()
+    {
+        foreach (var target in Targets)
+        {
+            target.Toggle();
+
+            if (target.Cascading && target != this)
+            {
+                target.Cascading = false;
+                target.Click();
+            }
+        }
+
+        foreach (var square in _level.Squares)
+        {
+            square.SetupPredictions(false);
+        }
+    }
+
+    public void Toggle()
+    {
         Toggled = !Toggled;
 
-        _rectangle.Color = Toggled 
+        _rectangle.Color = Toggled
             ? _toggledColor
             : _normalColor;
 
@@ -551,39 +497,54 @@ public class Square : MonoBehaviour
         }
     }
 
-	public void ShowTargetPredictions()
-	{
-		foreach(var targetPredictions in _targetPredictions)
-		{
-			targetPredictions.Value.Color = targetPredictions.Key.Toggled
-			? _normalColor
-			: _toggledColor;
+    public void ShowTargetPredictions()
+    {
+        foreach (var targetPredictionEntry in _targetPredictions)
+        {
+            foreach (var targetPrediction in targetPredictionEntry.Value)
+            {
+                if (_coloredTargetPrediction)
+                {
+                    targetPrediction.Color = targetPredictionEntry.Key.Toggled
+                        ? _normalColor
+                        : _toggledColor;
+                }
 
-			if(!targetPredictions.Value.gameObject.activeSelf)
-			{
-				targetPredictions.Value.gameObject.SetActive(true);
-			}
-		}
-	}
+                if (!targetPrediction.gameObject.activeSelf)
+                {
+                    targetPrediction.gameObject.SetActive(true);
+                }
+            }
+        }
+    }
 
-	public void HideTargetPredictions()
-	{
-		foreach (var targetPredictions in _targetPredictions)
-		{
-			targetPredictions.Value.Color = targetPredictions.Key.Toggled
-			? _normalColor
-			: _toggledColor;
+    public void HideTargetPredictions()
+    {
+        foreach (var targetPredictionEntry in _targetPredictions)
+        {
+            foreach (var targetPrediction in targetPredictionEntry.Value)
+            {
+                if (_coloredTargetPrediction)
+                {
+                    targetPrediction.Color = targetPredictionEntry.Key.Toggled
+                        ? _normalColor
+                        : _toggledColor;
+                }
 
-			targetPredictions.Value.gameObject.SetActive(false);
-		}
-	}
+                if (targetPrediction.gameObject.activeSelf)
+                {
+                    targetPrediction.gameObject.SetActive(false);
+                }
+            }
+        }
+    }
 
-	public void Shake()
+    public void Shake()
     {
         ChangeSortingOrderOfComponents(10);
 
-        if(_shake != null)
-		{
+        if (_shake != null)
+        {
             DOTween.Kill(_shake, true);
 
             transform.position = _normalPosition;
@@ -597,7 +558,7 @@ public class Square : MonoBehaviour
             _shakeSnapping,
             _shakeFadeOut
         ).OnComplete(() =>
-		{
+        {
             ChangeSortingOrderOfComponents(-10);
 
             transform.position = _normalPosition;
@@ -607,8 +568,8 @@ public class Square : MonoBehaviour
 
         var value = 0f;
 
-        if(_colorChange != null)
-		{
+        if (_colorChange != null)
+        {
             DOTween.Kill(_colorChange, true);
 
             _noMoreClicksOverlay.Color = _normalOverlayColor;
@@ -622,7 +583,7 @@ public class Square : MonoBehaviour
         },
         1f,
         _shakeTime).OnComplete(() =>
-		{
+        {
             _colorChange = null;
 
             _noMoreClicksOverlay.Color = _normalOverlayColor;
@@ -630,7 +591,7 @@ public class Square : MonoBehaviour
     }
 
     private void MatchUninteractableOverlayColorWithRectangle()
-	{
+    {
         var color = _rectangle.Color;
         color.a = _uninteractableOverlayAlpha;
 
@@ -638,28 +599,34 @@ public class Square : MonoBehaviour
     }
 
     private void ChangeSortingOrderOfComponents(int factor)
-	{
+    {
         var components = GetComponentsInChildren<Rectangle>(true);
 
-        foreach(var component in components)
-		{
+        foreach (var component in components)
+        {
             component.SortingOrder += factor;
         }
 
         _targetIndicator.sortingOrder += factor;
     }
 
-	private void OnDestroy()
-	{
-		if(_targetPredictions != null)
-		{
-			foreach (var targetPrediction in _targetPredictions)
-			{
-				if (targetPrediction.Value != null)
-				{
-					Destroy(targetPrediction.Value.gameObject);
-				}
-			}
-		}
-	}
+    private void OnDestroy()
+    {
+        if (_targetPredictions != null)
+        {
+            foreach (var targetPredictionEntry in _targetPredictions)
+            {
+                if (targetPredictionEntry.Value != null)
+                {
+                    foreach (var targetPrediction in targetPredictionEntry.Value)
+                    {
+                        if (targetPrediction != null)
+                        {
+                            Destroy(targetPrediction.gameObject);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

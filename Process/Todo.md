@@ -100,3 +100,8 @@
 - [visual] Try a less explicit feedback for the toggle predictions
 - ~~[feat] Don't generate levels with all self targeting schemes~~
 - ~~[tech] Don't save level to file if it already exists in file~~
+
+## 2024-12-06
+
+- [feat] Try and make sure that the new progression feature that's just being introduced is involved in the level's solution
+- [feat] Visual hint for cascaging toggle effect

@@ -320,11 +320,16 @@ public class Level : MonoBehaviour
 
 		for (var i = 0; i < Squares.Length; i++)
 		{
-			Squares[i].SetupTargetsAndPredictions(Squares);
+			Squares[i].SetupTargets(Squares);
 
 			firstHistorySnapshot[i].Toggled = Squares[i].Toggled;
 			firstHistorySnapshot[i].Interactable = true;
 			firstHistorySnapshot[i].Cascading = Squares[i].Cascading;
+		}
+
+		for (var i = 0; i < Squares.Length; i++)
+		{
+			Squares[i].SetupPredictions(true);
 		}
 
 		_squareHistory.Clear();
@@ -435,14 +440,6 @@ public class Level : MonoBehaviour
 		}
 		else
 		{
-			for (var i = 0; i < Squares.Length; i++)
-			{
-				if (UnityEngine.Random.Range(0f, 1f) > 0.5f)
-				{
-					Squares[i].Toggle();
-				}
-			}
-
 			if(Squares.Length == 1)
 			{
 				var square = Squares[0];
@@ -455,11 +452,32 @@ public class Level : MonoBehaviour
 				var firstSquare = Squares[UnityEngine.Random.Range(0, 2)];
 				var otherSquare = firstSquare.PreviousSquare;
 
+				if (UnityEngine.Random.Range(0f, 1f) > 0.5f)
+				{
+					firstSquare.Toggle();
+				}
+
+				if(!firstSquare.Toggled)
+				{
+					otherSquare.Toggle();
+				}
+
 				firstSquare.TargetScheme = firstSquare.Id == 0 ? Square.TargetingScheme.Right : Square.TargetingScheme.Left;
+				firstSquare.Cascading = false;
+
 				otherSquare.TargetScheme = Square.TargetingScheme.Self;
+				otherSquare.Cascading = false;
 			}
 			else
 			{
+				for (var i = 0; i < Squares.Length; i++)
+				{
+					if (UnityEngine.Random.Range(0f, 1f) > 0.5f)
+					{
+						Squares[i].Toggle();
+					}
+				}
+
 				var squaresForWrapAround = new List<Square>();
 
 				if (_currentProgressionEntry.WrapAroundToggles != 0)
@@ -771,20 +789,16 @@ public class Level : MonoBehaviour
 
 			_testSquares[i] = new TestSquare(square);
 
-			square.SetupTargetsAndPredictions(Squares);
-			SolutionSquares[i].SetupTargetsAndPredictions(SolutionSquares);
+			square.SetupTargets(Squares);
+			SolutionSquares[i].SetupTargets(SolutionSquares);
 
 			_testSquares[i].SetupTargets(square);
 		}
 
-		/*for (var i = 0; i < Squares.Length; i++)
+		for (var i = 0; i < Squares.Length; i++)
 		{
-			Squares[i].TurnOffUnnecessaryCascading();
-
-			SolutionSquares[i].Cascading = Squares[i].Cascading;
-			_testSquares[i].Cascading = Squares[i].Cascading;
-			firstHistorySnapshot[i].Cascading = Squares[i].Cascading;
-		}*/
+			Squares[i].SetupPredictions(true);
+		}
 
 		_squareHistory.Add(firstHistorySnapshot);
 
@@ -1498,7 +1512,12 @@ public class Level : MonoBehaviour
             Squares[i].Toggle(historySnapshot[i].Toggled);
 			Squares[i].Interactable = historySnapshot[i].Interactable;
 			Squares[i].Cascading = historySnapshot[i].Cascading;
-        }
+		}
+
+		foreach(var square in Squares)
+		{
+			square.SetupPredictions(false);
+		}
 
         LevelPanel.Instance.UpdateClicksCounter();
     }
