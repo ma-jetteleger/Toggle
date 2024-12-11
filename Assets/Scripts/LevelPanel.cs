@@ -12,6 +12,7 @@ public class LevelPanel : MonoBehaviour
 	// Components
 	[SerializeField] private GameObject _solutionClicksBoxTemplate = null;
 	[SerializeField] private Button _nextLevelButton = null;
+	//[SerializeField] private Button _previousLevelButton = null;
 	[SerializeField] private Button _resetButton = null;
 	[SerializeField] private Button _undoButton = null;
 	[SerializeField] private Button _redoButton = null;
@@ -31,8 +32,18 @@ public class LevelPanel : MonoBehaviour
 	[SerializeField] private float _clicksCounterShakeRandomness = 0f;
 	[SerializeField] private bool _clicksCounterShakeSnapping = false;
 	[SerializeField] private bool _clicksCounterShakeFadeOut = false;
+	[SerializeField] private Vector3 _clicksCounterPunchScale = Vector3.zero;
+	[SerializeField] private float _clicksCounterPunchTime = 0f;
+	[SerializeField] private int _clicksCounterPunchVibrato = 0;
+	[SerializeField] private float _clicksCounterPunchElasticity = 0f;
+	[SerializeField] private Vector3 _levelsClearedPunchScale = Vector3.zero;
+	[SerializeField] private float _levelsClearedPunchTime = 0f;
+	[SerializeField] private int _levelsClearedPunchVibrato = 0;
+	[SerializeField] private float _levelsClearedPunchElasticity = 0f;
 
 	private RectTransform _nextLevelButtonRectTransform;
+	private Tweener _clicksCounterPunch;
+	private Tweener _levelsClearedPunch;
 	private Tweener _clicksCounterShake;
 	private Tweener _nextLevelButtonShake;
 	private Tweener _clicksCounterColorChange;
@@ -85,9 +96,14 @@ public class LevelPanel : MonoBehaviour
 		}
 	}
 
-	public void UpdateLevelsClearedText(int levelsCleared)
+	public void UpdateLevelsClearedText(int levelsCleared, bool animate)
 	{
 		_levelsClearedText.text = levelsCleared.ToString();
+
+		if(animate)
+		{
+			PunchLevelsClearedText();
+		}
 	}
 
 	public void UpdateNextLevelButton(bool toggle)
@@ -95,6 +111,12 @@ public class LevelPanel : MonoBehaviour
 		_nextLevelButton.gameObject.SetActive(toggle);
 		_nextLevelButton.interactable = toggle;
 	}
+
+	/*public void UpdatePreviousLevelButton(bool toggle)
+	{
+		_previousLevelButton.gameObject.SetActive(toggle);
+		_previousLevelButton.interactable = toggle;
+	}*/
 
 	public void ShakeNextLevelButton()
 	{
@@ -190,7 +212,41 @@ public class LevelPanel : MonoBehaviour
 		});
 	}
 
-	public void UpdateClicksCounter()
+	public void PunchClicksCounter()
+	{
+		if (_clicksCounterPunch != null)
+		{
+			DOTween.Kill(_clicksCounterPunch);
+
+			_clicksCounterText.transform.localScale = Vector3.one;
+		}
+
+		_clicksCounterPunch = _clicksCounterText.transform.DOPunchScale(_clicksCounterPunchScale, _clicksCounterPunchTime, _clicksCounterPunchVibrato, _clicksCounterPunchElasticity).OnComplete(() =>
+		{
+			_clicksCounterText.transform.localScale = Vector3.one;
+
+			_clicksCounterPunch = null;
+		});
+	}
+
+	public void PunchLevelsClearedText()
+	{
+		if (_levelsClearedPunch != null)
+		{
+			DOTween.Kill(_levelsClearedPunch);
+
+			_levelsClearedText.transform.localScale = Vector3.one;
+		}
+
+		_levelsClearedPunch = _levelsClearedText.transform.DOPunchScale(_levelsClearedPunchScale, _levelsClearedPunchTime, _levelsClearedPunchVibrato, _levelsClearedPunchElasticity).OnComplete(() =>
+		{
+			_levelsClearedText.transform.localScale = Vector3.one;
+
+			_levelsClearedPunch = null;
+		});
+	}
+
+	public void UpdateClicksCounter(bool animate)
 	{
 		var numberToDisplay = 0;
 
@@ -206,6 +262,11 @@ public class LevelPanel : MonoBehaviour
 		}
 
 		_clicksCounterText.text = $"{numberToDisplay}";
+
+		if(animate)
+		{
+			PunchClicksCounter();
+		}
 	}
 
 	public void UpdateHistoryButtons(bool? forcedValue = null)
@@ -239,4 +300,9 @@ public class LevelPanel : MonoBehaviour
 	{
 		_level.NextLevel();
 	}
+
+	/*public void UI_PreviousLevel()
+	{
+		_level.Previouslevel();
+	}*/
 }

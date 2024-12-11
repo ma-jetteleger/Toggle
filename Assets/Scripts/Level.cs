@@ -138,9 +138,11 @@ public class Level : MonoBehaviour
     private Vector2 _levelCompletionFeedbackFinalSize;
     private Color _levelCompletionFeedbackBaseColor;
     private int _progressionIndex;
+    //private int _progressionIndexBuffer;
     private List<HistorySquare[]> _squareHistory;
 	private TestSquare[] _testSquares;
 	private Queue<string> _playedLevels;
+	//private List<string> _generatedLevels;
 	private string _levelCode;
 	private bool _trulyCompleted;
 	private List<ProgressionEntry> _progressionEntries;
@@ -157,6 +159,7 @@ public class Level : MonoBehaviour
         _squareHistory = new List<HistorySquare[]>();
 
 		_playedLevels = new Queue<string>();
+		//_generatedLevels = new List<string>();
 
 		_progressionEntries = new List<ProgressionEntry>();
 	}
@@ -171,7 +174,7 @@ public class Level : MonoBehaviour
 		LoadProgressionEntries();
 		GenerateLevel();
 
-		LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex);
+		LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, false);
 	}
 
     private void Update()
@@ -197,19 +200,19 @@ public class Level : MonoBehaviour
 			{
 				_progressionIndex--;
 
-				LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex);
+				LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, false);
 			}
 			if (Input.GetKeyDown(KeyCode.RightArrow))
 			{
 				_progressionIndex++;
 
-				LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex);
+				LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, true);
 			}
 			if (Input.GetKeyDown(KeyCode.Backspace))
 			{
 				_progressionIndex = 0;
 
-				LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex);
+				LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, false);
 			}
 			if (Input.GetKeyDown(KeyCode.Space))
 			{
@@ -276,7 +279,7 @@ public class Level : MonoBehaviour
 
 					AddNewHistorySnapshot();
 
-					LevelPanel.Instance.UpdateClicksCounter();
+					LevelPanel.Instance.UpdateClicksCounter(true);
 
 					CheckLevelCompletion();
 
@@ -820,11 +823,13 @@ public class Level : MonoBehaviour
 		Clicks = 0;
 
 		LevelPanel.Instance.SetupSolutionBoxes(Solutions);
-		LevelPanel.Instance.UpdateClicksCounter();
+		LevelPanel.Instance.UpdateClicksCounter(false);
 
 		CheckLevelCompletion();
 
 		LevelPanel.Instance.UpdateHistoryButtons();
+
+		//_generatedLevels.Add(_levelCode);
 	}
 
 	private void GenerateSolution(string[] splitGoalCode, string[] splitSolutionsCode)
@@ -1423,6 +1428,15 @@ public class Level : MonoBehaviour
 
 	public void NextLevel()
     {
+		/*if(_progressionIndexBuffer < 0)
+		{
+			_progressionIndexBuffer++;
+
+			GenerateLevel(_generatedLevels[_progressionIndex + _progressionIndexBuffer]);
+
+			return;
+		}*/
+
         if (_solutionType == SolutionType.SingleSolution
 			&& _clicksCountRestriction == ClicksCountToNextLevelRestriction.SoftRestriction 
 			&& ClicksLeft < 0)
@@ -1432,9 +1446,16 @@ public class Level : MonoBehaviour
         }
         else
         {
-            GenerateLevel();
+			GenerateLevel();
         }
     }
+
+	/*public void Previouslevel()
+	{
+		_progressionIndexBuffer--;
+
+		GenerateLevel(_generatedLevels[_progressionIndex + _progressionIndexBuffer]);
+	}*/
 
     public void ResetLevel()
 	{
@@ -1519,7 +1540,7 @@ public class Level : MonoBehaviour
 			square.SetupPredictions(false);
 		}
 
-        LevelPanel.Instance.UpdateClicksCounter();
+        LevelPanel.Instance.UpdateClicksCounter(false);
     }
 
 	public bool GetLevelCompletion()
@@ -1648,7 +1669,7 @@ public class Level : MonoBehaviour
 				{
 					_progressionIndex++;
 
-					LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex);
+					LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, true);
 
 					_playedLevels.Enqueue(_levelCode);
 

@@ -65,7 +65,7 @@
 - ~~[visual] Don't show the "level cleared" animation when re-inputing an already discovered solution~~
 - ~~[feat] Involve more features in the progression (different targeting arrows, wrap around toggles)~~
 	- ~~[tech] Make the progression be more easily editable, not just lines of code~~
-- [visual] Better (more prominently) display the clicks counter
+- ~~[visual] Better (more prominently) display the clicks counter~~
 
 ## 2024-10-29
 
@@ -81,7 +81,7 @@
 - ~~[feat] Gradually introduce cascading toggles in the progression~~
 	- ~~Maybe go back to shorter arrays to introduce cascading toggles and rebuild to longer arrays gradually~~
 - [visual] ? Animate cascading toggles?
-- [visual] ? Highlight cascading toggles on hover?
+- ~~[visual] ? Highlight cascading toggles on hover?~~
 - ~~[feat] Exclude squares that aren't toggled by others from being cascading~~
 - ~~[tech] Write a function to re-order/cleanup the pregenerated levels files in ascending order of level lengths~~ 
 
@@ -104,4 +104,4 @@
 ## 2024-12-06
 
 - [feat] Try and make sure that the new progression feature that's just being introduced is involved in the level's solution
-- [feat] Visual hint for cascaging toggle effect
+- ~~[feat] Visual hint for cascaging toggle effect~~
