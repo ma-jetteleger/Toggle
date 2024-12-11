@@ -22,7 +22,7 @@ Squares can be in two states, represented by two different colors: black and whi
 - A dot on a square indicates that, when it is targeted and toggled by another clicked square, it will toggle its own target(s) immediately as well
 
 
-The black and white rectangles that appear beneath the main array when hovering a square are showing you a prediction of the effect of clicking the hovered square. They indicate the predicted color of the squares above, should you click the square you are hovering.
+The black dots that appear beneath the main array when hovering a square are showing you a prediction of the effect of clicking the hovered square. They indicate which ones of the squares above are going to be toggled, should you click the square you are hovering.
 
 
 The buttons at the top-left side of the screen are, from left to right:

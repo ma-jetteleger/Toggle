@@ -1073,8 +1073,9 @@ public class Level : MonoBehaviour
 		{
 			PrintSolutions();
 		}
-	}
 #endif
+	}
+
 
 	private void PrintSolutions()
 	{
