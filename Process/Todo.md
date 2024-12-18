@@ -42,7 +42,6 @@
 
 ## 2024-09-25
 
-- [visual] ? Add crosses and checkmarks to indicate that a square is in the right toggle state? (to make it easier to "read" a level)
 - ~~[feat] Restrict squares to be clickable only once per level~~
 
 ## 2024-10-15
@@ -53,9 +52,6 @@
 - ~~[visual] Change the placeholder UI arrows for the history buttons~~
 - [feat] ? Make some squares always interactable? 
 - [UI/feat] Add a menu with options to enable players/testers to test different modes and parameters 
-- [visual] Mobile interface
-	- Figure out how to convey the information that is conveyed when hovering squares without hover functionalities
-	- Figure out how to maintain the visibility of the toggle indicators when using fingers to press on squares
 - ~~[bug] Don't compile multiple solutions with the same amount of steps~~
 - ~~[bug] Level generation algorithm is suggesting solutions that are impossible/broken~~
 
@@ -105,3 +101,17 @@
 
 - [feat] Try and make sure that the new progression feature that's just being introduced is involved in the level's solution
 - ~~[feat] Visual hint for cascaging toggle effect~~
+
+## 2024-12-14
+
+- [visual] Hide the level number until the first level is completed
+- [visual] Make the win animation play every time a level is re-solved, maybe with a bit of a difference 
+- [visual] Add crosses and checkmarks to indicate that a square is in the right toggle state to make it easier to "read" a level and to understand the objective better
+- [feat] Try another progression scheme: more levels between new mechanics
+- [feat] Try another progression scheme: isolate newly introduced mechanics 
+- [feat] Try a second level with only one click, so it's not pre-solved when generated
+- [tech] Make the debug controls unavailable before hitting a specific key
+- [visual] Mobile interface
+	- Figure out how to convey the information that is conveyed when hovering squares without hover functionalities
+	- Figure out how to maintain the visibility of the toggle indicators when using fingers to press on squares
+- [visual] Try another icon as a cascading indicator (a wave? a looping arrow?)

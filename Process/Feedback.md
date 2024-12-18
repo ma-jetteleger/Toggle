@@ -41,3 +41,19 @@
 	+ Allows for flexibility/more options in goal selection
 + ~~Single-solution mode has great feedback when busting the clicks counter~~
 + Squares being "spent" in multi-solution mode (only able to be clicked once) feels good and captures the puzzly feeling
+
+## 2024-12-14
+
+- The clicks counter was interpreted as the level number
+- The fact that the winning animation doesn't play every time the level is re-solved makes the player doubt if they actually successfully understood the goal and how to reach it
+- The goal of a level (to match the bottom array's colors) is not immediately understood
+	- The bottom array of rectangles is not easily interpreted as the objective of the level
+- Some players suggested to have more levels between the introduction of new mechanics (slower pacing)
+- Another suggestion was to have new mechanics introduced in isolation (cut out the other mechanics when introducing a new one)
+- A player tried to play with the keyboard, triggering the debug fonctions
+- Some players did not understand the meaning of the number on the top right of the UI (the cleared level counter)
+- The wrap around arrows aren't emphasized enough
+- The cascading indicator dot isn't great, a player suggested using a "wave" icon
++ The progression is well paced and well organized, the mechanics are put in the right order and it makes for a satisfying, gradually more difficult (and gradually more "positively frustrating") experience
+- It felt/looked weird to have a level already solved (the second level)
++ People are really looking for a mobile version
