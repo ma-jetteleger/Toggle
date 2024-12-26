@@ -109,7 +109,7 @@
 - [visual] Add crosses and checkmarks to indicate that a square is in the right toggle state to make it easier to "read" a level and to understand the objective better
 - [feat] Try another progression scheme: more levels between new mechanics
 - [feat] Try another progression scheme: isolate newly introduced mechanics 
-- [feat] Try a second level with only one click, so it's not pre-solved when generated
+- ~~[feat] Try a second level with only one click, so it's not pre-solved when generated~~
 - [tech] Make the debug controls unavailable before hitting a specific key
 - [visual] Mobile interface
 	- Figure out how to convey the information that is conveyed when hovering squares without hover functionalities

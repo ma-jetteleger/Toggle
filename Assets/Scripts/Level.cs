@@ -455,7 +455,7 @@ public class Level : MonoBehaviour
 				var firstSquare = Squares[UnityEngine.Random.Range(0, 2)];
 				var otherSquare = firstSquare.PreviousSquare;
 
-				if (UnityEngine.Random.Range(0f, 1f) > 0.5f)
+				/*if (UnityEngine.Random.Range(0f, 1f) > 0.5f)
 				{
 					firstSquare.Toggle();
 				}
@@ -463,13 +463,15 @@ public class Level : MonoBehaviour
 				if(!firstSquare.Toggled)
 				{
 					otherSquare.Toggle();
-				}
+				}*/
 
 				firstSquare.TargetScheme = firstSquare.Id == 0 ? Square.TargetingScheme.Right : Square.TargetingScheme.Left;
 				firstSquare.Cascading = false;
 
 				otherSquare.TargetScheme = Square.TargetingScheme.Self;
 				otherSquare.Cascading = false;
+
+				otherSquare.Toggle();
 			}
 			else
 			{
@@ -883,31 +885,46 @@ public class Level : MonoBehaviour
 
 		for (var i = 0; i < _solutionGenerationAttempts; i++)
 		{
-			validSolutionSequence = false;
-
-			//_solutionSequence = new int[Random.Range(_minClicksForSolution, squares - _maxClicksBufferForSolution)];
-			mainSolution = new Solution
+			if (indices.Length <= 2)
 			{
-				Sequence = indices.Length > 2
-					? new int[indices.Length - _maxClicksBufferForSolution]
-					: new int[indices.Length]
-			};
+				/*var levelsToDequeue = _playedLevels.Count - 1;
 
-			var shuffledIndices = indices.OrderBy(a => System.Guid.NewGuid()).ToArray();
+				for (var j = 0; j < levelsToDequeue; j++)
+				{
+					_playedLevels.Dequeue();
+				}*/
 
-			for (var j = 0; j < mainSolution.Sequence.Length; j++)
-			{
-				mainSolution.Sequence[j] = shuffledIndices[j];
+				mainSolution = new Solution()
+				{
+					Sequence = new int[] { indices.Length == 1
+					? 0
+					: Squares.First(x => x.TargetScheme == Square.TargetingScheme.Self).PreviousSquare.Id
+				}
+				};
 
-				SolutionSquares[mainSolution.Sequence[j]].Click();
-			}
+				SolutionSquares[mainSolution.Sequence[0]].Click();
 
-			if(indices.Length <= 2)
-			{
 				validSolutionSequence = true;
 			}
 			else
 			{
+				validSolutionSequence = false;
+
+				//_solutionSequence = new int[Random.Range(_minClicksForSolution, squares - _maxClicksBufferForSolution)];
+				mainSolution = new Solution
+				{
+					Sequence = new int[indices.Length - _maxClicksBufferForSolution]
+				};
+
+				var shuffledIndices = indices.OrderBy(a => System.Guid.NewGuid()).ToArray();
+
+				for (var j = 0; j < mainSolution.Sequence.Length; j++)
+				{
+					mainSolution.Sequence[j] = shuffledIndices[j];
+
+					SolutionSquares[mainSolution.Sequence[j]].Click();
+				}
+
 				for (var j = 0; j < Squares.Length; j++)
 				{
 					if (Squares[j].Toggled != SolutionSquares[j].Toggled)
@@ -920,7 +937,7 @@ public class Level : MonoBehaviour
 					}
 				}
 			}
-
+			
 			var tentativeLevelCode = GetCurrentLevelCode();
 			var splitTentativeLevelCode = tentativeLevelCode.Split(';');
 
@@ -944,7 +961,7 @@ public class Level : MonoBehaviour
 				break;
 			}
 		}
-
+		
 		if (!validSolutionSequence)
 		{
 			Debug.Log("Couldn't generate a valid solution sequence, loading a prevalidated level from file");

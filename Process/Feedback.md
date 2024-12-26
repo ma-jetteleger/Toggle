@@ -55,5 +55,5 @@
 - The wrap around arrows aren't emphasized enough
 - The cascading indicator dot isn't great, a player suggested using a "wave" icon
 + The progression is well paced and well organized, the mechanics are put in the right order and it makes for a satisfying, gradually more difficult (and gradually more "positively frustrating") experience
-- It felt/looked weird to have a level already solved (the second level)
+- ~~It felt/looked weird to have a level already solved (the second level)~~
 + People are really looking for a mobile version

@@ -1,8 +1,8 @@
 f0;t;0
-t0,f1;t,f;01
-t2,f0;t,f;01
-f0,t1;f,t;01
-f2,t0;f,t;10
+t0,f1;f,f;0
+t2,f0;t,t;0
+f0,t1;t,t;0
+f2,t0;f,f;1
 f3,f0,f3;f,f,t;12
 t0,t6,f5;t,f,f;20
 f1,t6,t1;f,f,f;02
