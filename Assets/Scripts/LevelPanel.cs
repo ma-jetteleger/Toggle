@@ -40,9 +40,11 @@ public class LevelPanel : MonoBehaviour
 	[SerializeField] private float _levelsClearedPunchTime = 0f;
 	[SerializeField] private int _levelsClearedPunchVibrato = 0;
 	[SerializeField] private float _levelsClearedPunchElasticity = 0f;
+	[SerializeField] private float _levelsClearedDelay = 0f;
 
 	private RectTransform _nextLevelButtonRectTransform;
 	private Tweener _clicksCounterPunch;
+	private CanvasGroup _levelsClearedBox;
 	private Tweener _levelsClearedPunch;
 	private Tweener _clicksCounterShake;
 	private Tweener _nextLevelButtonShake;
@@ -73,6 +75,10 @@ public class LevelPanel : MonoBehaviour
 		_resetArrow = _resetButton.transform.GetChild(0).GetComponent<Image>();
 		_undoArrow = _undoButton.transform.GetChild(0).GetComponent<Image>();
 		_redoArrow = _redoButton.transform.GetChild(0).GetComponent<Image>();
+
+		_levelsClearedBox = _levelsClearedText.GetComponentInParent<CanvasGroup>();
+
+		_levelsClearedText.text = "0";
 	}
 
 	public void SetupSolutionBoxes(List<Solution> solutions)
@@ -98,12 +104,32 @@ public class LevelPanel : MonoBehaviour
 
 	public void UpdateLevelsClearedText(int levelsCleared, bool animate)
 	{
+		var active = levelsCleared > 0;
+
+		_levelsClearedBox.alpha = active ? 1f : 0f;
+
+		if(!active)
+		{
+			return;
+		}
+
+		var coroutine = DoUpdateLevelsClearedText(levelsCleared, animate);
+
+		StartCoroutine(coroutine);
+	}
+
+	private IEnumerator DoUpdateLevelsClearedText(int levelsCleared, bool animate)
+	{
+		yield return new WaitForSeconds(_levelsClearedDelay);
+
 		_levelsClearedText.text = levelsCleared.ToString();
 
-		if(animate)
+		if (animate)
 		{
 			PunchLevelsClearedText();
 		}
+
+		yield return null;
 	}
 
 	public void UpdateNextLevelButton(bool toggle)
