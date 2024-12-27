@@ -57,6 +57,7 @@ public class LevelPanel : MonoBehaviour
 	private Image _resetArrow;
 	private Image _undoArrow;
 	private Image _redoArrow;
+	private GameObject _leftCornerButtons;
 
 	private void Awake()
 	{
@@ -79,6 +80,9 @@ public class LevelPanel : MonoBehaviour
 		_levelsClearedBox = _levelsClearedText.GetComponentInParent<CanvasGroup>();
 
 		_levelsClearedText.text = "0";
+
+		_leftCornerButtons = _resetButton.transform.parent.gameObject;
+		_leftCornerButtons.SetActive(false);
 	}
 
 	public void SetupSolutionBoxes(List<Solution> solutions)
@@ -285,6 +289,11 @@ public class LevelPanel : MonoBehaviour
 				//_clicksCounterText.gameObject.SetActive(_level.Clicks > 0);
 				numberToDisplay = _level.Clicks;
 				break;
+		}
+
+		if (!_leftCornerButtons.activeSelf && animate)
+		{
+			_leftCornerButtons.SetActive(true);
 		}
 
 		_clicksCounterText.text = $"{numberToDisplay}";
