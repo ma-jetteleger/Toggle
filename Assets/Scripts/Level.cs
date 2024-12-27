@@ -1589,9 +1589,9 @@ public class Level : MonoBehaviour
 
 	public void CheckLevelCompletion()
 	{
-		var startOfLevelTwo = Squares.Length == 2 && BottomOfHistory;
+		//var startOfLevelTwo = Squares.Length == 2 && BottomOfHistory;
 
-		var levelComplete = startOfLevelTwo ? false : GetLevelCompletion();
+		var levelComplete = /*startOfLevelTwo ? false : */GetLevelCompletion();
 		var allSolutionsFound = true;
 		var solutionAlreadyFound = false;
 
@@ -1631,6 +1631,16 @@ public class Level : MonoBehaviour
 		}
 		else
 		{
+			if (Solutions[0].Solved)
+			{
+				if (Clicks == Solutions[0].Sequence.Length)
+				{
+					solutionAlreadyFound = true;
+				}
+			}
+
+			Solutions[0].Solved = Clicks == Solutions[0].Sequence.Length && levelComplete;
+
 			LevelPanel.Instance.UpdateNextLevelButton(_trulyCompleted || (levelComplete 
 				&& (_clicksCountRestriction == ClicksCountToNextLevelRestriction.NoRestriction 
 					|| (_clicksCountRestriction == ClicksCountToNextLevelRestriction.SoftRestriction && ClicksLeft >= 0) 
@@ -1667,7 +1677,13 @@ public class Level : MonoBehaviour
                 LevelPanel.Instance.UpdateHistoryButtons(false);
             }*/
 
-			if(!_trulyCompleted)
+			/*if(!solutionAlreadyFound)
+			{*/
+				//ShowLevelCompleteAnimation(trueCompletion);
+				ShowLevelCompleteAnimation(!solutionAlreadyFound);
+			//}
+
+			if (!_trulyCompleted)
 			{
 				var trueCompletion = _solutionType == SolutionType.SingleSolution && ClicksLeft == 0
 				|| _solutionType == SolutionType.MultipleSolutions && allSolutionsFound;
@@ -1675,11 +1691,6 @@ public class Level : MonoBehaviour
 				if (trueCompletion)
 				{
 					_trulyCompleted = true;
-				}
-
-				if(!solutionAlreadyFound)
-				{
-					ShowLevelCompleteAnimation(trueCompletion);
 				}
 
 				if ((_solutionType == SolutionType.MultipleSolutions && allSolutionsFound)
@@ -1762,7 +1773,9 @@ public class Level : MonoBehaviour
         {
             time = x;
 
-            _levelCompletionFeedback.Thickness = levelCompletionFeedbackThicknessBaseValue * _levelCompletionThicknessCurve.Evaluate(time);
+            _levelCompletionFeedback.Thickness = levelCompletionFeedbackThicknessBaseValue 
+			* _levelCompletionThicknessCurve.Evaluate(time)
+			* (trueCompletion ? 1f : 0.5f);
 
             var color = _levelCompletionFeedback.Color;
             color.a = _levelCompletionAlphaCurve.Evaluate(time);

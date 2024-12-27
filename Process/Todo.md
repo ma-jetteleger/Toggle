@@ -105,7 +105,7 @@
 ## 2024-12-14
 
 - ~~[visual] Hide the level number until the first level is completed~~
-- [visual] Make the win animation play every time a level is re-solved, maybe with a bit of a difference 
+- ~~[visual] Make the win animation play every time a level is re-solved, maybe with a bit of a difference~~
 - [visual] Add crosses and checkmarks to indicate that a square is in the right toggle state to make it easier to "read" a level and to understand the objective better
 - [feat] Try another progression scheme: more levels between new mechanics
 - [feat] Try another progression scheme: isolate newly introduced mechanics 

@@ -45,7 +45,7 @@
 ## 2024-12-14
 
 - The clicks counter was interpreted as the level number
-- The fact that the winning animation doesn't play every time the level is re-solved makes the player doubt if they actually successfully understood the goal and how to reach it
+- ~~The fact that the winning animation doesn't play every time the level is re-solved makes the player doubt if they actually successfully understood the goal and how to reach it~~
 - The goal of a level (to match the bottom array's colors) is not immediately understood
 	- The bottom array of rectangles is not easily interpreted as the objective of the level
 - Some players suggested to have more levels between the introduction of new mechanics (slower pacing)
