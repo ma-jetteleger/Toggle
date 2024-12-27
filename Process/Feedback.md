@@ -50,7 +50,7 @@
 	- The bottom array of rectangles is not easily interpreted as the objective of the level
 - Some players suggested to have more levels between the introduction of new mechanics (slower pacing)
 - Another suggestion was to have new mechanics introduced in isolation (cut out the other mechanics when introducing a new one)
-- A player tried to play with the keyboard, triggering the debug fonctions
+- ~~A player tried to play with the keyboard, triggering the debug fonctions~~
 - ~~Some players did not understand the meaning of the number on the top right of the UI (the cleared level counter)~~
 - The wrap around arrows aren't emphasized enough
 - The cascading indicator dot isn't great, a player suggested using a "wave" icon

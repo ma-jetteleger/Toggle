@@ -110,7 +110,7 @@
 - [feat] Try another progression scheme: more levels between new mechanics
 - [feat] Try another progression scheme: isolate newly introduced mechanics 
 - ~~[feat] Try a second level with only one click, so it's not pre-solved when generated~~
-- [tech] Make the debug controls unavailable before hitting a specific key
+- ~~[tech] Make the debug controls unavailable before hitting a specific key~~
 - [visual] Mobile interface
 	- Figure out how to convey the information that is conveyed when hovering squares without hover functionalities
 	- Figure out how to maintain the visibility of the toggle indicators when using fingers to press on squares
