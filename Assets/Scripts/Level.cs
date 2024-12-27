@@ -174,49 +174,50 @@ public class Level : MonoBehaviour
 		LoadProgressionEntries();
 		GenerateLevel();
 
-		LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, false);
+		LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, false, false);
 	}
 
     private void Update()
     {
         if(_lastSquareClickedDown == null)
 		{
-            if (Input.GetKeyDown(KeyCode.Return))
-			{ 
-				_playedLevels.Enqueue(_levelCode);
-					
-				if(_playedLevels.Count > _playedLevelQueueSize)
+			if(Input.GetKey(KeyCode.D))
+			{
+				if (Input.GetKeyDown(KeyCode.Return))
 				{
-					_playedLevels.Dequeue();
+					_playedLevels.Enqueue(_levelCode);
+
+					if (_playedLevels.Count > _playedLevelQueueSize)
+					{
+						_playedLevels.Dequeue();
+					}
+
+					GenerateLevel();
+
+					return;
 				}
+				if (Input.GetKeyDown(KeyCode.LeftArrow))
+				{
+					_progressionIndex--;
 
-				GenerateLevel();
+					LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, false, false);
+				}
+				if (Input.GetKeyDown(KeyCode.RightArrow))
+				{
+					_progressionIndex++;
 
-				//OnLevelCompletion();
+					LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, true, false);
+				}
+				if (Input.GetKeyDown(KeyCode.Backspace))
+				{
+					_progressionIndex = 0;
 
-				return;
-            }
-			if (Input.GetKeyDown(KeyCode.LeftArrow))
-			{
-				_progressionIndex--;
-
-				LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, false);
-			}
-			if (Input.GetKeyDown(KeyCode.RightArrow))
-			{
-				_progressionIndex++;
-
-				LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, true);
-			}
-			if (Input.GetKeyDown(KeyCode.Backspace))
-			{
-				_progressionIndex = 0;
-
-				LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, false);
-			}
-			if (Input.GetKeyDown(KeyCode.Space))
-			{
-				PrintSolutions();
+					LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, false, false);
+				}
+				if (Input.GetKeyDown(KeyCode.Space))
+				{
+					PrintSolutions();
+				}
 			}
 
 			var squareHovered = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero).collider?.GetComponent<Square>();
@@ -887,12 +888,12 @@ public class Level : MonoBehaviour
 		{
 			if (indices.Length <= 2)
 			{
-				/*var levelsToDequeue = _playedLevels.Count - 1;
+				var levelsToDequeue = _playedLevels.Count - 1;
 
 				for (var j = 0; j < levelsToDequeue; j++)
 				{
 					_playedLevels.Dequeue();
-				}*/
+				}
 
 				mainSolution = new Solution()
 				{
@@ -904,7 +905,15 @@ public class Level : MonoBehaviour
 
 				SolutionSquares[mainSolution.Sequence[0]].Click();
 
-				validSolutionSequence = true;
+				for (var j = 0; j < Squares.Length; j++)
+				{
+					if (Squares[j].Toggled != SolutionSquares[j].Toggled)
+					{
+						validSolutionSequence = true;
+
+						break;
+					}
+				}
 			}
 			else
 			{
@@ -1698,7 +1707,7 @@ public class Level : MonoBehaviour
 				{
 					_progressionIndex++;
 
-					LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, true);
+					LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, true, true);
 
 					_playedLevels.Enqueue(_levelCode);
 

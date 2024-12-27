@@ -78,6 +78,7 @@ public class LevelPanel : MonoBehaviour
 		_redoArrow = _redoButton.transform.GetChild(0).GetComponent<Image>();
 
 		_levelsClearedBox = _levelsClearedText.GetComponentInParent<CanvasGroup>();
+		_levelsClearedBox.alpha = 0f;
 
 		_levelsClearedText.text = "0";
 
@@ -106,26 +107,30 @@ public class LevelPanel : MonoBehaviour
 		}
 	}
 
-	public void UpdateLevelsClearedText(int levelsCleared, bool animate)
+	public void UpdateLevelsClearedText(int levelsCleared, bool animate, bool delayed)
 	{
-		var active = levelsCleared > 0;
-
-		_levelsClearedBox.alpha = active ? 1f : 0f;
-
-		if(!active)
+		if(_levelsClearedBox.alpha < 0.5f && levelsCleared > 0)
+		{
+			_levelsClearedBox.alpha = 1f;
+		}
+		
+		/*if(!active)
 		{
 			return;
-		}
+		}*/
 
-		var coroutine = DoUpdateLevelsClearedText(levelsCleared, animate);
+		var coroutine = DoUpdateLevelsClearedText(levelsCleared, animate, delayed);
 
 		StartCoroutine(coroutine);
 	}
 
-	private IEnumerator DoUpdateLevelsClearedText(int levelsCleared, bool animate)
+	private IEnumerator DoUpdateLevelsClearedText(int levelsCleared, bool animate, bool delayed)
 	{
-		yield return new WaitForSeconds(_levelsClearedDelay);
-
+		if(delayed)
+		{
+			yield return new WaitForSeconds(_levelsClearedDelay);
+		}
+		
 		_levelsClearedText.text = levelsCleared.ToString();
 
 		if (animate)
