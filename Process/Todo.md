@@ -76,7 +76,6 @@
 - ~~[feat] Implement cascading toggles~~
 - ~~[feat] Gradually introduce cascading toggles in the progression~~
 	- ~~Maybe go back to shorter arrays to introduce cascading toggles and rebuild to longer arrays gradually~~
-- [visual] ? Animate cascading toggles?
 - ~~[visual] ? Highlight cascading toggles on hover?~~
 - ~~[feat] Exclude squares that aren't toggled by others from being cascading~~
 - ~~[tech] Write a function to re-order/cleanup the pregenerated levels files in ascending order of level lengths~~ 
@@ -118,4 +117,8 @@
 - [visual] Mobile interface
 	- Figure out how to convey the information that is conveyed when hovering squares without hover functionalities
 	- Figure out how to maintain the visibility of the toggle indicators when using fingers to press on squares
+	
+## 2024-01-03
+
 - [audio] Add Vadim's sounds
+- [visual] ? Animate incremental cascading toggles?
