@@ -106,12 +106,16 @@
 
 - ~~[visual] Hide the level number until the first level is completed~~
 - ~~[visual] Make the win animation play every time a level is re-solved, maybe with a bit of a difference~~
-- [visual] Add crosses and checkmarks to indicate that a square is in the right toggle state to make it easier to "read" a level and to understand the objective better
+- ~~[visual] Add crosses and checkmarks to indicate that a square is in the right toggle  state (or not) to make it easier to "read" a level and to understand the objective better~~
 - [feat] Try another progression scheme: more levels between new mechanics
 - [feat] Try another progression scheme: isolate newly introduced mechanics 
 - ~~[feat] Try a second level with only one click, so it's not pre-solved when generated~~
 - ~~[tech] Make the debug controls unavailable before hitting a specific key~~
+- ~~[visual] Add feedback (small bump/pulse or a small version of the expanding background square) on toggle~~
+- ~~[visual] Try a different position for the solution squares~~
+- [visual] Try another icon as a cascading indicator (a wave? a looping arrow?)
+- [visual] Try a nudge animation to emphasis targeting/toggling squares
 - [visual] Mobile interface
 	- Figure out how to convey the information that is conveyed when hovering squares without hover functionalities
 	- Figure out how to maintain the visibility of the toggle indicators when using fingers to press on squares
-- [visual] Try another icon as a cascading indicator (a wave? a looping arrow?)
+- [audio] Add Vadim's sounds

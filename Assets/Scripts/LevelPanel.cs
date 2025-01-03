@@ -157,9 +157,7 @@ public class LevelPanel : MonoBehaviour
 	{
 		if (_nextLevelButtonShake != null)
 		{
-			DOTween.Kill(_nextLevelButtonShake, true);
-
-			_nextLevelButtonRectTransform.position = _nextLevelButtonNormalPosition;
+			_nextLevelButtonShake.Kill(true);
 		}
 
 		_nextLevelButtonShake = _nextLevelButtonRectTransform.DOShakePosition(
@@ -178,9 +176,7 @@ public class LevelPanel : MonoBehaviour
 
 		if (_nextLevelButtonColorChange != null)
 		{
-			DOTween.Kill(_nextLevelButtonColorChange, true);
-
-			_nextLevelButtonOverlay.color = _nextLevelButtonNormalOverlayColor;
+			_nextLevelButtonColorChange.Kill(true);
 		}
 
 		var value = 0f;
@@ -204,9 +200,7 @@ public class LevelPanel : MonoBehaviour
 	{
 		if (_clicksCounterShake != null)
 		{
-			DOTween.Kill(_clicksCounterShake, true);
-
-			_clicksCounterText.transform.position = _clicksCounterNormalPosition;
+			_clicksCounterShake.Kill(true);
 		}
 
 		_clicksCounterShake = _clicksCounterText.rectTransform.DOShakePosition(
@@ -225,9 +219,7 @@ public class LevelPanel : MonoBehaviour
 
 		if (_clicksCounterColorChange != null)
 		{
-			DOTween.Kill(_clicksCounterColorChange, true);
-
-			_clicksCounterText.color = _clicksCounterNormalColor;
+			_clicksCounterColorChange.Kill(true);
 		}
 
 		var value = 0f;
@@ -251,9 +243,7 @@ public class LevelPanel : MonoBehaviour
 	{
 		if (_clicksCounterPunch != null)
 		{
-			DOTween.Kill(_clicksCounterPunch);
-
-			_clicksCounterText.transform.localScale = Vector3.one;
+			_clicksCounterPunch.Kill(true);
 		}
 
 		_clicksCounterPunch = _clicksCounterText.transform.DOPunchScale(_clicksCounterPunchScale, _clicksCounterPunchTime, _clicksCounterPunchVibrato, _clicksCounterPunchElasticity).OnComplete(() =>
@@ -268,9 +258,7 @@ public class LevelPanel : MonoBehaviour
 	{
 		if (_levelsClearedPunch != null)
 		{
-			DOTween.Kill(_levelsClearedPunch);
-
-			_levelsClearedText.transform.localScale = Vector3.one;
+			_levelsClearedPunch.Kill(true);
 		}
 
 		_levelsClearedPunch = _levelsClearedText.transform.DOPunchScale(_levelsClearedPunchScale, _levelsClearedPunchTime, _levelsClearedPunchVibrato, _levelsClearedPunchElasticity).OnComplete(() =>
