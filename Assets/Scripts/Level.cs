@@ -133,6 +133,7 @@ public class Level : MonoBehaviour
 			: _progressionEntries[_progressionEntries.Count - 1]
 		: _nonProgressionFakeProgressionEntry;
 
+	private bool _canClick;
 	private Square _previousHoveredSquare;
     private Rectangle _squareTemplateRectangle;
     private Rectangle _solutionSquareTemplateRectangle;
@@ -179,11 +180,13 @@ public class Level : MonoBehaviour
 		GenerateLevel();
 
 		LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, false, false);
+
+		_canClick = true;
 	}
 
     private void Update()
     {
-        if(_lastSquareClickedDown == null)
+        if(_lastSquareClickedDown == null && _canClick)
 		{
 			if(Input.GetKey(KeyCode.D))
 			{
@@ -272,37 +275,72 @@ public class Level : MonoBehaviour
 					_lastSquareClickedDown.Shake();
 
 					LevelPanel.Instance.ShakeClicksCounter();
+
+					if (_lastSquareClickedDown != null)
+					{
+						_lastSquareClickedDown.OnMouseClickUp();
+						_lastSquareClickedDown.OnMouseOverExit();
+
+						_lastSquareClickedDown = null;
+					}
+
+					if (_previousHoveredSquare != null)
+					{
+						_previousHoveredSquare = null;
+					}
 				}
 				else
 				{
 					LastSquareClicked = _lastSquareClickedDown;
 
-					SquaresToggledLastClick.Clear();
+					_lastSquareClickedDown.Click(true);
 
-					_lastSquareClickedDown.Click();
-					//_lastSquareClickedDown.ShowTargetPredictions();
 					_lastSquareClickedDown.HideTargetPredictions();
-					_lastSquareClickedDown.Interactable = false;
+					//_lastSquareClickedDown.Interactable = false;
 
 					Clicks++;
 
-					AddNewHistorySnapshot();
-
 					LevelPanel.Instance.UpdateClicksCounter(true);
 
-					CheckLevelCompletion(true);
-
-					LevelPanel.Instance.UpdateHistoryButtons();
+					_canClick = false;
 				}
 			}
 
-			_lastSquareClickedDown.OnMouseClickUp();
-			_lastSquareClickedDown.OnMouseOverExit();
+			if(_lastSquareClickedDown != null)
+			{
+				_lastSquareClickedDown.OnMouseClickUp();
+				_lastSquareClickedDown.OnMouseOverExit();
 
-			_lastSquareClickedDown = null;
-			_previousHoveredSquare = null;
-        }
+				_lastSquareClickedDown = null;
+			}
+			
+			if(_previousHoveredSquare != null)
+			{
+				_previousHoveredSquare = null;
+			}
+		}
     }
+
+	public void OnSquareClicked()
+	{
+		GetLevelCompletion(true);
+	}
+
+	public void EndClickSequence(bool fromPlayer)
+	{
+		if(!fromPlayer)
+		{
+			return;
+		}
+
+		AddNewHistorySnapshot();
+
+		LevelPanel.Instance.UpdateHistoryButtons();
+
+		CheckLevelCompletion(true);
+
+		_canClick = true;
+	}
 
 	private void OverwriteLevel(string levelCode)
 	{
@@ -799,7 +837,7 @@ public class Level : MonoBehaviour
 			SolutionSquares[i].Initialize(this, square);
 			SolutionSquares[i].TargetScheme = square.TargetScheme;
 			SolutionSquares[i].Cascading = square.Cascading;
-			SolutionSquares[i].Toggle(square.Toggled);
+			SolutionSquares[i].ToggleTo(square.Toggled);
 
 			_testSquares[i] = new TestSquare(square);
 
@@ -843,6 +881,8 @@ public class Level : MonoBehaviour
 
 		CheckLevelCompletion(false);
 
+		UpdateChecksAndCrosses();
+
 		LevelPanel.Instance.UpdateHistoryButtons();
 
 		//_generatedLevels.Add(_levelCode);
@@ -877,7 +917,7 @@ public class Level : MonoBehaviour
 		{
 			var solutionSquare = SolutionSquares[i];
 
-			solutionSquare.Toggle(splitGoalCode[i] == "t");
+			solutionSquare.ToggleTo(splitGoalCode[i] == "t");
 		}
 	}
 
@@ -916,7 +956,7 @@ public class Level : MonoBehaviour
 				}
 				};
 
-				SolutionSquares[mainSolution.Sequence[0]].Click();
+				SolutionSquares[mainSolution.Sequence[0]].Click(false);
 
 				for (var j = 0; j < Squares.Length; j++)
 				{
@@ -944,7 +984,7 @@ public class Level : MonoBehaviour
 				{
 					mainSolution.Sequence[j] = shuffledIndices[j];
 
-					SolutionSquares[mainSolution.Sequence[j]].Click();
+					SolutionSquares[mainSolution.Sequence[j]].Click(false);
 				}
 
 				for (var j = 0; j < Squares.Length; j++)
@@ -1497,11 +1537,23 @@ public class Level : MonoBehaviour
 		GenerateLevel(_generatedLevels[_progressionIndex + _progressionIndexBuffer]);
 	}*/
 
+	public void UpdateChecksAndCrosses()
+	{
+		foreach (var square in Squares)
+		{
+			var correct = square.Toggled == SolutionSquares[square.Id].Toggled;
+
+			SolutionSquares[square.Id].UpdateCheckAndCross(correct, false);
+		}
+	}
+
     public void ResetLevel()
 	{
         LoadHistorySnapshot(0);
 
 		CheckLevelCompletion(false);
+
+		UpdateChecksAndCrosses();
 
 		LevelPanel.Instance.UpdateHistoryButtons();
 	}
@@ -1515,10 +1567,9 @@ public class Level : MonoBehaviour
 
         LoadHistorySnapshot(Clicks - 1);
 
-		/*if (!BottomOfHistory)
-		{*/
-			CheckLevelCompletion(false);
-		//}
+		CheckLevelCompletion(false);
+
+		UpdateChecksAndCrosses();
 
 		LevelPanel.Instance.UpdateHistoryButtons();
 	}
@@ -1532,10 +1583,9 @@ public class Level : MonoBehaviour
 
         LoadHistorySnapshot(Clicks + 1);
 
-		/*if(!BottomOfHistory)
-		{*/
-			CheckLevelCompletion(false);
-		//}
+		CheckLevelCompletion(false);
+
+		UpdateChecksAndCrosses();
 
 		LevelPanel.Instance.UpdateHistoryButtons();
 	}
@@ -1570,7 +1620,7 @@ public class Level : MonoBehaviour
 
         for (var i = 0; i < Squares.Length; i++)
         {
-            Squares[i].Toggle(historySnapshot[i].Toggled);
+            Squares[i].ToggleTo(historySnapshot[i].Toggled);
 			Squares[i].Interactable = historySnapshot[i].Interactable;
 			Squares[i].Cascading = historySnapshot[i].Cascading;
 		}
@@ -1607,10 +1657,10 @@ public class Level : MonoBehaviour
 				levelComplete = false;
 			}
 
-			if(SquaresToggledLastClick.Contains(Squares[i]))
+			/*if(SquaresToggledLastClick.Contains(Squares[i]))
 			{
 				SolutionSquares[i].UpdateCheckAndCross(correct, fromClickedSquare);
-			}
+			}*/
 		}
 
 		return levelComplete;

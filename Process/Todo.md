@@ -113,7 +113,7 @@
 - ~~[visual] Add feedback (small bump/pulse or a small version of the expanding background square) on toggle~~
 - ~~[visual] Try a different position for the solution squares~~
 - [visual] Try another icon as a cascading indicator (a wave? a looping arrow?)
-- [visual] Try a nudge animation to emphasis targeting/toggling squares
+- ~~[visual] Try a nudge animation to emphasis targeting/toggling squares~~
 - [visual] Mobile interface
 	- Figure out how to convey the information that is conveyed when hovering squares without hover functionalities
 	- Figure out how to maintain the visibility of the toggle indicators when using fingers to press on squares
@@ -121,4 +121,10 @@
 ## 2024-01-03
 
 - [audio] Add Vadim's sounds
-- [visual] ? Animate incremental cascading toggles?
+- ~~[visual] Animate incremental cascading toggles~~
+
+## 2024-01-23
+
+- [feat] ? Try vertical branches of squares?
+- [feat] ? Try disconnecting the squares from the array, connecting them by bridges (lines) any direction (and connect some squares to more than one other square)?
+- [feat] ? Try an alternative game where the toggled "off" squares are uninteractable?
