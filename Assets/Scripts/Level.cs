@@ -116,6 +116,7 @@ public class Level : MonoBehaviour
     public Square[] SolutionSquares { get; set; }
 	public List<Solution> Solutions { get; set; }
 	public int Clicks { get; set; }
+	public int TogglesThisClickSequence { get; set; }
 	public List<Square> SquaresToggledLastClick { get; set; }
 	public Square LastSquareClicked { get; set; }
 
@@ -291,9 +292,11 @@ public class Level : MonoBehaviour
 				}
 				else
 				{
+					TogglesThisClickSequence = 0;
+
 					LastSquareClicked = _lastSquareClickedDown;
 
-					_lastSquareClickedDown.Click(true);
+					_lastSquareClickedDown.Click(true, false);
 
 					_lastSquareClickedDown.HideTargetPredictions();
 					//_lastSquareClickedDown.Interactable = false;
@@ -480,7 +483,7 @@ public class Level : MonoBehaviour
 				var square = Squares[i];
 
 				square.TargetScheme = (Square.TargetingScheme)int.Parse(splitSquaresCode[i][1].ToString());
-				square.Cascading = splitSquaresCode.Length > 2 && splitSquaresCode[i][2] == 'c';
+				square.SetCascading(splitSquaresCode.Length > 2 && splitSquaresCode[i][2] == 'c', false);
 
 				if (splitSquaresCode[i][0] == 't')
 				{
@@ -495,7 +498,7 @@ public class Level : MonoBehaviour
 				var square = Squares[0];
 
 				square.TargetScheme = Square.TargetingScheme.Self;
-				square.Cascading = false;
+				square.SetCascading(false, false);
 			}
 			else if(Squares.Length == 2)
 			{
@@ -513,10 +516,10 @@ public class Level : MonoBehaviour
 				}*/
 
 				firstSquare.TargetScheme = firstSquare.Id == 0 ? Square.TargetingScheme.Right : Square.TargetingScheme.Left;
-				firstSquare.Cascading = false;
+				firstSquare.SetCascading(false, false);
 
 				otherSquare.TargetScheme = Square.TargetingScheme.Self;
-				otherSquare.Cascading = false;
+				otherSquare.SetCascading(false, false);
 
 				otherSquare.Toggle();
 			}
@@ -798,7 +801,7 @@ public class Level : MonoBehaviour
 							}
 						}
 
-						squaresThatCanBeCascading[i].Cascading = true;
+						squaresThatCanBeCascading[i].SetCascading(true, false);
 
 						assignedCascadingToggles++;
 
@@ -836,7 +839,7 @@ public class Level : MonoBehaviour
 
 			SolutionSquares[i].Initialize(this, square);
 			SolutionSquares[i].TargetScheme = square.TargetScheme;
-			SolutionSquares[i].Cascading = square.Cascading;
+			SolutionSquares[i].SetCascading(square.Cascading, false);
 			SolutionSquares[i].ToggleTo(square.Toggled);
 
 			_testSquares[i] = new TestSquare(square);
@@ -956,7 +959,7 @@ public class Level : MonoBehaviour
 				}
 				};
 
-				SolutionSquares[mainSolution.Sequence[0]].Click(false);
+				SolutionSquares[mainSolution.Sequence[0]].Click(false, false);
 
 				for (var j = 0; j < Squares.Length; j++)
 				{
@@ -984,7 +987,7 @@ public class Level : MonoBehaviour
 				{
 					mainSolution.Sequence[j] = shuffledIndices[j];
 
-					SolutionSquares[mainSolution.Sequence[j]].Click(false);
+					SolutionSquares[mainSolution.Sequence[j]].Click(false, false);
 				}
 
 				for (var j = 0; j < Squares.Length; j++)
@@ -1622,7 +1625,7 @@ public class Level : MonoBehaviour
         {
             Squares[i].ToggleTo(historySnapshot[i].Toggled);
 			Squares[i].Interactable = historySnapshot[i].Interactable;
-			Squares[i].Cascading = historySnapshot[i].Cascading;
+			Squares[i].SetCascading(historySnapshot[i].Cascading, false);
 		}
 
 		foreach(var square in Squares)

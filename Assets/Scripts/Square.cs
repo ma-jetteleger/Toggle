@@ -23,7 +23,7 @@ public class Square : MonoBehaviour
     [SerializeField] private Rectangle _uninteractableOverlay = null;
     [SerializeField] private GameObject _targetPredictionTemplate = null;
     [SerializeField] private GameObject[] _targetIndicators = null;
-    [SerializeField] private GameObject _cascadingIndicator = null;
+    [SerializeField] private Disc _cascadingIndicator = null;
     [SerializeField] private GameObject _solutionCheck = null;
     [SerializeField] private GameObject _solutionCross = null;
 
@@ -72,54 +72,6 @@ public class Square : MonoBehaviour
         get
         {
             return _cascading;
-        }
-        set
-        {
-            _cascading = value;
-
-            if (_cascadingIndicator != null)
-            {
-                _cascadingIndicator.SetActive(_cascading);
-
-                if (_cascading)
-                {
-                    var position = _cascadingIndicator.transform.localPosition;
-
-                    switch (_targetingScheme)
-                    {
-                        case TargetingScheme.Self:
-                            position.y = 0.3125f;
-                            position.x = 0f;
-                            break;
-                        case TargetingScheme.Left:
-                            position.y = 0.1875f;
-                            position.x = 0.1875f;
-                            break;
-                        case TargetingScheme.Right:
-                            position.y = 0.1875f;
-                            position.x = -0.1875f;
-                            break;
-                        case TargetingScheme.SelfLeft:
-                            position.y = 0.375f;
-                            position.x = 0.1875f;
-                            break;
-                        case TargetingScheme.SelfRight:
-                            position.y = 0.375f;
-                            position.x = -0.1875f;
-                            break;
-                        case TargetingScheme.LeftRight:
-                            position.y = 0.1875f;
-                            position.x = 0f;
-                            break;
-                        case TargetingScheme.SelfLeftRight:
-                            position.y = 0.375f;
-                            position.x = 0f;
-                            break;
-                    }
-
-                    _cascadingIndicator.transform.localPosition = position;
-                }
-            }
         }
     }
 
@@ -174,6 +126,7 @@ public class Square : MonoBehaviour
     private Tweener _leftArrowMove;
     private Tweener _rightArrowMove;
     private Tweener _diamondMove;
+    private Tweener _cascadingIndicatorMove;
     private Vector3 _normalPosition;
     private Color _normalOverlayColor;
     private Dictionary<Square, List<ShapeRenderer>> _targetPredictions;
@@ -212,7 +165,7 @@ public class Square : MonoBehaviour
 
         _outline.SetActive(false);
 
-		Cascading = false;
+        SetCascading(false, false);
 
         Interactable = true;
     }
@@ -241,13 +194,13 @@ public class Square : MonoBehaviour
         ToggleTo(toggle);
 
         TargetScheme = targetingScheme;
-        Cascading = cascading;
+        SetCascading(cascading, false);
     }
 
     public void Reinitialize()
     {
         ToggleTo(_referenceSquare.Toggled);
-        Cascading = _referenceSquare.Cascading;
+        SetCascading(_referenceSquare.Cascading, false);
     }
 
     public void OnMouseOverEnter(bool showOutline)
@@ -495,13 +448,13 @@ public class Square : MonoBehaviour
         }
     }
 
-    public void Click(bool fromPlayer)
+    public void Click(bool fromPlayer, bool extraDelay, bool turnOffCascading = false)
     {
         _level.SquaresToggledLastClick.Clear();
 
         if (!SolutionSquare)
 		{
-            var coroutine = DelayedClick(fromPlayer);
+            var coroutine = DelayedClick(fromPlayer, extraDelay, turnOffCascading);
 
             StartCoroutine(coroutine);
         }
@@ -511,9 +464,26 @@ public class Square : MonoBehaviour
         }
     }
 
-    private IEnumerator DelayedClick(bool fromPlayer)
+    private IEnumerator DelayedClick(bool fromPlayer, bool extraDelay, bool turnOffCascading = false)
     {
         var animationTime = _level.SolutionSquares[0]._checkAndCrossPunchTime / 4f;
+
+        /*if(extraDelay)
+		{
+            animationTime *= 2f;
+        }*/
+
+        if(fromPlayer && extraDelay && Cascading)
+		{
+            AnimateCascadingIndicator();
+
+            yield return new WaitForSeconds(animationTime * 1.75f);
+        }
+
+        if (turnOffCascading)
+        {
+            SetCascading(false, true);
+        }
 
         AnimateTargetIndicator(animationTime);
 
@@ -530,15 +500,21 @@ public class Square : MonoBehaviour
         {
             target.Toggle(fromPlayer);
 
+            _level.TogglesThisClickSequence++;
+
             if (target.Cascading && target != this)
             {
                 if(endClickSequence)
 				{
                     endClickSequence = false;
                 }
-                
-                target.Cascading = false;
-                target.Click(fromPlayer);
+
+                if (!fromPlayer)
+                {
+                    SetCascading(false, false);
+                } 
+
+                target.Click(fromPlayer, true, true);
             }
         }
 
@@ -553,6 +529,103 @@ public class Square : MonoBehaviour
 		{
             _level.EndClickSequence(fromPlayer);
         }
+    }
+
+    public void SetCascading(bool value, bool fromPlayer)
+	{
+        _cascading = value;
+
+        if (_cascadingIndicator != null)
+        {
+            if(!fromPlayer)
+			{
+                _cascadingIndicator.gameObject.SetActive(_cascading);
+
+                if (_cascading)
+                {
+                    _cascadingIndicator.Color = Color.black;
+
+                    var position = _cascadingIndicator.transform.localPosition;
+
+                    switch (_targetingScheme)
+                    {
+                        case TargetingScheme.Self:
+                            position.y = 0.3125f;
+                            position.x = 0f;
+                            break;
+                        case TargetingScheme.Left:
+                            position.y = 0.1875f;
+                            position.x = 0.1875f;
+                            break;
+                        case TargetingScheme.Right:
+                            position.y = 0.1875f;
+                            position.x = -0.1875f;
+                            break;
+                        case TargetingScheme.SelfLeft:
+                            position.y = 0.375f;
+                            position.x = 0.1875f;
+                            break;
+                        case TargetingScheme.SelfRight:
+                            position.y = 0.375f;
+                            position.x = -0.1875f;
+                            break;
+                        case TargetingScheme.LeftRight:
+                            position.y = 0.1875f;
+                            position.x = 0f;
+                            break;
+                        case TargetingScheme.SelfLeftRight:
+                            position.y = 0.375f;
+                            position.x = 0f;
+                            break;
+                    }
+
+                    _cascadingIndicator.transform.localPosition = position;
+                }
+            }
+			else
+			{
+                //_cascadingIndicator.gameObject.SetActive(_cascading);
+            }
+        }
+    }
+
+    public void AnimateCascadingIndicator()
+	{
+        var originalPosition = _cascadingIndicator.transform.localPosition;
+
+        if (_cascadingIndicatorMove != null)
+        {
+            _cascadingIndicatorMove.Kill(false);
+
+            _cascadingIndicatorMove = null;
+
+            _cascadingIndicator.transform.localPosition = originalPosition;
+
+            _cascadingIndicator.transform.localScale = Vector3.one;
+        }
+
+        var movement = Vector3.up;
+        var time = _level.SolutionSquares[0]._checkAndCrossPunchTime / 4f;
+
+        _cascadingIndicatorMove = _cascadingIndicator.transform.DOLocalMove(originalPosition + (movement * _targetIndicatorMoveDistance / 2f), time).SetEase(_targetIndicatorMoveCurve)
+        .OnComplete(() =>
+        {
+            _cascadingIndicator.transform.DOLocalMove(originalPosition, time).SetEase(_targetIndicatorMoveCurve).OnComplete(() =>
+            {
+                _cascadingIndicator.transform.localPosition = originalPosition;
+
+            }).OnComplete(() =>
+			{
+                _cascadingIndicator.transform.DOScale(Vector3.zero, time / 3f).SetEase(_targetIndicatorMoveCurve).OnComplete(() =>
+                {
+                    _cascadingIndicatorMove = null;
+
+                    _cascadingIndicator.gameObject.SetActive(false);
+
+                    _cascadingIndicator.transform.localScale = Vector3.one;
+                });
+            });
+        });
     }
 
     public void Toggle(bool fromPlayer = false)
@@ -873,7 +946,7 @@ public class Square : MonoBehaviour
     private void ChangeSortingOrderOfComponents(int factor)
     {
         var components = GetComponentsInChildren<ShapeRenderer>(true);
-		var trueFactor = (factor * Id) + (factor * (_level.LastSquareClicked == this ? 10 : 1));
+		var trueFactor = (factor * Id) + (factor * (_level.SquaresToggledLastClick.Contains(this) ? 10 + (_level.TogglesThisClickSequence * 5) : 1));
 
 		foreach (var component in components)
         {
