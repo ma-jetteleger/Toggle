@@ -3960,6 +3960,14 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _solutionRectanglePunchScale: {x: 0.25, y: 0.25, z: 0.5}
+  _solutionRectanglePunchTime: 0.33
+  _solutionRectanglePunchVibrato: 6
+  _solutionRectanglePunchElasticity: 0
+  _levelCompleteSequenceDelays:
+  - 0.5
+  - 0.5
+  - 0.625
   _progression: 1
   _progressionFile: Progression.txt
   _squares: 4
@@ -8649,7 +8657,6 @@ MonoBehaviour:
   _levelsClearedPunchTime: 0.66
   _levelsClearedPunchVibrato: 6
   _levelsClearedPunchElasticity: 0
-  _levelsClearedDelay: 0.66
 --- !u!1 &1808911048
 GameObject:
   m_ObjectHideFlags: 0
@@ -13378,11 +13385,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
       propertyPath: _targetIndicatorMoveCurve.m_Curve.Array.data[0].inSlope
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
       propertyPath: _targetIndicatorMoveCurve.m_Curve.Array.data[1].inSlope
-      value: 0
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
       propertyPath: _targetIndicatorMoveCurveUp.m_Curve.Array.data[1].value
@@ -13390,11 +13397,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
       propertyPath: _targetIndicatorMoveCurve.m_Curve.Array.data[0].outSlope
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
       propertyPath: _targetIndicatorMoveCurve.m_Curve.Array.data[1].outSlope
-      value: 0
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
       propertyPath: _targetIndicatorMoveCurveDown.m_Curve.Array.data[1].time

@@ -62,7 +62,6 @@ public class Level : MonoBehaviour
     [SerializeField] private Rectangle _rectangle = null;
     [SerializeField] private Rectangle _solutionRectangle = null;
     [SerializeField] private Rectangle _levelCompletionFeedback = null;
-    [SerializeField] private Rectangle _correctSolutionFeedback = null;
 
 	[HorizontalLine(1)]
 
@@ -81,6 +80,11 @@ public class Level : MonoBehaviour
     [SerializeField] private AnimationCurve _levelCompletionCurve = null;
     [SerializeField] private AnimationCurve _levelCompletionThicknessCurve = null;
     [SerializeField] private AnimationCurve _levelCompletionAlphaCurve = null;
+	[SerializeField] private Vector3 _solutionRectanglePunchScale = Vector3.zero;
+	[SerializeField] private float _solutionRectanglePunchTime = 0f;
+	[SerializeField] private int _solutionRectanglePunchVibrato = 0;
+	[SerializeField] private float _solutionRectanglePunchElasticity = 0f;
+	[SerializeField] private float[] _levelCompleteSequenceDelays = null;
 
 	[HorizontalLine(1)]
 
@@ -155,6 +159,8 @@ public class Level : MonoBehaviour
 	private Tweener _levelCompleteHeightScale;
 	private Tweener _levelCompleteWidthScale;
 	private Tweener _levelCompleteThicknessScale;
+	private Tweener _solutionRectangleScale;
+	private Tweener _levelRectangleScale;
 
     private void Awake()
 	{
@@ -395,6 +401,38 @@ public class Level : MonoBehaviour
 
     public void GenerateLevel(string levelCode = null)
 	{
+		StopAllCoroutines();
+
+		if(_levelCompleteHeightScale != null)
+		{
+			_levelCompleteHeightScale.Kill(true);
+			_levelCompleteHeightScale = null;
+		}
+
+		if (_levelCompleteWidthScale != null)
+		{
+			_levelCompleteWidthScale.Kill(true);
+			_levelCompleteWidthScale = null;
+		}
+
+		if (_levelCompleteThicknessScale != null)
+		{
+			_levelCompleteThicknessScale.Kill(true);
+			_levelCompleteThicknessScale = null;
+		}
+
+		if (_solutionRectangleScale != null)
+		{
+			_solutionRectangleScale.Kill(true);
+			_solutionRectangleScale = null;
+		}
+
+		if (_levelRectangleScale != null)
+		{
+			_levelRectangleScale.Kill(true);
+			_levelRectangleScale = null;
+		}
+
 		_trulyCompleted = false;
 
 		// Clean up
@@ -1753,7 +1791,11 @@ public class Level : MonoBehaviour
 				LevelPanel.Instance.ShakeClicksCounter();
 			}
 
-			yield return new WaitForSeconds(0.4375f);
+			yield return new WaitForSeconds(_levelCompleteSequenceDelays[0]);
+
+			ShowCorrectSolutionAnimation(!solutionAlreadyFound);
+
+			yield return new WaitForSeconds(_levelCompleteSequenceDelays[1]);
 
 			ShowLevelCompleteAnimation(!solutionAlreadyFound);
 
@@ -1772,7 +1814,7 @@ public class Level : MonoBehaviour
 				{
 					_progressionIndex++;
 
-					yield return new WaitForSeconds(0.5625f);
+					yield return new WaitForSeconds(_levelCompleteSequenceDelays[2]);
 
 					LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, true/*, true*/);
 
@@ -1829,9 +1871,22 @@ public class Level : MonoBehaviour
 
     private void ShowLevelCompleteAnimation(bool trueCompletion)
 	{
-        //var levelCompletionFeedbackWidth = _levelCompletionFeedback.Width;
-        //var levelCompletionFeedbackHeight = _levelCompletionFeedback.Height;
-        //var levelCompletionFeedbackThicknessBaseValue = _levelCompletionFeedback.Thickness;
+		if (_levelRectangleScale != null)
+		{
+			_levelRectangleScale.Kill(true);
+		}
+
+		_levelRectangleScale = transform.DOPunchScale(
+			trueCompletion ? _solutionRectanglePunchScale : _solutionRectanglePunchScale / 2f,
+			_solutionRectanglePunchTime,
+			_solutionRectanglePunchVibrato,
+			_solutionRectanglePunchElasticity
+		).OnComplete(() =>
+		{
+			transform.localScale = Vector3.one;
+
+			_levelRectangleScale = null;
+		});
 
 		var levelCompletionFeedbackWidth = 1f;
 		var levelCompletionFeedbackHeight = 1f;
@@ -1906,6 +1961,26 @@ public class Level : MonoBehaviour
             _levelCompletionFeedback.Color = _levelCompletionFeedbackBaseColor;
 
 			_levelCompleteThicknessScale = null;
+		});
+	}
+
+	private void ShowCorrectSolutionAnimation(bool trueCompletion)
+	{
+		if (_solutionRectangleScale != null)
+		{
+			_solutionRectangleScale.Kill(true);
+		}
+
+		_solutionRectangleScale = _solutionRectangle.transform.DOPunchScale(
+			trueCompletion ? _solutionRectanglePunchScale : _solutionRectanglePunchScale / 3f,
+			_solutionRectanglePunchTime,
+			_solutionRectanglePunchVibrato,
+			_solutionRectanglePunchElasticity
+		).OnComplete(() =>
+		{
+			_solutionRectangle.transform.localScale = Vector3.one;
+
+			_solutionRectangleScale = null;
 		});
 	}
 

@@ -47,7 +47,7 @@
 ## 2024-10-15
 
 - ~~[feat] Organize levels (and the generation of levels) to follow some kind of progression curve~~
-	- Test if this is enough to "teach" the game to first time players
+	- ~~Test if this is enough to "teach" the game to first time players~~
 - ~~[feat] Add "wrap around" toggle indicators~~
 - ~~[visual] Change the placeholder UI arrows for the history buttons~~
 - [feat] ? Make some squares always interactable? 
@@ -92,7 +92,7 @@
 ## 2024-12-02
 
 - ~~[feat] Include the basic targeting schemes (self-targeting and side-targeting) in the progression~~
-- [visual] Try a less explicit feedback for the toggle predictions
+- ~~[visual] Try a less explicit feedback for the toggle predictions~~
 - ~~[feat] Don't generate levels with all self targeting schemes~~
 - ~~[tech] Don't save level to file if it already exists in file~~
 
@@ -106,21 +106,15 @@
 - ~~[visual] Hide the level number until the first level is completed~~
 - ~~[visual] Make the win animation play every time a level is re-solved, maybe with a bit of a difference~~
 - ~~[visual] Add crosses and checkmarks to indicate that a square is in the right toggle  state (or not) to make it easier to "read" a level and to understand the objective better~~
-- [feat] Try another progression scheme: more levels between new mechanics
-- [feat] Try another progression scheme: isolate newly introduced mechanics 
 - ~~[feat] Try a second level with only one click, so it's not pre-solved when generated~~
 - ~~[tech] Make the debug controls unavailable before hitting a specific key~~
 - ~~[visual] Add feedback (small bump/pulse or a small version of the expanding background square) on toggle~~
 - ~~[visual] Try a different position for the solution squares~~
 - [visual] Try another icon as a cascading indicator (a wave? a looping arrow?)
 - ~~[visual] Try a nudge animation to emphasis targeting/toggling squares~~
-- [visual] Mobile interface
-	- Figure out how to convey the information that is conveyed when hovering squares without hover functionalities
-	- Figure out how to maintain the visibility of the toggle indicators when using fingers to press on squares
 	
 ## 2024-01-03
 
-- [audio] Add Vadim's sounds
 - ~~[visual] Animate incremental cascading toggles~~
 
 ## 2024-01-23
@@ -128,3 +122,12 @@
 - [feat] ? Try vertical branches of squares?
 - [feat] ? Try disconnecting the squares from the array, connecting them by bridges (lines) any direction (and connect some squares to more than one other square)?
 - [feat] ? Try an alternative game where the toggled "off" squares are uninteractable?
+
+## 2024-01-28
+
+- [audio] Add Vadim's sounds
+- [feat] Try another progression scheme: more levels between new mechanics
+- [feat] Try another progression scheme: isolate newly introduced mechanics 
+- [visual] Mobile interface
+	- Figure out how to convey the information that is conveyed when hovering squares without hover functionalities
+	- Figure out how to maintain the visibility of the toggle indicators when using fingers to press on squares

@@ -54,7 +54,13 @@
 - ~~Some players did not understand the meaning of the number on the top right of the UI (the cleared level counter)~~
 - ~~The wrap around arrows aren't emphasized enough~~
 - The cascading indicator dot isn't great, a player suggested using a "wave" icon
-? Someone suggested to have a "nudge" animation so that the arrows that target and togle a square "push" a little bit in the direction of the square to emphasize the targeting of that square
+? ~~Someone suggested to have a "nudge" animation so that the arrows that target and togle a square "push" a little bit in the direction of the square to emphasize the targeting of that square~~
 + The progression is well paced and well organized, the mechanics are put in the right order and it makes for a satisfying, gradually more difficult (and gradually more "positively frustrating") experience
 - ~~It felt/looked weird to have a level already solved (the second level)~~
 + People are really looking for a mobile version
+
+## 2025-01-24
+
+- ~~The animation all happening at once is making it really hard to read what's going on~~
+- ~~The game might be to maximalistic, the predictions dots and the checks and crosses add visual noise and might actually be distracting from the actual rules/mechanics of the game~~
+- ~~Being so rigidly minimalistic about not including movement might hinder the experience of learning the game for new players~~
