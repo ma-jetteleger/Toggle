@@ -946,7 +946,9 @@ public class Square : MonoBehaviour
     private void ChangeSortingOrderOfComponents(int factor)
     {
         var components = GetComponentsInChildren<ShapeRenderer>(true);
-		var trueFactor = (factor * Id) + (factor * (_level.SquaresToggledLastClick.Contains(this) ? 10 + (_level.TogglesThisClickSequence * 5) : 1));
+        var wasToggledLastClick = _level.SquaresToggledLastClick.Contains(this) || (_referenceSquare != null && _level.SquaresToggledLastClick.Contains(_referenceSquare));
+
+        var trueFactor = (factor * Id) + (factor * (wasToggledLastClick ? 10 + (_level.TogglesThisClickSequence * 5) : 1));
 
 		foreach (var component in components)
         {
