@@ -182,11 +182,17 @@ public class Square : MonoBehaviour
 
         gameObject.name = $"SolutionSquare({Id})";
 
-		_solutionCheck.transform.SetParent(transform.parent);
-		_solutionCheck.name = $"Check({Id})";
-
-		_solutionCross.transform.SetParent(transform.parent);
-		_solutionCross.name = $"Cross({Id})";
+        if(_solutionCheck != null)
+		{
+            _solutionCheck.transform.SetParent(transform.parent);
+            _solutionCheck.name = $"Check({Id})";
+        }
+		
+        if(_solutionCross != null)
+		{
+            _solutionCross.transform.SetParent(transform.parent);
+            _solutionCross.name = $"Cross({Id})";
+        }
 	}
 
     public void Overwrite(bool toggle, TargetingScheme targetingScheme, bool cascading)
@@ -477,7 +483,7 @@ public class Square : MonoBehaviour
 		{
             AnimateCascadingIndicator();
 
-            yield return new WaitForSeconds(animationTime * 1.75f);
+            yield return new WaitForSeconds(animationTime * 1.875f);
         }
 
         if (turnOffCascading)
@@ -490,6 +496,8 @@ public class Square : MonoBehaviour
         yield return new WaitForSeconds(animationTime);
 
         InstantClick(fromPlayer);
+
+        LevelPanel.Instance.UpdateClicksCounter(true);
     }
 
     private void InstantClick(bool fromPlayer)
@@ -795,15 +803,39 @@ public class Square : MonoBehaviour
 
 	public void UpdateCheckAndCross(bool correct, bool animate)
 	{
-		_solutionCheck.SetActive(correct);
-		_solutionCross.SetActive(!correct);
+        if (_solutionCheck != null && _solutionCross != null)
+		{
+            _solutionCheck.SetActive(correct);
+            _solutionCross.SetActive(!correct);
+        }
 
 		if(!animate)
 		{
 			return;
 		}
 
-		if(_referenceSquare != null)
+        if (_punch != null)
+        {
+            _punch.Kill(true);
+        }
+
+        /*ChangeSortingOrderOfComponents(10);
+
+        _punch = transform.DOPunchScale(
+            _checkAndCrossPunchScale / 2f,
+            _checkAndCrossPunchTime,
+            _checkAndCrossPunchVibrato,
+            _checkAndCrossPunchElasticity
+        ).OnComplete(() =>
+        {
+            RestoreSortingOrderOfComponents();
+
+            transform.localScale = Vector3.one;
+
+            _punch = null;
+        });*/
+
+        if (_referenceSquare != null)
 		{
 			if (_referenceSquarePunch != null)
 			{
@@ -827,60 +859,42 @@ public class Square : MonoBehaviour
 			});
 		}
 
-		if (_punch != null)
-		{
-			_punch.Kill(true);
-		}
+        if (_solutionCheck != null && _solutionCross != null)
+        {
+            if (_checkOrCrossPunch != null)
+            {
+                _checkOrCrossPunch.Kill(true);
+            }
 
-		ChangeSortingOrderOfComponents(10);
+            if (correct)
+            {
+                _checkOrCrossPunch = _solutionCheck.transform.DOPunchScale(
+                    _checkAndCrossPunchScale,
+                    _checkAndCrossPunchTime,
+                    _checkAndCrossPunchVibrato,
+                    _checkAndCrossPunchElasticity
+                ).OnComplete(() =>
+                {
+                    _solutionCheck.transform.localScale = Vector3.one;
 
-		_punch = transform.DOPunchScale(
-			_checkAndCrossPunchScale / 2f,
-			_checkAndCrossPunchTime,
-			_checkAndCrossPunchVibrato,
-			_checkAndCrossPunchElasticity
-		).OnComplete(() =>
-		{
-            RestoreSortingOrderOfComponents();
+                    _checkOrCrossPunch = null;
+                });
+            }
+            else
+            {
+                _checkOrCrossPunch = _solutionCross.transform.DOPunchScale(
+                    _checkAndCrossPunchScale,
+                    _checkAndCrossPunchTime,
+                    _checkAndCrossPunchVibrato,
+                    _checkAndCrossPunchElasticity
+                ).OnComplete(() =>
+                {
+                    _solutionCross.transform.localScale = Vector3.one;
 
-			transform.localScale = Vector3.one;
-
-			_punch = null;
-		});
-
-		if (_checkOrCrossPunch != null)
-		{
-			_checkOrCrossPunch.Kill(true);
-		}
-
-		if (correct)
-		{
-			_checkOrCrossPunch = _solutionCheck.transform.DOPunchScale(
-				_checkAndCrossPunchScale,
-				_checkAndCrossPunchTime,
-				_checkAndCrossPunchVibrato,
-				_checkAndCrossPunchElasticity
-			).OnComplete(() =>
-			{
-				_solutionCheck.transform.localScale = Vector3.one;
-
-				_checkOrCrossPunch = null;
-			});
-		}
-		else
-		{
-			_checkOrCrossPunch = _solutionCross.transform.DOPunchScale(
-				_checkAndCrossPunchScale,
-				_checkAndCrossPunchTime,
-				_checkAndCrossPunchVibrato,
-				_checkAndCrossPunchElasticity
-			).OnComplete(() =>
-			{
-				_solutionCross.transform.localScale = Vector3.one;
-
-				_checkOrCrossPunch = null;
-			});
-		}
+                    _checkOrCrossPunch = null;
+                });
+            }
+        }
 	}
 
     public void Shake()

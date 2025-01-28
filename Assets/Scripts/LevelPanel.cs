@@ -40,7 +40,7 @@ public class LevelPanel : MonoBehaviour
 	[SerializeField] private float _levelsClearedPunchTime = 0f;
 	[SerializeField] private int _levelsClearedPunchVibrato = 0;
 	[SerializeField] private float _levelsClearedPunchElasticity = 0f;
-	[SerializeField] private float _levelsClearedDelay = 0f;
+	//[SerializeField] private float _levelsClearedDelay = 0f;
 
 	private RectTransform _nextLevelButtonRectTransform;
 	private Tweener _clicksCounterPunch;
@@ -107,7 +107,7 @@ public class LevelPanel : MonoBehaviour
 		}
 	}
 
-	public void UpdateLevelsClearedText(int levelsCleared, bool animate, bool delayed)
+	public void UpdateLevelsClearedText(int levelsCleared, bool animate/*, bool delayed*/)
 	{
 		if(_levelsClearedBox.alpha < 0.5f && levelsCleared > 0)
 		{
@@ -119,17 +119,17 @@ public class LevelPanel : MonoBehaviour
 			return;
 		}*/
 
-		var coroutine = DoUpdateLevelsClearedText(levelsCleared, animate, delayed);
+		/*var coroutine = */DoUpdateLevelsClearedText(levelsCleared, animate/*, delayed*/);
 
-		StartCoroutine(coroutine);
+		//StartCoroutine(coroutine);
 	}
 
-	private IEnumerator DoUpdateLevelsClearedText(int levelsCleared, bool animate, bool delayed)
+	private /*IEnumerator */ void DoUpdateLevelsClearedText(int levelsCleared, bool animate/*, bool delayed*/)
 	{
-		if(delayed)
+		/*if(delayed)
 		{
 			yield return new WaitForSeconds(_levelsClearedDelay);
-		}
+		}*/
 		
 		_levelsClearedText.text = levelsCleared.ToString();
 
@@ -138,7 +138,7 @@ public class LevelPanel : MonoBehaviour
 			PunchLevelsClearedText();
 		}
 
-		yield return null;
+		//yield return null;
 	}
 
 	public void UpdateNextLevelButton(bool toggle)
@@ -284,9 +284,9 @@ public class LevelPanel : MonoBehaviour
 				break;
 		}
 
-		if (!_leftCornerButtons.activeSelf && animate)
+		if (_clicksCounterText.text == numberToDisplay.ToString())
 		{
-			_leftCornerButtons.SetActive(true);
+			return;
 		}
 
 		_clicksCounterText.text = $"{numberToDisplay}";
@@ -297,16 +297,21 @@ public class LevelPanel : MonoBehaviour
 		}
 	}
 
-	public void UpdateHistoryButtons(bool? forcedValue = null)
+	public void UpdateHistoryButtons(bool fromPlayerAction)
 	{
-		_resetButton.interactable = forcedValue != null ? forcedValue.Value : (!_level.EmptyHistory && !_level.BottomOfHistory);
+		_resetButton.interactable = !_level.EmptyHistory && !_level.BottomOfHistory;
 		_resetArrow.color = new Color(_resetArrow.color.r, _resetArrow.color.g, _resetArrow.color.b, _resetButton.interactable ? 1f : 0.5f);
 
-		_undoButton.interactable = forcedValue != null ? forcedValue.Value : (!_level.EmptyHistory && !_level.BottomOfHistory);
+		_undoButton.interactable = !_level.EmptyHistory && !_level.BottomOfHistory;
 		_undoArrow.color = new Color(_undoArrow.color.r, _undoArrow.color.g, _undoArrow.color.b, _undoButton.interactable ? 1f : 0.5f);
 
-		_redoButton.interactable = forcedValue != null ? forcedValue.Value : (!_level.EmptyHistory && !_level.TopOfHistory);
+		_redoButton.interactable = !_level.EmptyHistory && !_level.TopOfHistory;
 		_redoArrow.color = new Color(_redoArrow.color.r, _redoArrow.color.g, _redoArrow.color.b, _redoButton.interactable ? 1f : 0.5f);
+
+		if (fromPlayerAction && !_leftCornerButtons.activeSelf)
+		{
+			_leftCornerButtons.SetActive(true);
+		}
 	}
 
 	public void UI_Reset()

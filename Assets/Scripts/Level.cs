@@ -62,6 +62,7 @@ public class Level : MonoBehaviour
     [SerializeField] private Rectangle _rectangle = null;
     [SerializeField] private Rectangle _solutionRectangle = null;
     [SerializeField] private Rectangle _levelCompletionFeedback = null;
+    [SerializeField] private Rectangle _correctSolutionFeedback = null;
 
 	[HorizontalLine(1)]
 
@@ -151,6 +152,9 @@ public class Level : MonoBehaviour
 	private bool _trulyCompleted;
 	private List<ProgressionEntry> _progressionEntries;
 	private ProgressionEntry _nonProgressionFakeProgressionEntry;
+	private Tweener _levelCompleteHeightScale;
+	private Tweener _levelCompleteWidthScale;
+	private Tweener _levelCompleteThicknessScale;
 
     private void Awake()
 	{
@@ -180,7 +184,7 @@ public class Level : MonoBehaviour
 		LoadProgressionEntries();
 		GenerateLevel();
 
-		LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, false, false);
+		LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, false);
 
 		_canClick = true;
 	}
@@ -208,19 +212,19 @@ public class Level : MonoBehaviour
 				{
 					_progressionIndex--;
 
-					LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, false, false);
+					LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, false);
 				}
 				if (Input.GetKeyDown(KeyCode.RightArrow))
 				{
 					_progressionIndex++;
 
-					LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, true, false);
+					LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, true);
 				}
 				if (Input.GetKeyDown(KeyCode.Backspace))
 				{
 					_progressionIndex = 0;
 
-					LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, false, false);
+					LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, false);
 				}
 				if (Input.GetKeyDown(KeyCode.Space))
 				{
@@ -303,8 +307,6 @@ public class Level : MonoBehaviour
 
 					Clicks++;
 
-					LevelPanel.Instance.UpdateClicksCounter(true);
-
 					_canClick = false;
 				}
 			}
@@ -338,7 +340,7 @@ public class Level : MonoBehaviour
 
 		AddNewHistorySnapshot();
 
-		LevelPanel.Instance.UpdateHistoryButtons();
+		LevelPanel.Instance.UpdateHistoryButtons(true);
 
 		CheckLevelCompletion(true);
 
@@ -886,7 +888,7 @@ public class Level : MonoBehaviour
 
 		UpdateChecksAndCrosses();
 
-		LevelPanel.Instance.UpdateHistoryButtons();
+		LevelPanel.Instance.UpdateHistoryButtons(false);
 
 		//_generatedLevels.Add(_levelCode);
 	}
@@ -1558,7 +1560,7 @@ public class Level : MonoBehaviour
 
 		UpdateChecksAndCrosses();
 
-		LevelPanel.Instance.UpdateHistoryButtons();
+		LevelPanel.Instance.UpdateHistoryButtons(false);
 	}
 
     public void Undo()
@@ -1574,7 +1576,7 @@ public class Level : MonoBehaviour
 
 		UpdateChecksAndCrosses();
 
-		LevelPanel.Instance.UpdateHistoryButtons();
+		LevelPanel.Instance.UpdateHistoryButtons(false);
 	}
 
     public void Redo()
@@ -1590,7 +1592,7 @@ public class Level : MonoBehaviour
 
 		UpdateChecksAndCrosses();
 
-		LevelPanel.Instance.UpdateHistoryButtons();
+		LevelPanel.Instance.UpdateHistoryButtons(false);
 	}
 
     private void AddNewHistorySnapshot()
@@ -1671,9 +1673,7 @@ public class Level : MonoBehaviour
 
 	public void CheckLevelCompletion(bool fromClickedSquare)
 	{
-		//var startOfLevelTwo = Squares.Length == 2 && BottomOfHistory;
-
-		var levelComplete = /*startOfLevelTwo ? false : */GetLevelCompletion(fromClickedSquare);
+		var levelComplete = GetLevelCompletion(fromClickedSquare);
 		var allSolutionsFound = true;
 		var solutionAlreadyFound = false;
 
@@ -1705,11 +1705,6 @@ public class Level : MonoBehaviour
 
 				solution.SolutionClicksBox.SolvedOverlay.SetActive(solution.Solved);
 			}
-
-			LevelPanel.Instance.UpdateNextLevelButton(_trulyCompleted || (levelComplete
-				&& (_completedSolutionsToNextLevelRestriction == CompletedSolutionsToNextLevelRestriction.AtLeastOneSolution && levelComplete
-					|| _completedSolutionsToNextLevelRestriction == CompletedSolutionsToNextLevelRestriction.AllSolutions && allSolutionsFound
-					)));
 		}
 		else
 		{
@@ -1724,12 +1719,6 @@ public class Level : MonoBehaviour
 			{
 				Solutions[0].Solved = Clicks == Solutions[0].Sequence.Length && levelComplete;
 			}
-
-			LevelPanel.Instance.UpdateNextLevelButton(_trulyCompleted || (levelComplete 
-				&& (_clicksCountRestriction == ClicksCountToNextLevelRestriction.NoRestriction 
-					|| (_clicksCountRestriction == ClicksCountToNextLevelRestriction.SoftRestriction && ClicksLeft >= 0) 
-					|| (_clicksCountRestriction == ClicksCountToNextLevelRestriction.HardRestriction && ClicksLeft >= 0)
-					)));
 		}
         
 		if (_solutionType == SolutionType.SingleSolution
@@ -1748,24 +1737,25 @@ public class Level : MonoBehaviour
 			}
 		}
 
+		var coroutine = PlayLevelCompleteSequence(levelComplete, solutionAlreadyFound, allSolutionsFound);
+
+		StartCoroutine(coroutine);
+	}
+
+	private IEnumerator PlayLevelCompleteSequence(bool levelComplete, bool solutionAlreadyFound, bool allSolutionsFound)
+	{
 		if (levelComplete)
 		{
-            if(_solutionType == SolutionType.SingleSolution
-			&& _clicksCountRestriction == ClicksCountToNextLevelRestriction.SoftRestriction 
+			if (_solutionType == SolutionType.SingleSolution
+			&& _clicksCountRestriction == ClicksCountToNextLevelRestriction.SoftRestriction
 			&& ClicksLeft < 0)
 			{
-                LevelPanel.Instance.ShakeClicksCounter();
-            }
-			/*else
-			{
-                LevelPanel.Instance.UpdateHistoryButtons(false);
-            }*/
+				LevelPanel.Instance.ShakeClicksCounter();
+			}
 
-			/*if(!solutionAlreadyFound)
-			{*/
-				//ShowLevelCompleteAnimation(trueCompletion);
-				ShowLevelCompleteAnimation(!solutionAlreadyFound);
-			//}
+			yield return new WaitForSeconds(0.4375f);
+
+			ShowLevelCompleteAnimation(!solutionAlreadyFound);
 
 			if (!_trulyCompleted)
 			{
@@ -1782,7 +1772,9 @@ public class Level : MonoBehaviour
 				{
 					_progressionIndex++;
 
-					LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, true, true);
+					yield return new WaitForSeconds(0.5625f);
+
+					LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, true/*, true*/);
 
 					_playedLevels.Enqueue(_levelCode);
 
@@ -1792,7 +1784,23 @@ public class Level : MonoBehaviour
 					}
 				}
 			}
-        }
+		}
+
+		if (_solutionType == SolutionType.MultipleSolutions)
+		{
+			LevelPanel.Instance.UpdateNextLevelButton(_trulyCompleted || (levelComplete
+				&& (_completedSolutionsToNextLevelRestriction == CompletedSolutionsToNextLevelRestriction.AtLeastOneSolution && levelComplete
+					|| _completedSolutionsToNextLevelRestriction == CompletedSolutionsToNextLevelRestriction.AllSolutions && allSolutionsFound
+					)));
+		}
+		else
+		{
+			LevelPanel.Instance.UpdateNextLevelButton(_trulyCompleted || (levelComplete
+				&& (_clicksCountRestriction == ClicksCountToNextLevelRestriction.NoRestriction
+					|| (_clicksCountRestriction == ClicksCountToNextLevelRestriction.SoftRestriction && ClicksLeft >= 0)
+					|| (_clicksCountRestriction == ClicksCountToNextLevelRestriction.HardRestriction && ClicksLeft >= 0)
+					)));
+		}
 	}
 	
 	private void LoadProgressionEntries()
@@ -1821,11 +1829,20 @@ public class Level : MonoBehaviour
 
     private void ShowLevelCompleteAnimation(bool trueCompletion)
 	{
-        var levelCompletionFeedbackWidth = _levelCompletionFeedback.Width;
-        var levelCompletionFeedbackHeight = _levelCompletionFeedback.Height;
-        var levelCompletionFeedbackThicknessBaseValue = _levelCompletionFeedback.Thickness;
+        //var levelCompletionFeedbackWidth = _levelCompletionFeedback.Width;
+        //var levelCompletionFeedbackHeight = _levelCompletionFeedback.Height;
+        //var levelCompletionFeedbackThicknessBaseValue = _levelCompletionFeedback.Thickness;
 
-        DOTween.To(() => levelCompletionFeedbackWidth, x =>
+		var levelCompletionFeedbackWidth = 1f;
+		var levelCompletionFeedbackHeight = 1f;
+		var levelCompletionFeedbackThicknessBaseValue = 0.15f;
+
+		if (_levelCompleteWidthScale != null)
+		{
+			_levelCompleteWidthScale.Kill(true);
+		}
+
+		_levelCompleteWidthScale = DOTween.To(() => levelCompletionFeedbackWidth, x =>
         {
             levelCompletionFeedbackWidth = x;
 
@@ -1835,9 +1852,17 @@ public class Level : MonoBehaviour
         _levelCompletionTime).SetEase(_levelCompletionCurve).OnComplete(() =>
 		{
             _levelCompletionFeedback.Width = _levelCompletionFeedbackFinalSize.x / 100f;
-        });
 
-        DOTween.To(() => levelCompletionFeedbackHeight, x =>
+			_levelCompleteWidthScale = null;
+
+		});
+
+		if(_levelCompleteHeightScale != null)
+		{
+			_levelCompleteHeightScale.Kill(true);
+		}
+
+        _levelCompleteHeightScale = DOTween.To(() => levelCompletionFeedbackHeight, x =>
         {
             levelCompletionFeedbackHeight = x;
 
@@ -1847,13 +1872,21 @@ public class Level : MonoBehaviour
         _levelCompletionTime).SetEase(_levelCompletionCurve).OnComplete(() =>
         {
             _levelCompletionFeedback.Height = _levelCompletionFeedbackFinalSize.y / 100f;
-        });
 
-        var time = 0f;
+			_levelCompleteHeightScale = null;
+
+		});
+
+		if (_levelCompleteThicknessScale != null)
+		{
+			_levelCompleteThicknessScale.Kill(true);
+		}
+
+		var time = 0f;
 
 		_levelCompletionFeedback.Color = trueCompletion ? _trueLevelCompletionColor : _levelCompletionFeedbackBaseColor;
 
-		DOTween.To(() => time, x =>
+		_levelCompleteThicknessScale = DOTween.To(() => time, x =>
         {
             time = x;
 
@@ -1871,7 +1904,9 @@ public class Level : MonoBehaviour
         {
             _levelCompletionFeedback.Thickness = levelCompletionFeedbackThicknessBaseValue;
             _levelCompletionFeedback.Color = _levelCompletionFeedbackBaseColor;
-        });
+
+			_levelCompleteThicknessScale = null;
+		});
 	}
 
 #if UNITY_EDITOR
