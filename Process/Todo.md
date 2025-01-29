@@ -126,7 +126,7 @@
 ## 2024-01-28
 
 - [audio] Add Vadim's sounds
-- [feat] Try another progression scheme: more levels between new mechanics
+- ~~[feat] Try another progression scheme: more levels between new mechanics~~
 - [feat] Try another progression scheme: isolate newly introduced mechanics 
 - [visual] Mobile interface
 	- Figure out how to convey the information that is conveyed when hovering squares without hover functionalities
