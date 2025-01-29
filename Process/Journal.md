@@ -108,7 +108,7 @@ I'm not sure why the game isn't showing its fun by itself to me like some others
 
 The question of whether the core loop is too tiny or at what point minimalism breaks is scary and daunting. I could spend a lot of time reflecting on that so I'll stop for now and revisit this entry/thought in the future. 
 
-# The list
+### The list
 
 - Toggle mechanisms
 	- Cascading toggles (only certain squares? indicated by special arrows?)
@@ -265,7 +265,7 @@ The reflection on minimalism that I want to materialize here is a big daunting s
 	- (Possibly and ideally even no numbers?)
 - No representation of outside "objects"
 
-# 2024-11-04
+## 2024-11-04
 
 I want to add a feature that's going to feel like a twist on the whole concept. In the "nice to have"s list of features that I wrote in here a while ago, I included "cascading toggles", meaning squares that, when clicked and toggling their target(s), will also trigger their target's like a click would, toggling their respective target(s) as well
 
@@ -328,7 +328,7 @@ The only thing that's left to be done about this whole task is to re-work the "g
 
 With this complete, I think I'll be ready to consider this game mechanically feature-complete. I'll work on the UX and finally choose what to do with the two different modes, but I won't consider adding any new mechanic to the gameplay loop
 
-# 2024-12-05
+## 2024-12-05
 
 The game is feature complete! Both in terms of the features/mechanics included and the progression system through which these features are introduced to the players. 
 
