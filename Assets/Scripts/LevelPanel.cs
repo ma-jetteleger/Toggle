@@ -19,6 +19,7 @@ public class LevelPanel : MonoBehaviour
 	[SerializeField] private TextMeshProUGUI _clicksCounterText = null;
 	[SerializeField] private Image _nextLevelButtonOverlay = null;
 	[SerializeField] private TextMeshProUGUI _levelsClearedText = null;
+	[SerializeField] private TextMeshProUGUI _debugSolutionText = null;
 
 	// References
 	[SerializeField] private Level _level = null;
@@ -105,6 +106,8 @@ public class LevelPanel : MonoBehaviour
 				solutions[i].SolutionClicksBox = newSolutionClicksBox;
 			}
 		}
+
+		_debugSolutionText.text = string.Empty;
 	}
 
 	public void UpdateLevelsClearedText(int levelsCleared, bool animate/*, bool delayed*/)
@@ -312,6 +315,11 @@ public class LevelPanel : MonoBehaviour
 		{
 			_leftCornerButtons.SetActive(true);
 		}
+	}
+
+	public void UpdateDebugSolutionText(string text)
+	{
+		_debugSolutionText.text = text;
 	}
 
 	public void UI_Reset()

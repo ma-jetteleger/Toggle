@@ -124,14 +124,15 @@ public class Level : MonoBehaviour
 	public int TogglesThisClickSequence { get; set; }
 	public List<Square> SquaresToggledLastClick { get; set; }
 	public Square LastSquareClicked { get; set; }
+	public bool CanClick { get; set; }
 
 	public int ClicksLeft => Solutions[0].Sequence.Length - Clicks;
     public bool EmptyHistory => _squareHistory.Count == 1;
     public bool TopOfHistory => Clicks == _squareHistory.Count - 1;
     public bool BottomOfHistory => Clicks == 0;
     public SolutionType SolutionType => _solutionType;
-
-    private string _levelsFileName => _solutionType == SolutionType.SingleSolution? _singleSolutionLevelsFile : _multiSolutionsLevelsFile;
+	
+	private string _levelsFileName => _solutionType == SolutionType.SingleSolution? _singleSolutionLevelsFile : _multiSolutionsLevelsFile;
     private string _levelsFilePath => Application.persistentDataPath + "/" + _levelsFileName;
 	private ProgressionEntry _currentProgressionEntry => _progression 
 		? _progressionIndex <= _progressionEntries.Count - 1 
@@ -139,7 +140,6 @@ public class Level : MonoBehaviour
 			: _progressionEntries[_progressionEntries.Count - 1]
 		: _nonProgressionFakeProgressionEntry;
 
-	private bool _canClick;
 	private Square _previousHoveredSquare;
     private Rectangle _squareTemplateRectangle;
     private Rectangle _solutionSquareTemplateRectangle;
@@ -192,12 +192,12 @@ public class Level : MonoBehaviour
 
 		LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, false);
 
-		_canClick = true;
+		CanClick = true;
 	}
 
     private void Update()
     {
-        if(_lastSquareClickedDown == null && _canClick)
+        if(_lastSquareClickedDown == null && CanClick)
 		{
 			if(Input.GetKey(KeyCode.D))
 			{
@@ -313,7 +313,7 @@ public class Level : MonoBehaviour
 
 					Clicks++;
 
-					_canClick = false;
+					CanClick = false;
 				}
 			}
 
@@ -349,8 +349,6 @@ public class Level : MonoBehaviour
 		LevelPanel.Instance.UpdateHistoryButtons(true);
 
 		CheckLevelCompletion(true);
-
-		_canClick = true;
 	}
 
 	private void OverwriteLevel(string levelCode)
@@ -1183,12 +1181,8 @@ public class Level : MonoBehaviour
 		}
 #endif
 
-		// Order the solutions to be displayed in descending order?
-		// Feels like going from highest to lowest, in terms of gameplay, 
-		// makes for a bit more of a "climactic" progression/finish
-		Solutions = Solutions.OrderByDescending(x => x.Sequence.Length).ToList();
-
-		//LevelPanel.Instance.SetupSolutionBoxes(Solutions);
+		//Solutions = Solutions.OrderByDescending(x => x.Sequence.Length).ToList();
+		Solutions = Solutions.OrderBy(x => x.Sequence.Length).ToList();
 
 #if UNITY_EDITOR
 		if (_printSolutions)
@@ -1198,15 +1192,28 @@ public class Level : MonoBehaviour
 #endif
 	}
 
-
+	[Button]
 	private void PrintSolutions()
 	{
+		if(Solutions == null)
+		{
+			Debug.Log("Printing solutions is only possible while playing");
+
+			return;
+		}
+
 		Debug.Log($"{Solutions.Count} possible solutions:");
+
+		var solutionStrings = new string[Solutions.Count];
 
 		for (var i = 0; i < Solutions.Count; i++)
 		{
 			Debug.Log(string.Join(", ", Solutions[i].Sequence));
+
+			solutionStrings[i] = string.Join(string.Empty, Solutions[i].Sequence);
 		}
+
+		LevelPanel.Instance.UpdateDebugSolutionText(string.Join(" | ", solutionStrings));
 	}
 
 	private string GetValidPregeneratedLevel()

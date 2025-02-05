@@ -96,6 +96,14 @@ public class Square : MonoBehaviour
                     if (activate)
                     {
                         _targetIndicatorSprites = _targetIndicators[i].GetComponentsInChildren<SpriteRenderer>();
+                        _targetIndicatorSpritesoriginalPosition = new Vector3[_targetIndicatorSprites.Length];
+
+						for (int j = 0; j < _targetIndicatorSprites.Length; j++)
+						{
+							var targetIndicatorSprite = _targetIndicatorSprites[j];
+
+                            _targetIndicatorSpritesoriginalPosition[j] = targetIndicatorSprite.transform.localPosition;
+                        }
                     }
                 }
             }
@@ -105,6 +113,7 @@ public class Square : MonoBehaviour
     public bool SolutionSquare => _referenceSquare != null;
     public Square PreviousSquare => _level.Squares[Id > 0 ? Id - 1 : _level.Squares.Length - 1];
     public Square NextSquare => _level.Squares[Id < _level.Squares.Length - 1 ? Id + 1 : 0];
+    public bool Animating => _punch != null || _referenceSquarePunch != null || _leftArrowMove != null || _rightArrowMove != null || _diamondMove != null || _cascadingIndicatorMove != null;
 
     public bool Toggled { get; set; }
     public bool Highlighted { get; set; }
@@ -137,6 +146,7 @@ public class Square : MonoBehaviour
     private bool _coloredTargetPrediction;
     private int _lastSortingOrderChangeFactor;
     private SpriteRenderer[] _targetIndicatorSprites;
+    private Vector3[] _targetIndicatorSpritesoriginalPosition;
 
     public void Initialize(
         int id,
@@ -495,12 +505,22 @@ public class Square : MonoBehaviour
 
         yield return new WaitForSeconds(animationTime);
 
-        InstantClick(fromPlayer);
+        var endClickSequence = InstantClick(fromPlayer);
 
         LevelPanel.Instance.UpdateClicksCounter(true);
+
+        if (fromPlayer && endClickSequence)
+		{
+            yield return new WaitForSeconds(animationTime * 1.125f);
+
+            if (!_level.Squares.Any(x => x.Animating))
+			{
+                _level.CanClick = true;
+            }
+        }
     }
 
-    private void InstantClick(bool fromPlayer)
+    private bool InstantClick(bool fromPlayer)
 	{
         var endClickSequence = true;
 
@@ -531,12 +551,17 @@ public class Square : MonoBehaviour
             square.SetupPredictions(false);
         }
 
-        _level.OnSquareClicked();
+        if(fromPlayer)
+		{
+            _level.OnSquareClicked();
+        }
 
         if (endClickSequence)
-		{
+        {
             _level.EndClickSequence(fromPlayer);
         }
+
+        return endClickSequence;
     }
 
     public void SetCascading(bool value, bool fromPlayer)
@@ -644,19 +669,22 @@ public class Square : MonoBehaviour
             ? _toggledColor
             : _normalColor;
 
-        if (!Interactable && !SolutionSquare)
-        {
-            MatchUninteractableOverlayColorWithRectangle();
-        }
-
-		if (!_level.SquaresToggledLastClick.Contains(this))
+        if(fromPlayer)
 		{
-			_level.SquaresToggledLastClick.Add(this);
-		}
+            if (!Interactable && !SolutionSquare)
+            {
+                MatchUninteractableOverlayColorWithRectangle();
+            }
 
-        var correct = Toggled == _level.SolutionSquares[Id].Toggled;
+            if (!_level.SquaresToggledLastClick.Contains(this))
+            {
+                _level.SquaresToggledLastClick.Add(this);
+            }
 
-        _level.SolutionSquares[Id].UpdateCheckAndCross(correct, fromPlayer);
+            var correct = Toggled == _level.SolutionSquares[Id].Toggled;
+
+            _level.SolutionSquares[Id].UpdateCheckAndCross(correct, fromPlayer);
+        }
     }
 
     public void ToggleTo(bool toggle)
@@ -730,7 +758,7 @@ public class Square : MonoBehaviour
         for (var i = 0; i < _targetIndicatorSprites.Length; i++)
         {
             var targetIndicatorSprite = _targetIndicatorSprites[i];
-            var originalPosition = targetIndicatorSprite.transform.localPosition;
+            var originalPosition = _targetIndicatorSpritesoriginalPosition[i];
 
             if (targetIndicatorSprite.gameObject.name.Contains("Left"))
 			{
