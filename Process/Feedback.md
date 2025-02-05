@@ -71,6 +71,6 @@
 + ~~Square shaped objective array feels better then the thin rectangles for "mapping"/associating it with the interactive middle array~~
 ? There's a clear distinction between two types of players: the ones that don't feel very engaged with the game because they don't understand what's going on and there's not enough feedback and information to get them going; and the ones that feel very stimulated by the lack of information and the motivation they feel to figure out what's going on and what to do with minimal feedback
 - ~~There's a bug that happens when you spam click on a square~~
-- There was a level that had an impossible solution, it seems like it built its solution with a cascading toggle on a square not going away after being activated
+- ~~There was a level that had an impossible solution, it seems like it built its solution with a cascading toggle on a square not going away after being activated~~
 - ~~Some people remarked that having multi-solution levels (which sneak their way in the game as a fallback to not being able to generate a level) in the game feels weird~~
 - People don't know when they're supposed to be done with the game
