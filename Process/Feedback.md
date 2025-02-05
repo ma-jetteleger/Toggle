@@ -73,3 +73,4 @@
 - ~~There's a bug that happens when you spam click on a square~~
 - There was a level that had an impossible solution, it seems like it built its solution with a cascading toggle on a square not going away after being activated
 - ~~Some people remarked that having multi-solution levels (which sneak their way in the game as a fallback to not being able to generate a level) in the game feels weird~~
+- People don't know when they're supposed to be done with the game

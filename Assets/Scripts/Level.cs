@@ -927,6 +927,42 @@ public class Level : MonoBehaviour
 		LevelPanel.Instance.UpdateHistoryButtons(false);
 
 		//_generatedLevels.Add(_levelCode);
+
+		/*var confirmationSquares = new TestSquare[Squares.Length];
+
+		for (var i = 0; i < confirmationSquares.Length; i++)
+		{
+			confirmationSquares[i] = new TestSquare(Squares[i]);
+		}
+
+		for (var i = 0; i < confirmationSquares.Length; i++)
+		{
+			confirmationSquares[i].SetupTargets(Squares[i]);
+		}
+
+		for (var i = 0; i < Solutions[0].Sequence.Length; i++)
+		{
+			confirmationSquares[Solutions[0].Sequence[i]].Click(confirmationSquares);
+		}
+
+		var good = true;
+
+		for (var i = 0; i < confirmationSquares.Length; i++)
+		{
+			if(confirmationSquares[i].Toggled != SolutionSquares[i].Toggled)
+			{
+				Debug.Log("There was an issue");
+
+				good = false;
+
+				break;
+			}
+		}
+
+		if (good)
+		{
+			Debug.Log("We're good");
+		}*/
 	}
 
 	private void GenerateSolution(string[] splitGoalCode, string[] splitSolutionsCode)

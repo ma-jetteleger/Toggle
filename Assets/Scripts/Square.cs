@@ -464,13 +464,13 @@ public class Square : MonoBehaviour
         }
     }
 
-    public void Click(bool fromPlayer, bool extraDelay, bool turnOffCascading = false)
+    public void Click(bool fromPlayer, bool extraDelay/*, bool turnOffCascading*/)
     {
         _level.SquaresToggledLastClick.Clear();
 
         if (!SolutionSquare)
 		{
-            var coroutine = DelayedClick(fromPlayer, extraDelay, turnOffCascading);
+            var coroutine = DelayedClick(fromPlayer, extraDelay/*, turnOffCascading*/);
 
             StartCoroutine(coroutine);
         }
@@ -480,7 +480,7 @@ public class Square : MonoBehaviour
         }
     }
 
-    private IEnumerator DelayedClick(bool fromPlayer, bool extraDelay, bool turnOffCascading = false)
+    private IEnumerator DelayedClick(bool fromPlayer, bool extraDelay/*, bool turnOffCascading*/)
     {
         var animationTime = _level.SolutionSquares[0]._checkAndCrossPunchTime / 4f;
 
@@ -494,11 +494,8 @@ public class Square : MonoBehaviour
             AnimateCascadingIndicator();
 
             yield return new WaitForSeconds(animationTime * 1.875f);
-        }
 
-        if (turnOffCascading)
-        {
-            SetCascading(false, true);
+            SetCascading(false, fromPlayer);
         }
 
         AnimateTargetIndicator(animationTime);
@@ -511,7 +508,7 @@ public class Square : MonoBehaviour
 
         if (fromPlayer && endClickSequence)
 		{
-            yield return new WaitForSeconds(animationTime * 1.125f);
+            yield return new WaitForSeconds(animationTime * 1.25f);
 
             if (!_level.Squares.Any(x => x.Animating))
 			{
@@ -539,10 +536,10 @@ public class Square : MonoBehaviour
 
                 if (!fromPlayer)
                 {
-                    SetCascading(false, false);
+                    target.SetCascading(false, false);
                 } 
 
-                target.Click(fromPlayer, true, true);
+                target.Click(fromPlayer, true/*, true*/);
             }
         }
 

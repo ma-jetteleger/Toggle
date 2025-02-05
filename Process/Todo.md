@@ -131,3 +131,4 @@
 - [visual] Mobile interface
 	- Figure out how to convey the information that is conveyed when hovering squares without hover functionalities
 	- Figure out how to maintain the visibility of the toggle indicators when using fingers to press on squares
+- [feat] Add a way to track progression out of all possible levels (xx/40? A gradual fill in the levels-cleared-counter box? A gradual fill in the background? A bunch of faded/opaque dots?)
