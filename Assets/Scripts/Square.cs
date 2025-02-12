@@ -30,6 +30,7 @@ public class Square : MonoBehaviour
     [SerializeField] private Color _clickedOutlineColor = Color.black;
     //[SerializeField] private Sprite[] _targetSchemeSprites = null;
     [SerializeField] private Color _toggledColor = Color.black;
+    //[SerializeField] private Color _toggledTargetIndicatorColor = Color.black;
 
     [SerializeField] private Gradient _shakeGradient = null;
     [SerializeField] private float _shakeTime = 0f;
@@ -46,6 +47,10 @@ public class Square : MonoBehaviour
 
     [SerializeField] private float _targetIndicatorMoveDistance = 0f;
     [SerializeField] private AnimationCurve _targetIndicatorMoveCurve = null;
+
+    public Color ClickedOutlineColor { get { return _clickedOutlineColor; } set { _clickedOutlineColor = value; } }
+    public Color ToggledColor { get { return _toggledColor; } set { _toggledColor = value; } }
+    //public Color ToggledTargetIndicatorColor { get { return _toggledTargetIndicatorColor; } set { _toggledTargetIndicatorColor = value; } }
 
     public bool Interactable
     {
@@ -96,13 +101,13 @@ public class Square : MonoBehaviour
                     if (activate)
                     {
                         _targetIndicatorSprites = _targetIndicators[i].GetComponentsInChildren<SpriteRenderer>();
-                        _targetIndicatorSpritesoriginalPosition = new Vector3[_targetIndicatorSprites.Length];
+                        _targetIndicatorSpritesOriginalPosition = new Vector3[_targetIndicatorSprites.Length];
 
 						for (int j = 0; j < _targetIndicatorSprites.Length; j++)
 						{
 							var targetIndicatorSprite = _targetIndicatorSprites[j];
 
-                            _targetIndicatorSpritesoriginalPosition[j] = targetIndicatorSprite.transform.localPosition;
+                            _targetIndicatorSpritesOriginalPosition[j] = targetIndicatorSprite.transform.localPosition;
                         }
                     }
                 }
@@ -146,7 +151,8 @@ public class Square : MonoBehaviour
     private bool _coloredTargetPrediction;
     private int _lastSortingOrderChangeFactor;
     private SpriteRenderer[] _targetIndicatorSprites;
-    private Vector3[] _targetIndicatorSpritesoriginalPosition;
+    private Vector3[] _targetIndicatorSpritesOriginalPosition;
+    private Color _normalTargetIndicatorColor;
 
     public void Initialize(
         int id,
@@ -178,6 +184,8 @@ public class Square : MonoBehaviour
         SetCascading(false, false);
 
         Interactable = true;
+
+        _normalTargetIndicatorColor = _targetIndicators[0].GetComponentInChildren<SpriteRenderer>().color;
     }
 
     public void Initialize(Level level, Square referenceSquare)
@@ -666,7 +674,15 @@ public class Square : MonoBehaviour
             ? _toggledColor
             : _normalColor;
 
-        if(fromPlayer)
+        /*if(_targetIndicatorSprites != null)
+		{
+            foreach (var targetIndicatorSprite in _targetIndicatorSprites)
+            {
+                targetIndicatorSprite.color = Toggled ? _toggledTargetIndicatorColor : _normalTargetIndicatorColor;
+            }
+        }*/
+        
+        if (fromPlayer)
 		{
             if (!Interactable && !SolutionSquare)
             {
@@ -755,7 +771,7 @@ public class Square : MonoBehaviour
         for (var i = 0; i < _targetIndicatorSprites.Length; i++)
         {
             var targetIndicatorSprite = _targetIndicatorSprites[i];
-            var originalPosition = _targetIndicatorSpritesoriginalPosition[i];
+            var originalPosition = _targetIndicatorSpritesOriginalPosition[i];
 
             if (targetIndicatorSprite.gameObject.name.Contains("Left"))
 			{

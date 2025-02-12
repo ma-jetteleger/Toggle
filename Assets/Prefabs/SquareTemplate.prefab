@@ -74,7 +74,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 770a73197c15828429d31811aab1075b, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0.14901961, b: 0.20000002, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -135,16 +135,62 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _outline: {fileID: 6273017413554541825}
+  _noMoreClicksOverlay: {fileID: 0}
+  _uninteractableOverlay: {fileID: 0}
+  _targetPredictionTemplate: {fileID: 0}
+  _targetIndicators: []
+  _cascadingIndicator: {fileID: 0}
+  _solutionCheck: {fileID: 0}
+  _solutionCross: {fileID: 0}
   _clickedOutlineColor: {r: 0, g: 0, b: 0, a: 1}
-  _targetSchemeSprites:
-  - {fileID: 21300000, guid: fe21d4867268e534f921a6703547a53b, type: 3}
-  - {fileID: 21300000, guid: 08e65c944bf80e84d8e0ced3bf6704d6, type: 3}
-  - {fileID: 21300000, guid: 60038adce75cd7f45960f2a8f44ce7d2, type: 3}
-  - {fileID: 21300000, guid: 56d32a9b976efe948badb159b55dae1a, type: 3}
-  - {fileID: 21300000, guid: 6b35c1626a08c2145be2655488d7b006, type: 3}
-  - {fileID: 21300000, guid: 02b0055b8c9f1e844badebad36cdc982, type: 3}
-  - {fileID: 21300000, guid: 770a73197c15828429d31811aab1075b, type: 3}
   _toggledColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
+  _shakeGradient:
+    serializedVersion: 2
+    key0: {r: 1, g: 1, b: 1, a: 1}
+    key1: {r: 1, g: 1, b: 1, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
+  _shakeTime: 0
+  _shakeStrength: 0
+  _shakeVibrato: 0
+  _shakeRandomness: 0
+  _shakeSnapping: 0
+  _shakeFadeOut: 0
+  _checkAndCrossPunchScale: {x: 0, y: 0, z: 0}
+  _checkAndCrossPunchTime: 0
+  _checkAndCrossPunchVibrato: 0
+  _checkAndCrossPunchElasticity: 0
+  _targetIndicatorMoveDistance: 0
+  _targetIndicatorMoveCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!114 &1580128755209089801
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -340,7 +386,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   blendMode: 1
   scaleMode: 0
-  color: {r: 0.2509804, g: 0.2509804, b: 0.2509804, a: 1}
+  color: {r: 0, g: 0.57254905, b: 0.73333335, a: 1}
   detailLevel: 2
   zTest: 4
   zOffsetFactor: 0

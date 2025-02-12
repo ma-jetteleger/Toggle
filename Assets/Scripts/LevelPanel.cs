@@ -19,6 +19,7 @@ public class LevelPanel : MonoBehaviour
 	[SerializeField] private TextMeshProUGUI _clicksCounterText = null;
 	[SerializeField] private Image _nextLevelButtonOverlay = null;
 	[SerializeField] private TextMeshProUGUI _levelsClearedText = null;
+	[SerializeField] private TextMeshProUGUI _maxLevelsText = null;
 	[SerializeField] private TextMeshProUGUI _debugSolutionText = null;
 
 	// References
@@ -41,12 +42,17 @@ public class LevelPanel : MonoBehaviour
 	[SerializeField] private float _levelsClearedPunchTime = 0f;
 	[SerializeField] private int _levelsClearedPunchVibrato = 0;
 	[SerializeField] private float _levelsClearedPunchElasticity = 0f;
+	[SerializeField] private AnimationCurve _maxLevelsFadeCurve = null;
+	[SerializeField] private AnimationCurve _maxLevelsFadeOutCurve = null;
+	[SerializeField] private float _maxLevelsFadeDelay = 0f;
+	[SerializeField] private float _maxLevelsTextStayTime = 0f;
 	//[SerializeField] private float _levelsClearedDelay = 0f;
 
 	private RectTransform _nextLevelButtonRectTransform;
 	private Tweener _clicksCounterPunch;
 	private CanvasGroup _levelsClearedBox;
 	private Tweener _levelsClearedPunch;
+	private Tweener _maxLevelsFade;
 	private Tweener _clicksCounterShake;
 	private Tweener _nextLevelButtonShake;
 	private Tweener _clicksCounterColorChange;
@@ -85,6 +91,8 @@ public class LevelPanel : MonoBehaviour
 
 		_leftCornerButtons = _resetButton.transform.parent.gameObject;
 		_leftCornerButtons.SetActive(false);
+
+		_maxLevelsText.color = Color.clear;
 	}
 
 	public void SetupSolutionBoxes(List<Solution> solutions)
@@ -122,12 +130,12 @@ public class LevelPanel : MonoBehaviour
 			return;
 		}*/
 
-		/*var coroutine = */DoUpdateLevelsClearedText(levelsCleared, animate/*, delayed*/);
+		var coroutine = DoUpdateLevelsClearedText(levelsCleared, animate/*, delayed*/);
 
-		//StartCoroutine(coroutine);
+		StartCoroutine(coroutine);
 	}
 
-	private /*IEnumerator */ void DoUpdateLevelsClearedText(int levelsCleared, bool animate/*, bool delayed*/)
+	private IEnumerator /*void*/ DoUpdateLevelsClearedText(int levelsCleared, bool animate/*, bool delayed*/)
 	{
 		/*if(delayed)
 		{
@@ -136,12 +144,35 @@ public class LevelPanel : MonoBehaviour
 		
 		_levelsClearedText.text = levelsCleared.ToString();
 
+		_levelsClearedText.GetComponent<LayoutElement>().minWidth = levelsCleared < 10 ? 25 : 50;
+		_levelsClearedText.transform.parent.GetComponent<LayoutElement>().minWidth = levelsCleared < 10 ? 160 : 185;
+
 		if (animate)
 		{
 			PunchLevelsClearedText();
+
+			/*if (_maxLevelsFade != null)
+			{
+				StopAllCoroutines();
+
+				_maxLevelsFade.Kill(true);
+
+				_maxLevelsText.color = Color.clear;
+			}
+
+			if (levelsCleared == 1 || levelsCleared % 8 == 0)
+			{
+				yield return new WaitForSeconds(_maxLevelsFadeDelay);
+
+				FadeMaxLevelsText(Color.black, _levelsClearedPunchTime / 2f);
+
+				yield return new WaitForSeconds(_maxLevelsTextStayTime);
+
+				FadeMaxLevelsText(Color.clear, _levelsClearedPunchTime * 2f);
+			}*/
 		}
 
-		//yield return null;
+		yield return null;
 	}
 
 	public void UpdateNextLevelButton(bool toggle)
@@ -269,6 +300,23 @@ public class LevelPanel : MonoBehaviour
 			_levelsClearedText.transform.localScale = Vector3.one;
 
 			_levelsClearedPunch = null;
+		});
+	}
+
+	public void FadeMaxLevelsText(Color color, float time)
+	{
+		if (_maxLevelsFade != null)
+		{
+			_maxLevelsFade.Kill(true);
+
+			_maxLevelsText.color = color == Color.black ? Color.clear : Color.black;
+		}
+
+		_maxLevelsFade = _maxLevelsText.DOFade(color == Color.black ? 1f : 0f, time).SetEase(color == Color.black ? _maxLevelsFadeCurve : _maxLevelsFadeOutCurve).OnComplete(() =>
+		{
+			_maxLevelsText.color = color;
+
+			_maxLevelsFade = null;
 		});
 	}
 

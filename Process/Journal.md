@@ -253,7 +253,7 @@ Next, I want to add more features (maybe only just one more?) to the game so tha
 
 From this reflection on this small handful of mechanics, I also am slowly realizing that, honestly, I think the game is a bit stale. It's not bad or empty or anything, but the core loop isn't making the player "hold on" to the game for a very long time. I'm not sure what the best approach is: accepting that the game offers a very short experience that doesn't need to be expanded, or continue to dig and try to find a way to make the core loop more interesting in itself or a mechanical twist that would make the base experience reach a bit of a peak and hoping that this provides satisfaction and closure to the player?
 
-The reflection on minimalism that I want to materialize here is a big daunting so I'm pushing it back for later. I'll jot down a list of ideas (general "aspects of minimalism" that take form within this game) first to make it possible to jump back in later:
+The reflection on minimalism that I want to materialize here is a bit daunting so I'm pushing it back for later. I'll jot down a list of ideas (general "aspects of minimalism" that take form within this game) first to make it possible to jump back in later:
 - Static, completely and exhaustively visible interface in one screen
 - One interaction mechanic, one objective
 	- (How can we do progression through that?)
