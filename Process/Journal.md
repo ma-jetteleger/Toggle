@@ -340,11 +340,147 @@ A visual indication for the cascading mechanism could also help a lot... This is
 
 I also chose to go with the single-solution mode as the main mode of the game. Even though I really liked the multi-solution approach conceptually, the feedback I received made it clear that it was superior in terms of player experience and flow. I might offer the multi-solution mode as an alternative way to play the game (through a menu option or something similar) as it's still fun and some players might enjoy it.
 
+## 2025-02-12
 
+Let's go back in time a little to address the changes and the thoughts I had while continuing the development of this game while I was too overwhelmed to write them punctually
 
+In the last journal entry before this one, about two months ago, I was mentioning that the game was finished (at least in terms of features to be added) and that very little work was still needed to complete the project. This was both true and false
 
+### 2024-12-09.1
 
+In this project, I'm trying to get away with making as few decisions as possible. Hand-crafting levels would be making a lot of micro-decisions so I've opted to craft a level generation algorihm that handle both the generation of levels and the progression through the mechanics included in the game. This way, all I have to do is to make a "few" macro decisions about how levels should be configured and when/how mechanics should be integrated in those levels. Examples of such macro decisions include:
 
+	- the level's objective configuration should be reachable by clicking a specific amount of squares
+	- levels shouldn't be in a solved state when presented to the player
+	- an extra square should be added to the array every couple of levels to increase difficulty
+	- Wrap around toggles sould be introcued when the player has already beaten a couple of levels to understand the basics of the game
+	- the player should be presented self-targeting squares and simple left/right target schemes before being introduced to multi-arrow target schemes and cascading toggles
+	- cascading toggles should be introduced in isolation
+	- cascading toggles shouldn't be adjacent to each other when first inroduced 
+	- squares with cascading toggles should always be targeted by at least another square
+	
+Implementating, writing and making sure that these macro decisions are respected by the game's systems in a bug-free way is a lot of work. And the system that takes all of these decisions into consideration while generating levels is very complex, requiring a ton of (technical) decisions. However, I still consider this way of working minimalistic since it enables me to make fewer (design) decisions. 
+
+This way, I don't have to decide on each and every level to be included in the game, I also don't have to decide on the initial toggled state of each square, their target scheme, and their relation with the objective of the level. I only have to decide on the rules of the game, not their implementation.
+
+This reflection came to life when realizing that at least half the amount of time working on this game has been focused on working on the level generation/level progression algorihm. A ton of technical work to avoid a ton of design decisions
+
+### 2024-12-09.2
+
+I was giving away too much information with the prediction rectangles that helped predict in which toggled state would be a square if you pressed the currently hovered one. Not only this, but even though it was a "helpful" feature, it added to the stack of this the player had to understand/internalize to complete their mental model of the game.
+
+By changing it to a very austere black dot instead of a colored rectangle, I made it so player still had a hint at knowing which square would be toggled by the other squares, but they still had to "do the work" of understanding the end color of the toggled square
+
+I also acheived two unintended consequences with this change:
+
+- Without the coloration of the rectangles, and with the smaller size of the dot, it's now possible to "stack" those prediction dots, making it possible to support the prediction of of a series of cascading toggles with a stack of dots. Minimalism as a way of making things (like signifiers, in this case) more versatile in an emergent way
+- Gathering feedback on this change revealed something that was already there: there are two very different kinds of player feedback I'm getting every time I playtest this game. The first is feedback according to which the game does not inform the player about what's going on, what to do and what will be the outcomes of their actions. The second is that lack of information makes the game more interesting, that there is a lot of enjoyment and satisfaction from figuring out the mechanisms of the game without much help. 
+
+The dichotomy in the second point is become more and more apparent as I introduce features intended to minimalistically signify possibilities of interactions (affordances, signifiers) and outcome of interactions (feedforward, feedback) in the game and I'm pretty much always getting responses ranging from: "this is helpful, but not enough to understand" to: "this is too helpful and it's taking away the enjoyment of figuring it out by myself"
+
+In choosing to go with cryptic black dots instead of colored rectangles, I'm trying to strike a balance between those two different kinds of engagement with the game
+
+### 2024-12-12
+
+I started adding some animation in the game. Originally, I thought I could get away with having absolutely on movement in the game. It felt very satisfying to have a completely static interface with only instant state changes
+
+It was satisfying for me, as a minimalist designer, but not very satisfying for the players
+
+Many players reported either not seeing some essential visual element, not having their attention pulled enough by it, or not being able to "map" it to the correct game mechanism and/or other connected elements of the game
+
+In order to solve this, I added a "punch" animation to some elements of the UI I think are essential to understand: the clicks counter and the levels cleared counter. Both now "punch" when they are increases or decreases as a consequence of a player action (clicking on a square for the clicks counter and beating a level for the levels cleared counter)
+
+At some point previously, I attempted to create a connection between beating a level and the levels cleared counter by putting a known symbol (a trophy) next to the counter. It proved useful but I quickly removed it when I realized it broke the minimalist intent of non-representation
+
+By connecting/timing the animation of the number to the player action, I'm leverage the (more minimalistic) concept of causality, guiding the player toward establishing a cause and effect relationship between their action and the "punched" visual outcome. Hopefully, this will draw enough attention to these elements and help players map them to the correct mechanism without "real life" symbolic representation
+
+### 2024-12-26
+
+By writing the commit reflection entries, I'll quickly catching on on some patterns. One of these patterns in the yearning for consistency
+
+I recently wrote about the "rules" for level generation I wrote the algorithm to follow. One of these rules is that levels shouldn't come pre-solved
+
+In another recent update, I updated the progression of the game with the intent to guide the player through a smooth level curve, especially for the first couple of levels of the game. This led me to introduce some very particular exception to the first two levels specifically. I wanted the first level to have only one square, and the second to have two
+
+Unfortunately, I originally wrote the level generation algorithm to generate levels with 3 to 9 squares. Having fewer squares broke the algorithm, so I had to write some very specific exceptions for the first two levels. The second level was even more exceptional since I wanted a "two click" solution for it. Following this intent, it was mathematically impossible to have such a level (2 squares, 2 clicks) without presenting it to the player pre-solved. I wrote a couple of exceptions in the code to make sure the player could still solve it by themselves, but basically the level came with the center array already configured to match the objective array
+
+I knew I broke my rule but I figured it was for a good reason: to teach the game through a ever increasing gradual number of clicks. And maybe players wouldn't notice? Unfortunately I received a lot of feedback afterward about players not only noticing but also feeling very weird about being presenting a pre-solved level
+
+I had to back pedal and change the second level's exceptional configuration. I made it have 2 squares, but a one-click solution. I figured I can make exception and compromises on by ideal progression scheme, but not on the principle of consistency in interaction design
+
+### 2025-01-03
+
+When a new player plays for the first time, there is a good chance they'll be very confused about some of the elements they see on screen for the first time. The undo/redo/reset buttons don't show what their specific functions are if you're not familiar with puzzle game, the levels cleared counter is just a number and could mean many different things, and the objective array has frequently been associated with wildly different things, other things than what just "showing the objective of the level"
+
+So I continued making presentational changes to reinforce action/reaction mappings for these elements:
+
+- Hiding things (UI elements) until the specific point in time when it's used. One example is hiding the levels cleared counter until the first level is beaten. I did that to reinforce the mapping between the displayed number and the "action" to beat a level. I also did the same with the history buttons (undo, redo, reset) so that they only appear after the first player "move", again to reinforce the mapping between affordance (the button's function) and the related player action (making a move)
+
+- Squeezing the objective array closer to the center interactive array to try and solidify the relation/mapping between a middle square and its equivalent objective rectangle. I toyed with multiple potential solutions like a connecting line between the two or sticking the objective rectangle directly underneath but both attempts were very visually unapealing. Reducing the distance between the two is a good compromise  
+
+- Adding checks and crosses to hammer down on the mapping between the same elements mentioned above. These "evaluation graphics" will also help in understanding their relation to the objective of the game. In adding these symbols, I'm getting dangerously close to breaking the non-representation minimalistic constraint. But I figured I can get away with using abstract symbolism for binary information (good or bad) as opposed to using images of real world objects to represent complex ideas
+
+- Adding more "punch" animations to put emphasis on related elements. The more I integrate those animation, the more I'm realizing the power of "timing" animations and punches to relate elements to each other and to player action (combined with the power of interactive causality). For example, by making a square from the center array "punch" at the same time as a rectangle from the objective array, these two elements are immediately put in relation to each other and to whatever the player did to cause that effect. I'm even making the new checks and crosses punch with their related square and rectangle to make the most out of this feature.
+
+I'm happy to be working on visual/aesthetic stuff instead of features, it makes me feel like the end of the project is near. I think this is because that, when working on a feature, you're effectively expanding the design space of the game by making decisions, opening up new possibilities and triggering new ideas by uncovering more areas of this creative space. When you're working on visuals, decisions don't lead to an expansion of the design space, making it feel like you're stepping closer to the end of a creative space, as opposed to making steps that always open it up more and more.
+
+### 2025-02-05
+
+I've experimented with animations further. I originally had a very strict intention of only using these "punch" animations since they introduced very minimal movement and they also happened very "instantly", keeping to the intention of only presenting "discrete" state changes, not actual "continuous" movement. The consequence was, however, that everything in the state change (the click, the toggling, the decrementing of the clicks counter, the check/cross evaluation, the possible chained cascading toggles, the possible "beating" of the level, the possible increment of the levels cleared counter) was happening and was represented by a punch all at the same time.
+
+The solution was to introduce delays in the "click" sequence. Even a small delay between the multiple effect of a click makes it so players can focus on each effect separately and can therefore better understand the cause and effect relationship between their actions and the reaction of the game elements.
+
+The introduction of these delays gave me room to experiment with more complex animations. With that available space, I made the arrow indicators move (in the direction of the arrow, toward the square to be toggled) to clarify their role in the toggling mechanism. That changed everything   
+
+With that animation taking center stage after clicking a square, the "targeting of other squares" effect is much clearer and, immediately, I received feedback about there being a lot of redundant information in the game. Information that was redundant, but also making the game more confusing. 
+
+The prediction dots, specifically, had to go away. They were technically present to help the player predict (feedforward) but also understand the targeting effect of clicking a square (feedback). However, playtests revealed two things: the first is that players didn't need them to understand the effect of a click (as feedback) since that information was now present and felt through the arrow animation. The second is that most players not only did not understand their function as feedforward (prediction), but they added visual clutter and made it feel like they were part of another system the player had to grasp. In the words of a playtester, they made the game "not minimalistic enough". Even though these dots were meant to simplify an existing system, they ended up complexifying the game by adding extra unnecessary information for player to put and try and fit in their mental model of the game
+
+The same reflection applied to checks and crosses. As much as I meant for them to be helpful and guide the players to understand an existing system, they ended up making the player have to think harder about how these extra graphics fit their mental model/understanding of the game, scattering the actual grasp they had of the game's systems. They had to go
+
+I extended this reflection on visual clutter to the dichotomy of player types I mentioned in an earlier entry. I had made the decisions to introduce predication graphics and evaluation checks and crosses to try and help players understand the mechanisms making up the game. But it turns out that they not only hindered their building of a mental model for the game, but they also deteriorated the enjoyment of another type of players: the ones that yearned to figure it all out by themselves. By clearing out the clutter, it also had the consequence of me leaning 100% into the minimalist intention of giving away as little information as possible to the player. For their enjoyment of course 
+
+It's interesting how decisions lead to other decisions: adding simple delays in animation -> made room for adding a small amount of extra feedback -> removing redundant information -> reflecting on user engagement ->  reinforcing the main design intention
+
+While playing with the objective array after removing the checks and crosses, I experimented with different configurations, distances but also shapes. I made the objective array squares again (last time they were square was in the first week of development) and it made me reflect on mappings again. I originally made them rectangle so that they "fit" directly under the square. But that came at the cost of having them a different shape. Then, is a "shape-based" mapping between elements better than a "distance-based" or a "position-based" mapping? I don't know if there's a general answer to this but in this specific situation, I feel like both arrays being the same shape (squares) makes for a better mapping between the two elements. They basically feel "more like the same array"
+
+I'm still happy to be working on visuals, even though there's a lot of coupling with technical/gameplay stuff, it's not as overwhelming as making feature-related decisions. For the same reasons as the last entry  
+
+### 2025-02-12
+
+Back to the present. Back to saying I'm done with this project while still maintaining a list of things I'd like to include in it in my mind. These things are:
+
+- Colors
+- Sounds
+- Communicating the "intended length" of the game
+- Maybe something about saving the player's progress to pick up the game again later through some menus. (This is the only thing missing that's stopping me from considering this like a "real" game... Does it have to be though?)
+
+There's difference now, though. The difference is that I'm comfortable with keeping these things half implemented and in the back of my mind while still considering and calling the game done.
+
+In fact, I've already started experimenting with changing the color scheme of the game and with different ways to communicate the relative progress of the player/the length of the game. These experiments are on standby since I want to start reflecting on the design of the game and on minimalism. Even though the todo list isn't all crossed out, I feel like the game is in a stable enough, rich enough, understandable enough, satisfying enough and compelling enough state to use it as a showcase for an investigation into, through and about minimalism
+
+I was recently asked what my point was, by making this game. It's somehow very easy for me to answer this question since I have a million different ideas and questions and intuitions and vectors of curiosity about all things games and minimalism. However, it's hard to give a definitive answer. I've been making this game to:
+
+- find out what is a minimalist game, what is minimalist game design
+- find out what constitudes a minimalist game design process
+- find out how far I can go into minimalism while making a game
+- find out how much minimalism is too much
+- prove that minimalist games can be interesting
+- prove that minimalist games can be fun
+- prove that minimalist games can exist
+- make a minimalist game so we can talk about it
+- materialize an idea that spawned in by head about an interactive system
+- gamify an interactive system 
+
+But, weirdly enough, even though I got really close to fulfilling these "reasons" to make a game (and even actually fulfilling some of theme), I never considered my mission done until recently. I think there's a specific intention I had that, when fulfilled, made it really easy to call the project done. It also made it easier to have a definitive reason for making that game, that I can now communicate with the people that ask me this question. In reality, my goal was to:
+
+- Make a minimalistic game that's compelling and functional enough that players want to experiment with its interface and rules so we can have a conversation about its mechanics, its systems and the process of designing it
+
+It's not a pretty sentence, but it's a sentence
+
+I got hit by surprise when I fulfilled this goal without having it fully formulated and, by the same account, finally feeling some closure even though all features are not implemented yet.
+
+So the game isn't wrapped up in a neat little box with pretty ribbons on top yet, but its (interactive) design is done. I'm somehow confident that the last few minor things that keep existing in the todo list will be quickly taken care of once I have a clear idea for their implementation and once I have the energy to make them happen (without them being in the way of writing the follow up thesis). That they won't bubble up into another feature or idea. That they won't expand the design space of the game and trigger me into wanting to investigate the newly created nooks and crevasses of that space once I integrate them in the game. Or will they?
 
 
 
