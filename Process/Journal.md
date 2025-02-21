@@ -453,7 +453,7 @@ Back to the present. Back to saying I'm done with this project while still maint
 - Colors
 - Sounds
 - Communicating the "intended length" of the game
-- Maybe something about saving the player's progress to pick up the game again later through some menus. (This is the only thing missing that's stopping me from considering this like a "real" game... Does it have to be though?)
+- Maybe something about saving the player's progress to pick up the game again later through some menus. (This is the only thing missing that's stopping me from considering this like a "real" game... Does it have to be, though?)
 
 There's difference now, though. The difference is that I'm comfortable with keeping these things half implemented and in the back of my mind while still considering and calling the game done.
 
@@ -480,7 +480,74 @@ It's not a pretty sentence, but it's a sentence
 
 I got hit by surprise when I fulfilled this goal without having it fully formulated and, by the same account, finally feeling some closure even though all features are not implemented yet.
 
-So the game isn't wrapped up in a neat little box with pretty ribbons on top yet, but its (interactive) design is done. I'm somehow confident that the last few minor things that keep existing in the todo list will be quickly taken care of once I have a clear idea for their implementation and once I have the energy to make them happen (without them being in the way of writing the follow up thesis). That they won't bubble up into another feature or idea. That they won't expand the design space of the game and trigger me into wanting to investigate the newly created nooks and crevasses of that space once I integrate them in the game. Or will they?
+So the game isn't wrapped up in a neat little box with pretty ribbons on top yet, but its (interactive) design is done. I'm somehow confident that the last few minor things that keep existing in the todo list will be quickly taken care of once I have a clear idea for their implementation and once I have the energy to make them happen (without them being in the way of writing the follow up thesis). I'm somehow confident that they won't bubble up into another feature or idea. That they won't expand the design space of the game and trigger me into wanting to investigate the newly created nooks and crevasses of that space once I integrate them in the game. Or will they?
 
+## 2025-02-21
 
+Looking back through this journal, I am reminded of an intention I had several times along the process of designing this game: reflection on minimalism as a whole. That reflection got pushed back a few times for multiple reasons, mainly because it was daunting and it seemed to get in the way of actually designing the game. Well now that the game is done, I have no excuse to push it back further
+
+Here's a mishmash of my final thoughts on this project and how my vision toward minimalism and toward my own act of making games have evolved through this project
+
+### Revisiting the minimalist intention
+
+On october 18th, after fixing a bug in the level generation algorithm, I reflected on an idea I had to generate every single possible level out of the different features, mechanics and level configuration parameters. My intention was to go through a thorough, algortihmically exhaustive exploration of the design space of the possible levels of the game. 
+
+The reason I got tempted into doing that is because, to me, minimalism is about the exhaustiveness of the exploration of a possibility space. It's about setting up and maintaining a set of constraints on a design space so it's possible to explore it fully, in every and all its possibilities
+
+Algorithmically generated levels was a constraint I set up and decided to maintain for that project a while ago. However, there were also others very important constraints that I decided to maintain in order to maintain the minimalistic intention for the game. On november 1st, I listed some of these constraints, namely:
+
+- Static, completely and exhaustively visible interface in one screen
+- One interactive object, one interaction mechanic, one objective
+- No movement
+- Discreet positioning of game objects
+- Algorithmically generated levels
+- No text 
+- No representation of outside, real world, "objects"
+
+Intuitively, I figured that this small list of constraints would reign in the size of the possibility space of the design of this game while still keeping it rich/interesting enough
+
+Keeping that list of contraints in mind also helped with staying in the right mindset to be able to call the game done. With this list of minimalistic constraints basically managing what is possible to include/work on in the game, it's easy(er) to see and feel when your game is done. Other/extra features will (more) easily feel like distinct "other games"
+
+### Constraints and possibility spaces
+
+Each of these constraint brought in a challenge of its own for the design of the game:
+
+- A static, wholy complete interface introduced a limit on the size of levels
+- A singular mechanic made made it challenging to make the game dynamic and interesting through the progression of its levels
+- No movement made it really hard to communicate affordances through limited feedback and feedforward
+- Same with no text and no outside object representation
+
+Algorithmically generated levels was definitely the one that required the most, mainly technical, work. Mostly because I had to design rules for how mechanics and features were introduced along and through increasing levels of difficulty. This is what took up so much of my time while developping this game
+
+I did manage to make it work though, as this constraint was very important to me since, by maintaining it, I satisfied the most important aspect of a minimalist design project: the exaustiveness of the exploration of its design space
+
+By having an algortihm "design" levels for me according to a complex set of rules, as opposed to crafting levels manually one by one, I'm basically allowing the game to virtually explore its level design space for me.
+
+The issue with minimalism, however, is that possibility spaces can be different for different people. In other words, a game can be minimalistic from the designer's point of view, and it can be minimalistic from the player's point of view. Both these points of view have their own possibility spaces, spawning from their own sets of constraints.
+
+From the design POV, I'm finding that constraints lead up to a satisfying and interesting (creative) exploration of a design space. However, is that equally true for the players? Do players enjoy the exhaustiveness of a highly constrained play space? Can an exhaustive and highly constrained play space be compelling enough to call for play? For how long? Does the length of time a game is interacted/played with truly matter? 
+
+Also, players learn about and interpret constraints throughout their experience of the game, maintaining a mental model of the game's systems and constraints that might (and will) be incomplete and imperfect, but will also evolve through time. How, then, can we design a game that keeps a set of *evolving, interpreted* constraints to a minimum? How can we keep that evolution and interpretation to a minimum? 
+
+### Abstraction as a tool
+
+A general hypothetical theoretical direction to follow to maybe start answering these questions resides in the concept of abstraction. All games are basically born from layering levels of abstraction onto a real-world activity, operation, or action. Game design is about enabling interaction through these layers of abstraction by introducing interesting and playful affordances, signifiers and feedback. I feel like minimalist game design is simply an extention of that concept, brought to its extreme. Layering extra levels of abstraction to the point of the designed interaction being completely divorced from an "outside" relation or association to a "real world" activity or operation
+
+It's either: layer so many levels of abstraction on top of a "real world" inspired action so that action completely disappears from view. And then work to make the resulting interaction playful and fun
+
+Or: craft a system of interaction that, from the ground up, has no possibility of connection to a real work activity or system
+
+Perhaps, then, with a truly minimalist game system, truly and completely abstracted from the real world, we can introduce a set of constraints so simple that it can't get interpreted or evolved out of its minimalism possibility space
+
+### Designing vs. playing a game
+
+The tension between the design possibility space (design space) vs. the play possibilitiy space (play space) might also be the reason behind this new dichotomy: I often say that I enjoy designing/creating the games I make much more than actually playing them. This surprises a lot of people but I think it follows very logically from this reflection: I enjoy the thorough exploration of an  possibility space and, by *designing* a game, I am objectively and entirely exploring its systems. *Playing* the game is another, different way to explore it and its systems, but it bores me because that's not the way I choose to explore it. Me designing the game is basically preparing the exploration of its systems for and by other people: players. 
+
+Players don't have access to the objective, abstract, conceptual systems behind the mechanical functionings of the game. I write code and rules so that players have a front facing, playful and approachable access to the game's system, so we can both interact with the game (with my ideas) from different POVs. But the POV I'm preparing for the player is usually bound to bore (or even annoy) me, as it's represented by an imperfect, slower interface filled with possibilities for errors and misinterpretations 
+
+This also explains why I often try and gather feedback about the game by showing a screenshot of its interface, as opposed to having people actually play it. I think I want people to get the game (or at least part of the game, the main idea, the system I have in mind, or at least the part of the system that's represented) through a quick look at its main interface. *Playing the game*, to me, sometimes feel like extra work that's unnecessary to get the system(s) that's behind it
+
+This also might explain why I'm growing into a tendency to make games that are simply compeling and functional enough to convey the idea behind an interactive system, as opposed to making "fun"/robust/replayable games. I just want people to get the idea behind this system. 
+
+Unfortunately, in order to acheive that feeling of "getting the idea" behind a game, it's actually necessary to have a somewhat robust, fun enough, motivating enough, bug free software to play with. Also, I do feel that, beyond getting the idea behind the game, seeing people continue playing my game is extremely satisfying and gratifying. So this does motivate me to create interfaces that go beyond being compeling, but also are fun and rich enough to keep the attention of players for a relatvely extended length of time
 
