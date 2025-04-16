@@ -211,13 +211,16 @@ public class Level : MonoBehaviour
 
 				if (Input.GetKeyDown(KeyCode.Return) || (mouseIsInQuadrant && Input.GetKeyDown(KeyCode.N)))
 				{
-					_playedLevels.Enqueue(_levelCode);
-
-					if (_playedLevels.Count > _playedLevelQueueSize)
+					if(_unclickableToggledSquares)
 					{
-						_playedLevels.Dequeue();
-					}
+						_playedLevels.Enqueue(_levelCode);
 
+						if (_playedLevels.Count > _playedLevelQueueSize)
+						{
+							_playedLevels.Dequeue();
+						}
+					}
+					
 					GenerateLevel();
 
 					return;
@@ -479,6 +482,11 @@ public class Level : MonoBehaviour
 			}
 
 			Solutions.Clear();
+		}
+
+		if (_unclickableToggledSquares)
+		{
+			_levelPanel.UpdateInvalidLevelX(false);
 		}
 
 		var splitLevelCode = levelCode != null ? levelCode.Split(';') : null;
@@ -1169,6 +1177,16 @@ public class Level : MonoBehaviour
 		{
 			Debug.Log("Couldn't generate a valid solution sequence, loading a prevalidated level from file");
 
+			if (_unclickableToggledSquares)
+			{
+				Debug.Log($"Loading prevalidated levels from file isn't supported for levels with unclickable toggled squares." +
+					$"Press D + Enter to try and generate a new random level");
+
+				_levelPanel.UpdateInvalidLevelX(true);
+
+				return;
+			}
+
 			var pregeneratedLevel = GetValidPregeneratedLevel();
 
 			if (pregeneratedLevel != null)
@@ -1228,25 +1246,47 @@ public class Level : MonoBehaviour
 			Debug.Log($"Couldn't force {(_solutionType == SolutionType.SingleSolution ? "a single solution" : "multiple solutions")}" +
 				$" for a randomly generated level, loading a prevalidated level from file");
 
-			var pregeneratedLevel = GetValidPregeneratedLevel();
-
-			if(pregeneratedLevel != null)
+			/*if(_unclickableToggledSquares)
 			{
-				_levelCode = pregeneratedLevel;
+				Debug.Log($"Loading prevalidated levels from file isn't supported for levels with unclickable toggled squares." +
+					$"Press D + Enter to try and generate a new random level");
 
-				OverwriteLevel(_levelCode);
-
-				//_levelPanel.SetupSolutionBoxes(Solutions);
+				_levelPanel.UpdateInvalidLevelX(true);
 
 				return;
-			}
+			}*/
+
+			if (_unclickableToggledSquares)
+			{
+				Debug.Log($"Loading prevalidated levels from file isn't supported for levels with unclickable toggled squares." +
+					$"settling for a random level");
 
 #if UNITY_EDITOR
-			saveLevelToFile = false;
+				saveLevelToFile = false;
+#endif
+			}
+			else
+			{
+				var pregeneratedLevel = GetValidPregeneratedLevel();
+
+				if (pregeneratedLevel != null)
+				{
+					_levelCode = pregeneratedLevel;
+
+					OverwriteLevel(_levelCode);
+
+					//_levelPanel.SetupSolutionBoxes(Solutions);
+
+					return;
+				}
+
+#if UNITY_EDITOR
+				saveLevelToFile = false;
 #endif
 
-			Debug.Log($"Couldn't find a valid unplayed pregenerated level, settling for a random " +
-				$"{(_solutionType == SolutionType.SingleSolution ? "multi-solution" : "single-solution")} level");
+				Debug.Log($"Couldn't find a valid unplayed pregenerated level, settling for a random " +
+					$"{(_solutionType == SolutionType.SingleSolution ? "multi-solution" : "single-solution")} level");
+			}
 		}
 
 		_levelCode = GetCurrentLevelCode();
@@ -1929,11 +1969,14 @@ public class Level : MonoBehaviour
 
 					_levelPanel.UpdateLevelsClearedText(_progressionIndex, true/*, true*/);
 
-					_playedLevels.Enqueue(_levelCode);
-
-					if (_playedLevels.Count > _playedLevelQueueSize)
+					if(_unclickableToggledSquares)
 					{
-						_playedLevels.Dequeue();
+						_playedLevels.Enqueue(_levelCode);
+
+						if (_playedLevels.Count > _playedLevelQueueSize)
+						{
+							_playedLevels.Dequeue();
+						}
 					}
 				}
 			}

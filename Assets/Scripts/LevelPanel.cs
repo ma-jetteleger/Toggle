@@ -21,6 +21,7 @@ public class LevelPanel : MonoBehaviour
 	[SerializeField] private TextMeshProUGUI _levelsClearedText = null;
 	[SerializeField] private TextMeshProUGUI _maxLevelsText = null;
 	[SerializeField] private TextMeshProUGUI _debugSolutionText = null;
+	[SerializeField] private GameObject _invalidLevelX = null;
 
 	// References
 	[SerializeField] private Level _level = null;
@@ -97,6 +98,13 @@ public class LevelPanel : MonoBehaviour
 		//
 
 		StartCoroutine(PositionAfterLayout());
+	}
+
+	public void UpdateInvalidLevelX(bool active)
+	{
+		_invalidLevelX.SetActive(active);
+
+		UpdateNextLevelButton(true);
 	}
 
 	IEnumerator PositionAfterLayout()
