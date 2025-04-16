@@ -1,0 +1,354 @@
+Introduction
+
+As video games have become a significant cultural and artistic medium, the exploration of diverse design paradigms has emerged as an essential area of study. Among these, minimalist game design remains underexplored. 
+
+In a market oversaturated with offers for the maximum number of features, maximum complexity and maximum play time, minimalist games offer an alternative approach for game designers seeking unique connections with players. Minimalist games like Tetris (Pajitnov, 1988), Limbo (Playdead, 2010), and Superhot (Superhot Team, 2016) have demonstrated the power of minimalism in game design. Despite their impact, existing literature on their minimalist game design fails to capture the breadth of design possibilities within this approach.
+
+Minimalist game design has been at the core of my creative practice, evolving from an intuitive exploration into a deliberate design philosophy. With over seven years of experience creating experimental minimalist games, I have embraced minimalism not just as an aesthetic choice but as a personal approach to game development. By prioritizing rapid prototyping and small-scale projects over optimization and technical complexity, I have discovered that reducing scope leads to great creative satisfaction and rich design spaces.
+
+Minimalism has become both a tool and a guiding principle in my work. The games I design are intentionally small, short, and mechanically straightforward, yet they provide deep opportunities for exploration and iteration. This process has shaped my perspective on game design, reinforcing the value of constraint-driven creativity.
+
+Now, I want to formalize my understanding of minimalist game design by critically examining the decision-making processes involved. Through this research, I aim to explore how minimalist design spaces shape creative choices, how minimalist constraints influence design outcomes, and how minimalist game design can act as a meaningful and intentional approach in the broader field of game development.
+
+In other words, this research aims to explore and experiment with the minimalist game design process by applying both established and emergent minimalist design constraints to iterative game prototyping. By analyzing the impact of these constraints on design decisions, I intend to expand the understanding of minimalist game design. By examining how different constraints influence iterative game design, this study will uncover new possibilities for game design spaces and contribute to the academic discourse on game design theory.
+
+To guide in my investigation of this topic, I ask: How do minimalist game design constraints shape decision-making in the iterative game development process? A secondary question follows: What new constraints can emerge during the development of a minimalist game to help guide its design through iteration?
+
+
+To address these questions, this study builds on existing research in game design and interaction design, while also drawing from Minimalism as an art form. By doing so, it seeks to establish concrete constraints and uncover new creative possibilities within the minimalist game design space.
+
+The first step in this process is to review existing literature on minimalist game design and to identify the constraints that have already been defined in order to shape its design space. Next, I will explore possible connections between minimalist design principles and fundamental concepts in game design, interaction design, and Minimalism as an art movement. This will allow for the identification of additional criteria, constraints, and areas of intervention to clarify and expand on what it means to design a game with minimalism.
+
+
+
+
+
+
+
+
+
+Minimalist game design
+
+Existing literature on minimalist game design is scarce. In 2011, Nealen et al. defines it as reducing a game to its most essential elements while maintaining rich play. They outline ways to achieve this, such as limiting rules, restricting decision spaces, using abstract visuals and audio, focusing on a single core mechanic, and leveraging procedural generation as a means of content creation.
+
+According to them, a key aspect of minimalist game design is the use of design constraints, often self-imposed to explore new play possibilities. For instance, a "1-button constraint" limits interaction but challenges designers to create engaging experiences within that narrow space (Nealen et al., 2011).
+
+They also mention discretization as another key principle, dividing controls and elements into distinct states rather than continuous ones. Fully discrete games use stepwise interactions, like turn-based mechanics, whereas continuous games allow fluid movement (Nealen et al., 2011). The level of discretization affects minimalism by simplifying player interactions to different degrees .
+
+Nealen et al. also discuss player interaction at different levels, from macro-mechanics (high-level, human-recognizable activities) to micro-mechanics (their building blocks). Minimalist games often limit themselves to a single macro-mechanic composed of a few micro-mechanics (Nealen et al., 2011).
+
+Before minimalist game design had been examined specifically, Jesper Juul examined abstraction as a way to shape game mechanics. In a 2007 paper, he writes that abstraction simplifies real-world complexities into a more focused game environment. He says that by removing elements of reality, designers narrow player actions, emphasizing the core mechanics that define gameplay. For example, restricting movement to two dimensions instead of allowing complete freedom of motion in three dimensions simplifies the design space of that game (Juul, 2007). This demonstrates how abstraction can help break down complex actions into more minimal game mechanics.
+
+Abstraction also applies to audiovisual design, where minimalist games favor stylized visuals, independent from visual references in the real world (Nealen et al., 2011).
+
+Minimalist games often omit explicit narratives, relying on systems, mechanics, and themes to convey meaning (Nealen et al., 2011). Myers published a paper in 2009 in which he discusses how games model their worlds, with actions objects ranging from realistic to entirely abstract. He argues that excessive realism risks turning a game into a simulation, moving too far from its essential qualities, namely rules, goals, opposition, and selective representation (Myers, 2009). From this, we can see that games inherently tend towards abstraction to some degrees, with minimalist games pushing this further by minimizing real-world representation.
+
+This overview of the very sparse literature on minimalist game design allows us to draw some quick preliminary conclusions. Minimalist game design is characterized by the deliberate imposition of constraints on the design space of a game, including:
+
+Narrow decision spaces with small rulesets restricting player interactions;
+A focus on one or very few macro-mechanics supported by limited micro-mechanics;
+The use of procedural generation;
+High degrees of discretization;
+Strong abstraction in both player actions and audiovisual design;
+Avoidance of real-world replication and simulation;
+Absence of explicit narrative.
+
+While existing research provides abstract guidelines and constraints, it does not explore their impact on design decisions or how constraints evolve during development. It also lacks insights on the philosophy behind minimalist game creation or how foundational design principles can guide decision-making in minimalist game development.
+
+
+Games
+
+In order to fully explore the components that make up the design constraints of minimalist games, it is necessary to establish a foundational understanding of what constitutes a game. In his 2020 book, Zubek highlights the inherently ambiguous nature of defining games, saying that game design is marked by a wide range of definitions, with no universal agreement. He notes that game scholars have tried to pinpoint the essence of games, but perspectives vary. For instance, Crawford defines games as “conflicts in which players interact to foil each other’s goals” (Crawford, 2003), while Salen and Zimmerman describe them as “a system in which players engage in an artificial conflict, defined by rules, that results in a quantifiable outcome”. (Salen and Zimmerman, 2004)
+
+This lack of agreement makes it particularly important to examine their common traits, in order to adequately frame minimalist game design within a broader theoretical context. To understand how minimalism interacts with game design, we must first clarify what games are and what fundamental characteristics they share. By doing so, we can better articulate the constraints and opportunities that arise when designing games with minimalism in mind.
+
+Common traits
+
+Interactivity is a key feature of games. In 2015, Upton wrote, “To play is to engage in a dialogue, information flows back and forth between player and game” (Upton, 2015). According to him, this interaction forms a continuous feedback loop, players act, the game responds, and new information shapes their next move. However, Upton argues that interaction alone isn’t enough and that a game must provide meaningful, engaging experiences that resonate with players.
+
+Despite varied definitions, some traits consistently appear in games. These include obstacles (arbitrary restrictions that challenge progress) and affordances, which offer opportunities for meaningful actions (Upton, 2015). Games also balance knowledge and uncertainty, typically lack real-life consequences, and often incorporate pretend-play (Zubek, 2020). Zubek also says that they frequently feature competition, clear goals, and observable outcomes.
+
+Play is another central concept in game design and has been studied extensively since Huizinga’s 1938 research. He defines it as “a voluntary activity within fixed limits of time and place, governed by freely accepted but binding rules, pursued for its own sake, and accompanied by tension, joy, and a sense of being distinct from ordinary life” (Huizinga, 1938). More recently, Upton described play as a process rather than a static state, involving mental and physical movement and characterized by freedom. He argues that while rules provide structure, they also allow players to explore, experiment, and express themselves.
+
+Structure
+
+Zubek suggests that games create opportunities for play through their structure, conceptualized as a model encompassing game pieces, rules, mechanics, gameplay, and player experience.
+
+According to him, at the core of any game are its game pieces, the "nouns" with which players interact. These can be physical objects like cards or tokens, abstract concepts like a "hand" of cards, or virtual elements in digital games (Zubek, 2020). Rules define how players interact with these pieces, acting as the "verbs" that govern what actions are allowed, such as shuffling, dealing, or placing a be (Zubek, 2020)t. They also determine how the game transitions between states and establish conditions for winning or losing (Zubek, 2020).
+
+Mechanics emerge from the combination of game pieces and rules, forming the fundamental actions players perform (Zubek, 2020). Zubeks mentions examples that include drawing a card, moving a piece, or attacking an enemy. Upton expands on this idea, noting that mechanics can be rigid or flexible depending on the game. For example, sports have strict physical constraints and referees enforcing rules, whereas children's play allows for fluid, adaptable rule sets (Upton, 2015).
+
+Gameplay results from the interaction between players, mechanics, and the game environment (Zubek, 2020). According to Zubek, It includes decisions, strategies, and actions that unfold over time. The core unit of gameplay is the gameplay loop, a repeated cycle of player activities (Zubek, 2020). He also says that, beyond loops, games often develop larger structures as players engage with them. In chess, for example, the primary mechanics involve moving pieces, but deeper strategies like "forking" or "pinning" emerge from understanding the game's deeper layers (Zubek, 2020).
+
+Mechanics can also be assembled into game systems, which combine multiple mechanics into broader activities like combat, exploration, or crafting (Zubek, 2020). Zubek says that systems represent another high-level abstraction of a game's setting and interactivity and create layers of decision-making, from short-term actions within a core gameplay loop to long-term strategic planning. The core loop is the smallest meaningful cycle of actions and decisions that sustain player engagement, providing a reason to keep playing (Zubek, 2020).
+
+The foundational principles outlined by Zubek and Upton can be applied directly to minimalist game design. Minimalist games enforce a constrained rule set that fosters emergent play, aligning with Upton’s idea that meaningful play comes from structured yet flexible interactions. Their reliance on a single macro-mechanic supported by few micro-mechanics aligns with Zubek’s core gameplay loop, where engagement resides in a tightly defined set of interactions.
+
+As a result, the larger systems in minimalist games must remain small in scope. Minimalist designers must carefully manage system expansion to maintain a limited decision space and ensure the game's mechanics remain minimal yet meaningful.
+
+Fantasy and fiction
+
+Zubek highlights the role of fiction, story, and fantasy in shaping player experience, providing context, motivation, and engagement.
+
+According to him, fiction establishes a game's thematic vision and setting, explaining the player’s role and objectives. This can range from detailed narratives to broad thematic backdrops, while some abstract games may forgo fiction entirely (Zubek, 2020). He adds that fantasy refers to the identity players adopt in the game world, allowing them to experience roles like ruling an empire or exploring vast landscapes. Similar mechanics can feel different depending on the fantasy they support (Zubek, 2020).
+
+Game stories can be delivered explicitly through cutscenes or character interactions, or implicitly through environmental details like sounds and visual cues (Zubek, 2020). When fiction and gameplay align, they reinforce each other (Zubek, 2020). However, a mismatch between the two can lead to ludonarrative dissonance, a concept introduced by Hocking in 2007, where story and mechanics contradict each other. 
+
+While fiction can be excluded entirely from minimalist games, designers should recognize that themes and stories can enhance gameplay. The absence of these elements will undoubtedly influence how gameplay features are introduced by designers of minimalist games and how abstract affordances are utilized to shape player interactions.
+
+Constraints
+
+Upton explains that players are typically unaware of a game's underlying rules and structures. When making decisions, they interact with the system without fully perceiving the loops and mechanics guiding their choices (Upton, 2015).
+
+He adds that constraints shape the player’s experience by defining what actions are possible and that these constraints shift as the game progresses. Upton distinguishes between external constraints, imposed by forces like referees, physics, or game code, and internal constraints, which players impose on themselves based on their understanding of the game. For example, a player avoids running into a wall because they internally assume it will block their path, even before testing it (Upton, 2015).
+
+Learning a game involves internalizing its external constraints (Upton, 2015). In games where rules are not explicitly stated, players experiment and gradually build an internal model of how the game works (Upton, 2015). According to Upton, however, players also develop constraints from outside sources. They apply real-world expectations, fictional contexts, and past gaming experiences to new situations, shaping how they interact with the game (Upton, 2015).
+
+Since players primarily operate within their own internal set of constraints, minimalist designers should focus on limiting inferred constraints rather than simply reducing external ones. To keep this set minimal, designers must also consider how real-world representations and connections to other games may unintentionally expand a player’s internal model, aligning with the minimalist principle of non-representational design.
+
+State space
+
+Zubek suggests visualizing games as a form of machine, a dynamic system of rules and interactions that operate according to their own logic but respond to player inputs.
+
+He says that games are stateful systems, meaning they possess an internal state, a snapshot of all game pieces and their properties at a specific moment. Player actions cause transitions between different game states, shaping the game’s trajectory over time (Zubek, 2020). The set of all possible game states is called the state space (Zubek, 2020).
+
+The action space of a game is the set of all actions available to the player from a given state, which can fluctuate based on the game's progress and player choices (Zubek, 2020). Upton refers to these as horizons of action, with similar states tending to have similar action possibilities (Upton, 2015). The perceived action space, or horizon of intent, is what a player believes they can do at a given time, influenced by their understanding of the game, their strategies, and their internalized constraints (Upton, 2015). According to Upton, this perception may differ from the actual action space, helping players focus on a more manageable set of possible actions.
+
+Zubek distinguishes between mechanically distinct choices, which lead to different state transitions, and illusory choices, which may appear different but ultimately result in the same state (Zubek, 2020).
+
+The state space metaphor is helpful for minimalist game design as it models the evolving complexity of a game. By tracking the state and action spaces, designers can control the game’s expansion to avoid unnecessary complexity.
+
+The idea of perceived action space serves as a reminder that the player's perceived complexity of the game may differ from its theoretical action set, guiding designers to focus on essential choices. Finally, the concept of illusory actions aids minimalist designers in cutting down on unnecessary mechanics, eliminating actions that add complexity without meaningful interaction.
+
+Agency
+
+In games, agency refers to the player’s ability to act intentionally, set goals, and understand how their actions influence the outcomes of the game (Zubek, 2020).
+
+Upton highlights that the size of the perceived action space is crucial for fostering agency. Too few choices can feel restrictive and lead to boredom, while too many can cause confusion (Upton, 2015). He also says that variety is key to maintaining agency. If the available actions remain static, players may quickly exhaust the set of interesting choices (Upton, 2015). Games can address this by introducing new mechanics, challenges, or environments to refresh the player's interest (Upton, 2015).
+
+According to Upton, for a choice to feel meaningful, it must have clear consequences. Games need to provide feedback to help players understand these outcomes (Upton, 2015). Otherwise, the player's actions may seem pointless (Upton, 2015).
+
+Upton also mentions the importance of predictability. It’s essential for players to feel in control, but too much predictability can make the game feel boring (Upton, 2015). Anticipatory play, where players project future outcomes based on their decisions, is critical for strategic thinking (Upton, 2015). Zubek expands on this by introducing uncertainty, which arises from hidden information, chance, or complex choices. This uncertainty keeps players engaged, as the outcomes are not fully predictable (Zubek, 2020).
+
+There is tension between minimalism and agency. Minimalist constraints push for fewer mechanics and player choices, but to maintain agency, the game must layer and sequence mechanics to keep choices meaningful. By leaning toward either side of this dichotomy, minimalist designers can explore this tension during the development of their games.
+
+Predictability and uncertainty can help deliver agency without adding excessive mechanics. These concepts, alongside clear goals and feedback, can enrich minimalist designs, enhancing the impact of existing mechanics while avoiding unnecessary complexity in player actions.
+
+Motivation
+
+Zubek states that while players engage with games primarily for enjoyment, the concept of "fun" alone does not fully explain the range of player motivations (Zubek, 2020).
+
+According to him, one key motivator is mastery. Upton defines mastery as the pleasure derived from correctly anticipating and executing actions within a game's evolving state. Most games are designed with an increasing difficulty curve, aligning with the player’s growing skill (Upton, 2015). At times, players experience frustration when their understanding of the game diverges from reality, but these moments provide opportunities for learning and growth (Upton, 2015).
+
+In a 2004 publication, Koster wrote that a significant part of enjoyment in games comes from learning. To remain engaging, games must offer continuous opportunities for learning and experimentation in a low-risk environment (Koster, 2004). However, Upton notes that learning is not the only source of enjoyment. Players also find satisfaction in applying familiar knowledge and performing automatic actions within a well-understood system (Upton, 2015).
+
+This presents another tension in minimalist game design. With their limited mechanics and tight systems, minimalist games have fewer ways to sustain the feeling of mastery over time. Instead of expecting infinite play, minimalist games might be best designed with a smaller scope from the outset.
+
+That said, minimalist games can still provide meaningful interactions. Rather than continuously introducing new mechanics to challenge players, they can focus on encouraging players to deeply explore and experiment with the game’s core systems, fostering mastery through discovery and experimentation rather than accumulation.
+
+The game design process
+
+Zubek outlines the game design process, emphasizing that while designers may envision a specific player experience, they cannot directly create it. Instead, they shape the game’s fundamental elements (rules, pieces, available actions, and their mechanical outcomes) to guide players toward that experience (Zubek, 2020).
+
+He describes two primary approaches to game design. The top-down approach begins with a clear vision of the desired player experience (Zubek, 2020). In this approach, designers first identify the kind of gameplay that will evoke this experience and then determine the mechanics needed to support it (Zubek, 2020).
+
+The bottom-up approach starts with the smallest possible game element and builds upward, adding complexity gradually (Zubek, 2020). Following this method, designers begin with a micro loop, a simple interaction that forms the foundation of gameplay (Zubek, 2020). As development progresses, additional layers and systems are introduced to expand and refine the experience (Zubek, 2020).
+
+These approaches provide useful frameworks for minimalist game design. A top-down method allows designers to quickly distill an intended experience into a small set of abstracted mechanics. Meanwhile, a bottom-up approach can preserve abstraction by iterating only a few times on the micro loop, ensuring that complexity remains minimal while still offering engaging gameplay.
+
+
+Interaction
+
+Having established a foundational understanding of games and their defining characteristics, we can now focus on the element most crucial to minimalist game design: interaction. Minimalist games reduce gameplay to its most essential form, making interaction with rules and pieces the central experience. Understanding interaction at a fundamental level can help us see how minimalist constraints shape decision-making in minimalist game design.
+
+We have already drawn connections between minimalist game design and core game design principles. Now, by delving into the broader literature on interaction itself, we can further refine these connections and uncover new insights that will inform the development of minimalist games. Examining works that explore the nature of interaction will allow us to identify key principles that align with minimalist constraints for games and inspire new methods for guiding their design and development.
+
+Fundamental concepts
+
+In the 2013 edition of his 1988 book, Norman states that effective interaction design requires users to understand how to interact with things. This involves three key principles: discoverability (users identifying possible actions), understanding (users comprehending a product’s meaning, functions, and controls), and usability (users recognizing what is happening with a device and what has just occurred) (Norman, 2013). According to Norman, achieving these principles requires interactable objects to communicate effectively through affordances, signifiers, mappings, constraints, feedback, and conceptual models.
+
+Affordances describe the potential actions an object enables based on its properties and the user’s capabilities (Norman, 2013). Norman states that affordances exist regardless of their visibility. He says that an object might have certain affordances even if they are not immediately apparent. Signifiers, on the other hand, are perceivable indicators that communicate appropriate behavior, such as marks or sounds (Norman, 2013). He writes that while affordances exist independently, signifiers make them identifiable. Some affordances naturally include signifiers, but others require designers to add them for clarity (Norman, 2013).
+
+According to Norman, mappings describe the relationship between controls and the parts of a device being controlled. Natural mappings, which respect spatial correspondence, temporal contiguity, and cultural conventions, are the most effective (Norman, 2013). Norman connects the concept of mappings to gestalt psychology, which states that people naturally see organized patterns in groups of objects. For example, controls that are grouped together appear related, and controls close to the controlled item enhance usability (Norman, 2013).
+
+He adds that constraints guide user actions by limiting a device’s function. Norman identifies four types: physical constraints (material limitations, such as a large peg not fitting into a small hole), semantic constraints (context-based limitations, such as a motorcycle rider needing to face forward), cultural constraints (norms and conventions, like walking on a specific side of a sidewalk), and logical constraints (deductive reasoning, such as needing the same number of screws to reassemble an object). 
+
+Feedback provides information about an action’s results, helping users understand a system’s state, while feedforward informs users of potential outcomes before execution, assisting in decision-making (Norman, 2013).
+
+Conceptual models represent simplified understandings of how a system works, aiding users in predicting the resulting behavior of interacting with that system (Norman, 2013). Norman says these models stem from sources like manuals, shared knowledge, and a device’s perceived structure. According to him, multiple conceptual models can coexist, such as those of an average user, a technician, and a designer. By integrating affordances, signifiers, mappings, constraints, feedback, and feedforward, interaction designers can create intuitive products that build useful conceptual models (Norman, 2013).
+
+These fundamental concepts connect with minimalist game design. The idea of affordances offers another perspective on game mechanics. Just as minimalist games focus on limited mechanics, their affordances should also be minimal and centered around a micro-interaction loop. Prioritizing affordances with built-in signifiers would avoid unnecessary visual noise. Similarly, natural mappings enhance directness, a concept inherently tied to minimalist design.
+
+Categorizing constraints helps determine which are most applicable to minimalist game design. For example, cultural constraints should likely be avoided to exclude real-world references. Feedback and feedforward are necessary in any interactive product, including minimalist games, and provide opportunities to communicate mechanics without overcomplicating systems. Finally, conceptual models reinforce the idea that multiple representations of a game’s systems can coexist, one in the designer’s mind and another in the player’s. Minimalist designers should strive to keep the player’s conceptual model as simple as possible, regardless of the game’s internal complexity.
+
+Action and activities
+
+Norman states that interaction is goal-driven, shaped by understanding a system’s conceptual model and the user's emotions toward their goals. Interaction involves sub-goals, reformulated goals, and sequences, forming expectation-feedback loops that influence emotions and assign value to experiences (Norman, 2013).
+
+He mentions activity-centered design, which breaks actions into hierarchical structures: activities consist of related tasks, which further break down into subconscious operations. For instance, writing a letter involves tasks like opening a word processor, typing, and saving, while pressing a key is an operation (Norman, 2013). In his 2000 book, Svanæs also writes about the difference between conscious actions and subconscious operations. He evokes Heidegger in saying that tools become "ready-to-hand" when subconsciously used and "present-at-hand" when consciously considered, usually after a breakdown, a failure that prompts reevaluation and learning. 
+
+Breakdowns, whether due to user misunderstanding or by design, shift objects from background to foreground, turning subconscious actions into conscious ones (Svanæs, 2000). Svanæs notes that games intentionally include breakdowns to challenge players and encourage them to update their mental model of the system.
+
+Minimalist game creators can find inspiration for their designs in exploring alternatives to traditional hierarchical goal structures. They can instead design games with simple, clear objectives that avoid unnecessary sub-goals. They can also emphasize "ready-to-hand" interactions, creating compelling loops focused on subconscious operations as core mechanics. 
+
+Finally, breakdowns can make minimalist games engaging by prompting players to reinterpret mechanics through failure and shifting situations, reinforcing depth without adding unnecessary complexity through additional affordances and signifiers.
+
+Knowledge 
+
+Norman says that memory plays a crucial role in conscious interaction and learning, categorizing it into short-term memory (limited and easily disrupted), long-term memory (stable but subject to distortions), and prospective memory (reminders involving signals and messages). He says that interaction design balances knowledge in the world (affordances, signifiers, feedback, reminders) with knowledge in the head (conceptual models, learned actions, memory). Knowledge in the world reduces the need for learning, while knowledge in the head automates tasks (Norman, 2013).
+
+Norman says that designers can make systems more memorable by aligning them with existing knowledge and providing meaningful structures. According to him, arbitrary elements with no pattern or structure are harder to retain. Consistency also allows users to apply knowledge across systems, while standards offer a fallback when discoverability fails (Norman, 2013). He adds that skeuomorphism, which incorporates familiar elements from older technologies, eases transitions by adapting existing conceptual models to new interfaces.
+
+However, when knowledge in the head is solid and conventions change, users may experience confusion, frustration, and errors (Norman, 2013). Norman mentions that this is why newcomers to a culture or children, who lack preconceptions, can typically more easily distinguish between culturally significant objects (Norman, 2013).
+
+Minimalist games shouldn’t rely on real-world conventions, as doing so would break their abstraction. Instead, they must establish internal logic and patterns, where affordances and signifiers emerge from the game’s audiovisual style and mechanics rather than familiarity with real-world objects. Internal consistency is key, and minimalist games should avoid skeuomorphism, opting for abstract symbols and mechanics that develop a coherent set of internal rules.
+
+Since minimalist games deliberately avoid real-world representation, players often begin with no expectations. This presents an opportunity for designers to build systems free of incorrect assumptions, allowing for a purer form of discovery and engagement for the players.
+
+Metaphors
+
+Svanæs explains that users' conceptual and mental models often resemble a Finite State Automaton, where affordances and constraints guide transitions between system states. Errors and breakdowns arise from insufficient mental models, prompting users to adjust their understanding by better interpreting signifiers, feedback, and other design elements (Svanæs, 2000). He evokes Williams et al., who emphasize the importance of navigating multiple models in reasoning: “We consider the use of multiple models to be one of the crucial features of human reasoning” (Williams et al., 1983).
+
+Modern computers, according to Svanæs, are built upon layers of abstraction. He says that, in interaction design, users conceptualize these abstractions through metaphors, which facilitate engagement with complex digital systems. Spatial, temporal, and state space metaphors help users interpret virtual interactions as movements in space, sequences in time, and transitions between system states explored through trial and error (Svanæs, 2000).
+
+Another key metaphor Svanæs discusses is the complex object metaphor, which simplifies combinations of interactions into cohesive entities, forming interaction gestalts. These are complex interpretations emerging from atomic interactions, showing that users perceive interactive behaviors as cohesive wholes rather than isolated parts (Svanæs, 2000).
+
+The notion that players' conceptual models evolve through affordances and constraints ties directly to Zubek's player-specific action spaces and Upton’s horizon of intent. This highlights the connection between designing game mechanics and the player’s evolving experience. Minimalist designers should recognize that players' conceptual models of a game continually update, expanding or simplifying as they play.
+
+The metaphors shaping users' interactions with computers show that players naturally interpret actions abstractly. Designers can use this tendency to craft mechanics that remain abstract rather than developing into more complex actions.
+
+Comparing user mental models to finite state automata aligns with the high degrees of discretization in minimalist games, where interactions occur in well-defined states rather than continuous systems. Additionally, minimalist games’ mechanics can be designed by deconstructing interaction gestalts, extracting micro-mechanics from larger interactions, and focusing on the resulting atomic units of player engagement.
+
+Abstract interaction
+
+Svanæs explains that while metaphors help users learn and operate interactive systems, they are not the only method. He says that abstract representations and literal formalisms also facilitate understanding. According to him, users can engage with a system's functional elements without always relying on metaphorical representations.
+
+He adds that users accept interactive illusions, recognizing digital systems as layers of abstraction rather than reality. They engage with systems at varying levels, from broad whole-action perspectives to detailed visual, haptic, and auditory patterns forming atomic action-reaction pairs (Svanæs, 2000). As they interact, users shift along different levels of abstraction, adjusting their engagement based on system understanding and breakdowns (Svanæs, 2000).
+
+Svanæs references Merleau-Ponty’s dichotomy of abstract and concrete movements. Abstract movements are deliberate, performed "as movements," while concrete movements are contextual, integrated into a situation (Svanæs, 2000). Svanæs argues that interaction itself can be meaningful at a fundamental level, independent of metaphor.
+
+He also draws from Kandinsky’s study of painting, which focused on form and color as fundamental elements of the artform. Kandinsky’s abstraction explored media-specific properties, free from real-world references (Svanæs, 2000). He says that, similarly, interaction designers can view the computer as a material shaped by its core interactive properties. At the atomic level, interactivity emerges when the same reaction consistently follows the same action, establishing causality and control as the foundational elements of interaction, similar to form and color in painting (Svanæs, 2000).
+
+Minimalist game design’s emphasis on abstraction aligns with the idea that users can engage with systems without relying on real-world metaphors. This allows for games centered on minimal mechanics, reducing interaction to atomic action-reaction pairs. Abstract movements provide opportunities for interactions that exist for their own sake, like brushstrokes in abstract painting.
+
+Like Kandinsky's exploration of painting's core properties, minimalist game design examines interactivity itself by distilling games down to their essential components. Following this philosophy, designers can create minimalist games to explore the fundamental nature of player interaction.
+
+By identifying causality and control as interactivity's atomic building blocks, minimalist games should ensure clear, consistent action-reaction relationships. This design approach aligns with the principles of discretization, keeping interactions well-defined and unambiguous.
+
+
+Minimalism
+
+Now that we have examined both game design fundamentals and interaction design, we can turn to Minimalism itself to better understand how the artistic guidelines of the movement can relate to game creation. By studying Minimalism as an art form, I intend to find connections with minimalist game design, drawing inspiration from its guiding principles. I will also examine how these creative principles can influence game design and uncover new constraints to guide game development and shape playful interactions.
+
+In his 1997 book, Batchelor describes Minimalism as a multifaceted art movement that emerged around 1965, emphasizing simplicity and essential forms and materials. The movement first gained attention through postwar American sculpture, with artists stripping the art down to its fundamentals (Batchelor, 1997). He says that the term "Minimal Art" was coined by Richard Wollheim in a 1965 essay, marking its official recognition. However, Minimalism's roots extend beyond sculpture, influenced by monochrome paintings and ready-made sculptures of the 1950s (Batchelor, 1997).
+
+Style
+
+In his 2000 book, Strickland describes Minimalism as defined by geometric clarity, simplicity, and restraint. According to him, Minimalist artists often use right angles, squares, and uniform arrangements, using rectilinear symmetry, concentrism, and modularism. Morris, in his 1966 essay, notes that Minimalist works are often monochromatic, with neutral hues and centerless fields.
+
+Strickland says that it minimizes chance or accident, resulting in inexpressive, depersonalized works with a factual quality. In a book he wrote in 2004, Meyer adds that Minimalist art lacks authorial feeling and focuses on essential decisions, emphasizing physical values like scale, proportion, shape, and mass as the core properties of the medium in sculpture. 
+
+Morris states that Minimalist works avoid compositional detail, hierarchy and internal relations, often using simple unitary forms like polyhedrons to create a direct, immediate experience. According to him, the viewer's experience is intended to be direct, immediate and complete, with no hidden elements or complexities to discover over time. This approach leads to a perception of the work as a whole, rather than as an assemblage of distinct parts (Morris,1966).
+
+Batchelor describes Minimalist art as non-representational and non-referential, presenting “a world made rather than seen” (Batchelor, 1997). He says that it rejects contemplation, symbolism, and mystery, directing attention to the inherent properties of materials and forms rather than external associations. Minimalist works are non-imaginistic, non-decorative, and often unnamed, further reinforcing their detachment from human values (Batchelor, 1997).
+
+Minimalist art’s focus on simplicity and restraints parallels minimalist game design, where narrow decision spaces and rigid constraints shape player interactions. Just as Minimal artists limit forms and colors, minimalist games define a small set of possible actions. The removal of authorial intent in Minimalism aligns with the abstraction in game design, where mechanics and rules take precedence over emotional storytelling. The goal is not to evoke deep personal feelings but to create systems that are self-contained and mechanically pure
+
+A contradiction exists between Minimalism as a general artform and minimalist game design. Games are often designed to introduce new mechanics or even deliberate interactive breakdowns to keep players engaged in learning their systems, while Minimalism discourages revealing hidden layers over time, instead intending a piece to be understood in its entirety from the outset. Minimalist game designers have the opportunity to design in and around this dichotomy to uncover new and innovative design spaces. 
+
+Despite this difference, both Minimalist art and minimalist games reject representation and external references, focusing on internal consistency, form and material.
+
+Process
+
+Strickland describes process orientation as another significant aspect of Minimalist art, where artists use generative systems and algorithmic logic to create works with minimal artistic labor. Perreault echoes this idea, stating that "what is minimal about Minimal Art is the means, not the end" (Perreault, 1967). Batchelor adds that this approach prioritizes pragmatic decisions over craftsmanship or intuition. Many Minimalist works exhibit regular, repetitive, and serial structures, relying on patterns or modular repetition (Batchelor, 1997).
+
+Batchelor and Strickland agree that Minimalism avoids autographic traces (Batchelor, 1997) and spontaneous self-expression (Strickland, 2000). The movement is defined by control, as artists submit to the process and adhere to pre-determined, non-subjective rules (Strickland, 2000).
+
+Minimalism’s focus on algorithmic and procedural creation is particularly relevant to minimalist game design. It offers opportunities for game worlds, levels, and interactions to emerge from predefined rules and logic rather than direct human craftsmanship.
+
+Repetition, seriality, and modularity also reinforce the structured and impersonal aesthetic of minimalist games. Discretization enables minimalist systems to follow simple, repeatable patterns. Submitting to procedural decision-making further shapes minimalist game design, making the game an impersonal entity governed by abstract, predictable principles rather than organic, human-driven design.
+
+Philosophy
+
+Batchelor describes Minimalism as a rejective and reductive movement, reducing art to its most basic elements. This is reflected in how Minimalist sculptors avoid traditional labels, referring to their works as "three-dimensional works," "objects," or "unitary forms" (Batchelor, 1997). Strickland adds that Minimalism exposes the fundamental components of art, effectively “exposing the code of the medium” (Strickland, 2000).
+
+Strickland also notes that Minimalism dehumanizes art, shifting from the humanist phenomenology of impressionism and expressionism to a more objectivist approach. In Minimalist music, for example, sounds exist for themselves rather than as expressions of emotion (Strickland, 2000).
+
+Meyer highlights Minimalism’s anti-complexity stance, challenging the idea that artistic value is tied to effort and sophistication. In his 1964 essay, Judd says that "a work needs only to be interesting" (Judd, 1964), rejecting complexity as a measure of quality. In his 1965 essay, Wollheim describes Minimalist art as deconstructive, purifying works to their essential components, in contrast to traditional art’s constructive complexity.
+
+Morris argues that decision-making is central to Minimalism and that the artist’s choices regarding basic elements and presentation are integral to the work itself. In Minimalist sculpture, for example, the decision to position a beam upright or on its side fundamentally alters the viewer’s experience (Morris, 1966).
+
+Minimalist game design follows the same reductive approach, stripping away unnecessary elements to reveal core mechanics. Like Minimalist artists, minimalist game designers can work to make the rules and systems exposed and overt, ensuring that player interactions are transparent, immediate and direct.
+
+The rejection of complexity in Minimalist art aligns with minimalist game design’s focus on narrow decision spaces. Instead of layering complexity as a measure of sophistication, minimalist games have the opportunity to emphasize carefully chosen interactions.
+
+Minimalism and minimalist game design share a strong connection in decision-making. Just as Minimalist artists make deliberate choices about form and placement, small rule changes in a minimalist game can profoundly impact player experience, prioritizing clarity and intentionality over intricacy and complexity.
+
+
+
+
+Conclusion
+
+Minimalist game design relies on strict constraints, focusing on narrow decision spaces, limited mechanics, high levels of abstraction and discretization, and avoiding real-world simulation or explicit narratives. While existing research defines these constraints, it does not explore their impact on decision-making during development. This review addresses that gap by drawing from game design theory, interaction design, and Minimalism itself, identifying key insights and tensions that shape minimalist games.
+
+By examining game design principles, we identified several points of tension and strategies that minimalist game designers can navigate. Minimalist constraints limit player choice, yet agency must be preserved by integrating micro-mechanics and tightly designed systems that keep interactions meaningful. Without narrative elements, designers should consider how abstract affordances and emergent play can create engaging, interpretable experiences.
+
+State space and perceived action space help manage complexity, while limiting illusory choices controls the number of mechanics presented to players. Additionally, managing players’ internal constraints by limiting real-world representations and connections to other games can help the game feel more minimalistic. Lastly, both top-down and bottom-up design approaches can support minimalism, as long as they remain focused on the core gameplay loop.
+
+Fundamental concepts from interaction design reinforce the importance of minimal, intuitive affordances in games. Minimalist games can benefit from clear mappings, simple feedback loops, and internal consistency rather than relying on real-world references and conventions. Minimalist games can also emphasize subconscious interactions and design failure-driven engagement through breakdowns without adding complexity. Additionally, the emphasis on discretization in minimalist games aligns principles from interaction design, where interactions should be clear, well-defined, and direct.
+
+Metaphors help users interpret systems, but minimalist games can benefit from abstraction. They deconstruct interactions into atomic mechanics, simplifying gameplay into discrete action-reaction relationships. By boiling down interactivity to its essence, minimalist designers can focus on causality and control as foundational gameplay elements.
+
+Minimalism as an artform provides a broader philosophical framework for minimalist game design. Both disciplines emphasize reduction, exposing core elements and prioritizing internal consistency over external meaning. However, while Minimalist art aims for immediate comprehension, games rely on iterative learning and discovery. This tension presents an opportunity for minimalist game designers to explore new approaches to interactivity, determining how minimalist principles can be adapted through evolving gameplay systems. Procedural creation, generative systems, repetition, and modularity in Minimalist art also provide inspiration for structuring minimalist games.
+
+Taken together, these perspectives highlight how minimalist game design is not simply about removing elements from a game’s design but about carefully shaping constraints to foster engaging, emergent play. By refining our understanding of minimalist constraints and their impact on the design process of a game, we can push minimalist game design beyond the existing definitions and into a structured, intentional approach to game design. 
+
+My exploration of this space will clarify how constraints evolve through the iterative development of a game prototype and how they can be effectively applied to create minimal mechanics that inspire new forms of play. In the next chapter, I outline the methods used to develop a minimalist game prototype shaped by these constraints and analyze its design process. I will also explain how I aim to extract additional insights and heuristics about minimalist game design, examining how these constraints emerge and how they can be applied in practice.
+
+
+
+
+Bibliography
+
+Batchelor, D. (1997). Minimalism (S. Wilson, Ed.). Tate Pub Ltd. 
+
+Crawford, C. (2003). Chris Crawford on Game Design. New Riders.
+
+Hocking, C. (2007). Ludonarrative Dissonance in Bioshock [Blog]. Click Nothing. https://clicknothing.typepad.com/click_nothing/2007/10/ludonarrative-d.html
+
+Huizinga, J. (1955). Homo Ludens: A Study of the Play-Element in Culture. Beacon Press. 
+
+Judd, D. (1965). Specific Objects. Arts Yearbook, 8.
+
+Juul, J. (2007). A Certain Level of Abstraction. Situated Play: DiGRA 2007 Conference Proceedings, 510–515. http://www.jesperjuul.net/text/acertainlevel
+
+Kandinsky, V. (1912). Über das Geistige in der Kunst: Insbesondere in der Malerei (Concerning the Spiritual in Art: Especially in Painting) (1000th ed.). R. Piper & Co., Munich.
+
+Koster, R. (2004). A Theory of Fun for Game Design. O’Reilly Media, Inc.
+
+Meyer, J. (2004). Minimalism: Art and Polemics in the Sixties (Illustré édition). Yale University Press.
+
+Morris, R. (1966). Notes on Sculpture. Artforum. https://www.artforum.com/features/notes-on-sculpture-211706/
+
+Myers, D. (2009). In search of a minimalist game. 2009: Proceedings of DiGRA 2009 Conference: Breaking New Ground: Innovation in Games, Play, Practice and Theory. DiGRA 2009.
+
+Nealen, A., Saltsman, A., & Boxerman, E. (2011). Towards minimalist game design. Proceedings of the 6th International Conference on Foundations of Digital Games, 38–45. https://doi.org/10.1145/2159365.2159371
+
+Norman, D. (2013). The Design of Everyday Things: Revised and Expanded Edition (Révisé édition). Basic Books.
+
+Perrault, J. (1967). Minimal Art: Clearing the Air. Village Voice.
+
+Salen, K., & Zimmerman, E. (2004). Rules of Play: Game Design Fundamentals. The MIT Press.
+
+Strickland, E. (2000). Minimalism: Origins. Indiana University Press.
+
+
+Svanæs, D. (2000). Understanding Interactivity: Steps to a Phenomenology of Human-computer Interaction. Norges teknisk-naturvitenskapelige universitet, Institutt for datateknikk og informasjonsvitenskap.
+
+Upton, B. (2015). The Aesthetic of Play (1st edition). The MIT Press.
+
+Williams, M. D., Hollan, J. D., & Stevens, A. L. (2014). Human Reasoning About a Simple Physical System. In Mental Models (pp. 131–153). Psychology Press. https://doi.org/10.4324/9781315802725-8
+
+Wollheim, R. (1965). Minimal Art. Arts Magazine, January. 
+
+Zubek, R. (2020). Elements of Game Design. The MIT Press.

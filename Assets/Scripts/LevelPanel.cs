@@ -7,7 +7,7 @@ using DG.Tweening;
 
 public class LevelPanel : MonoBehaviour
 {
-    public static LevelPanel Instance { get; set; }
+    //public static LevelPanel Instance { get; set; }
 
 	// Components
 	[SerializeField] private GameObject _solutionClicksBoxTemplate = null;
@@ -68,7 +68,7 @@ public class LevelPanel : MonoBehaviour
 
 	private void Awake()
 	{
-		Instance = this;
+		//Instance = this;
 
 		_nextLevelButtonRectTransform = _nextLevelButton.GetComponent<RectTransform>();
 
@@ -93,6 +93,25 @@ public class LevelPanel : MonoBehaviour
 		_leftCornerButtons.SetActive(false);
 
 		_maxLevelsText.color = Color.clear;
+
+		//
+
+		StartCoroutine(PositionAfterLayout());
+	}
+
+	IEnumerator PositionAfterLayout()
+	{
+		yield return new WaitForEndOfFrame();
+
+		var uiPanel = GetComponent<RectTransform>();
+		var targetObject = _level.transform.parent;
+
+		var worldPosition = Camera.main.ScreenToWorldPoint(new Vector3(uiPanel.position.x, uiPanel.position.y, 0f));
+		worldPosition.z = 0f;
+
+		targetObject.position = worldPosition;
+
+		_level.Quadrant = _level.GetQuadrant(Camera.main.WorldToScreenPoint(_level.transform.position));
 	}
 
 	public void SetupSolutionBoxes(List<Solution> solutions)

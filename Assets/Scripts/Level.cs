@@ -56,8 +56,10 @@ public enum CompletedSolutionsToNextLevelRestriction
 
 public class Level : MonoBehaviour
 {
+    [SerializeField] private LevelPanel _levelPanel = null;
+	
 	// Components
-    [SerializeField] private GameObject _squareTemplate = null;
+	[SerializeField] private GameObject _squareTemplate = null;
     [SerializeField] private GameObject _solutionSquareTemplate = null;
     [SerializeField] private Rectangle _rectangle = null;
     [SerializeField] private Rectangle _solutionRectangle = null;
@@ -125,12 +127,14 @@ public class Level : MonoBehaviour
 	public List<Square> SquaresToggledLastClick { get; set; }
 	public Square LastSquareClicked { get; set; }
 	public bool CanClick { get; set; }
+	public int Quadrant { get; set; }
 
 	public int ClicksLeft => Solutions[0].Sequence.Length - Clicks;
     public bool EmptyHistory => _squareHistory.Count == 1;
     public bool TopOfHistory => Clicks == _squareHistory.Count - 1;
     public bool BottomOfHistory => Clicks == 0;
     public SolutionType SolutionType => _solutionType;
+    public LevelPanel LevelPanel => _levelPanel;
 	
 	private string _levelsFileName => _solutionType == SolutionType.SingleSolution? _singleSolutionLevelsFile : _multiSolutionsLevelsFile;
     private string _levelsFilePath => Application.persistentDataPath + "/" + _levelsFileName;
@@ -190,7 +194,7 @@ public class Level : MonoBehaviour
 		LoadProgressionEntries();
 		GenerateLevel();
 
-		LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, false);
+		_levelPanel.UpdateLevelsClearedText(_progressionIndex, false);
 
 		CanClick = true;
 	}
@@ -201,7 +205,9 @@ public class Level : MonoBehaviour
 		{
 			if(Input.GetKey(KeyCode.D))
 			{
-				if (Input.GetKeyDown(KeyCode.Return))
+				var mouseIsInQuadrant = GetQuadrant(Input.mousePosition) == Quadrant;
+
+				if (Input.GetKeyDown(KeyCode.Return) || (mouseIsInQuadrant && Input.GetKeyDown(KeyCode.N)))
 				{
 					_playedLevels.Enqueue(_levelCode);
 
@@ -214,25 +220,25 @@ public class Level : MonoBehaviour
 
 					return;
 				}
-				if (Input.GetKeyDown(KeyCode.LeftArrow))
+				if (Input.GetKeyDown(KeyCode.LeftArrow) || (mouseIsInQuadrant && Input.GetKeyDown(KeyCode.DownArrow)))
 				{
 					_progressionIndex--;
 
-					LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, false);
+					_levelPanel.UpdateLevelsClearedText(_progressionIndex, false);
 				}
-				if (Input.GetKeyDown(KeyCode.RightArrow))
+				if (Input.GetKeyDown(KeyCode.RightArrow) || (mouseIsInQuadrant && Input.GetKeyDown(KeyCode.UpArrow)))
 				{
 					_progressionIndex++;
 
-					LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, true);
+					_levelPanel.UpdateLevelsClearedText(_progressionIndex, true);
 				}
-				if (Input.GetKeyDown(KeyCode.Backspace))
+				if (Input.GetKeyDown(KeyCode.Backspace) || (mouseIsInQuadrant && Input.GetKeyDown(KeyCode.Minus)))
 				{
 					_progressionIndex = 0;
 
-					LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, false);
+					_levelPanel.UpdateLevelsClearedText(_progressionIndex, false);
 				}
-				if (Input.GetKeyDown(KeyCode.Space))
+				if (Input.GetKeyDown(KeyCode.Space) || (mouseIsInQuadrant && Input.GetKeyDown(KeyCode.S)))
 				{
 					PrintSolutions();
 				}
@@ -242,7 +248,7 @@ public class Level : MonoBehaviour
 
             if (squareHovered != null)
             {
-                if(squareHovered.SolutionSquare || !squareHovered.Interactable)
+                if(squareHovered.SolutionSquare || !squareHovered.Interactable || squareHovered.Level != this)
 				{
                     squareHovered = null;
 
@@ -285,7 +291,7 @@ public class Level : MonoBehaviour
 				{
 					_lastSquareClickedDown.Shake();
 
-					LevelPanel.Instance.ShakeClicksCounter();
+					_levelPanel.ShakeClicksCounter();
 
 					if (_lastSquareClickedDown != null)
 					{
@@ -332,6 +338,17 @@ public class Level : MonoBehaviour
 		}
     }
 
+	public int GetQuadrant(Vector2 screenPos)
+	{
+		var w = Screen.width;
+		var h = Screen.height;
+
+		if (screenPos.x < w / 2f)
+			return (screenPos.y < h / 2f) ? 3 : 1; // 1 = Top Left, 3 = Bottom Left
+		else
+			return (screenPos.y < h / 2f) ? 4 : 2; // 2 = Top Right, 4 = Bottom Right
+	}
+
 	public void OnSquareClicked()
 	{
 		GetLevelCompletion(true);
@@ -346,7 +363,7 @@ public class Level : MonoBehaviour
 
 		AddNewHistorySnapshot();
 
-		LevelPanel.Instance.UpdateHistoryButtons(true);
+		_levelPanel.UpdateHistoryButtons(true);
 
 		CheckLevelCompletion(true);
 	}
@@ -915,8 +932,8 @@ public class Level : MonoBehaviour
 
 		Clicks = 0;
 
-		LevelPanel.Instance.SetupSolutionBoxes(Solutions);
-		LevelPanel.Instance.UpdateClicksCounter(false);
+		_levelPanel.SetupSolutionBoxes(Solutions);
+		_levelPanel.UpdateClicksCounter(false);
 
 		SquaresToggledLastClick = new List<Square>(Squares);
 
@@ -924,7 +941,7 @@ public class Level : MonoBehaviour
 
 		UpdateChecksAndCrosses();
 
-		LevelPanel.Instance.UpdateHistoryButtons(false);
+		_levelPanel.UpdateHistoryButtons(false);
 
 		//_generatedLevels.Add(_levelCode);
 
@@ -1113,7 +1130,7 @@ public class Level : MonoBehaviour
 
 				OverwriteLevel(_levelCode);
 
-				//LevelPanel.Instance.SetupSolutionBoxes(Solutions);
+				//_levelPanel.SetupSolutionBoxes(Solutions);
 
 				return;
 			}
@@ -1172,7 +1189,7 @@ public class Level : MonoBehaviour
 
 				OverwriteLevel(_levelCode);
 
-				//LevelPanel.Instance.SetupSolutionBoxes(Solutions);
+				//_levelPanel.SetupSolutionBoxes(Solutions);
 
 				return;
 			}
@@ -1249,7 +1266,7 @@ public class Level : MonoBehaviour
 			solutionStrings[i] = string.Join(string.Empty, Solutions[i].Sequence);
 		}
 
-		LevelPanel.Instance.UpdateDebugSolutionText(string.Join(" | ", solutionStrings));
+		_levelPanel.UpdateDebugSolutionText(string.Join(" | ", solutionStrings));
 	}
 
 	private string GetValidPregeneratedLevel()
@@ -1607,8 +1624,8 @@ public class Level : MonoBehaviour
 			&& _clicksCountRestriction == ClicksCountToNextLevelRestriction.SoftRestriction 
 			&& ClicksLeft < 0)
         {
-            LevelPanel.Instance.ShakeNextLevelButton();
-            LevelPanel.Instance.ShakeClicksCounter();
+            _levelPanel.ShakeNextLevelButton();
+            _levelPanel.ShakeClicksCounter();
         }
         else
         {
@@ -1641,7 +1658,7 @@ public class Level : MonoBehaviour
 
 		UpdateChecksAndCrosses();
 
-		LevelPanel.Instance.UpdateHistoryButtons(false);
+		_levelPanel.UpdateHistoryButtons(false);
 	}
 
     public void Undo()
@@ -1657,7 +1674,7 @@ public class Level : MonoBehaviour
 
 		UpdateChecksAndCrosses();
 
-		LevelPanel.Instance.UpdateHistoryButtons(false);
+		_levelPanel.UpdateHistoryButtons(false);
 	}
 
     public void Redo()
@@ -1673,7 +1690,7 @@ public class Level : MonoBehaviour
 
 		UpdateChecksAndCrosses();
 
-		LevelPanel.Instance.UpdateHistoryButtons(false);
+		_levelPanel.UpdateHistoryButtons(false);
 	}
 
     private void AddNewHistorySnapshot()
@@ -1716,7 +1733,7 @@ public class Level : MonoBehaviour
 			square.SetupPredictions(false);
 		}
 
-        LevelPanel.Instance.UpdateClicksCounter(false);
+        _levelPanel.UpdateClicksCounter(false);
     }
 
 	public bool GetLevelCompletion(bool fromClickedSquare)
@@ -1831,7 +1848,7 @@ public class Level : MonoBehaviour
 			&& _clicksCountRestriction == ClicksCountToNextLevelRestriction.SoftRestriction
 			&& ClicksLeft < 0)
 			{
-				LevelPanel.Instance.ShakeClicksCounter();
+				_levelPanel.ShakeClicksCounter();
 			}
 
 			yield return new WaitForSeconds(_levelCompleteSequenceDelays[0]);
@@ -1859,7 +1876,7 @@ public class Level : MonoBehaviour
 
 					yield return new WaitForSeconds(_levelCompleteSequenceDelays[2]);
 
-					LevelPanel.Instance.UpdateLevelsClearedText(_progressionIndex, true/*, true*/);
+					_levelPanel.UpdateLevelsClearedText(_progressionIndex, true/*, true*/);
 
 					_playedLevels.Enqueue(_levelCode);
 
@@ -1873,14 +1890,14 @@ public class Level : MonoBehaviour
 
 		if (_solutionType == SolutionType.MultipleSolutions)
 		{
-			LevelPanel.Instance.UpdateNextLevelButton(_trulyCompleted || (levelComplete
+			_levelPanel.UpdateNextLevelButton(_trulyCompleted || (levelComplete
 				&& (_completedSolutionsToNextLevelRestriction == CompletedSolutionsToNextLevelRestriction.AtLeastOneSolution && levelComplete
 					|| _completedSolutionsToNextLevelRestriction == CompletedSolutionsToNextLevelRestriction.AllSolutions && allSolutionsFound
 					)));
 		}
 		else
 		{
-			LevelPanel.Instance.UpdateNextLevelButton(_trulyCompleted || (levelComplete
+			_levelPanel.UpdateNextLevelButton(_trulyCompleted || (levelComplete
 				&& (_clicksCountRestriction == ClicksCountToNextLevelRestriction.NoRestriction
 					|| (_clicksCountRestriction == ClicksCountToNextLevelRestriction.SoftRestriction && ClicksLeft >= 0)
 					|| (_clicksCountRestriction == ClicksCountToNextLevelRestriction.HardRestriction && ClicksLeft >= 0)

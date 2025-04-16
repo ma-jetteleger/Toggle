@@ -116,18 +116,18 @@ public class Square : MonoBehaviour
     }
 
     public bool SolutionSquare => _referenceSquare != null;
-    public Square PreviousSquare => _level.Squares[Id > 0 ? Id - 1 : _level.Squares.Length - 1];
-    public Square NextSquare => _level.Squares[Id < _level.Squares.Length - 1 ? Id + 1 : 0];
+    public Square PreviousSquare => Level.Squares[Id > 0 ? Id - 1 : Level.Squares.Length - 1];
+    public Square NextSquare => Level.Squares[Id < Level.Squares.Length - 1 ? Id + 1 : 0];
     public bool Animating => _punch != null || _referenceSquarePunch != null || _leftArrowMove != null || _rightArrowMove != null || _diamondMove != null || _cascadingIndicatorMove != null;
 
-    public bool Toggled { get; set; }
+	public Level Level { get; set; }
+	public bool Toggled { get; set; }
     public bool Highlighted { get; set; }
 
     public List<Square> Targets { get; set; }
     public int Id { get; set; }
 
     private bool _interactable;
-    private Level _level;
     private Color _normalColor;
     private Color _normalOutlineColor;
     private Rectangle _rectangle;
@@ -162,7 +162,7 @@ public class Square : MonoBehaviour
         _normalColor = _rectangle.Color;
 
         Id = id;
-        _level = level;
+        Level = level;
 
         gameObject.name = $"Square({Id})";
 
@@ -193,7 +193,7 @@ public class Square : MonoBehaviour
         _referenceSquare = referenceSquare;
 
         Id = _referenceSquare.Id;
-        _level = level;
+        Level = level;
 
         _rectangle = GetComponent<Rectangle>();
         _normalColor = _rectangle.Color;
@@ -413,11 +413,11 @@ public class Square : MonoBehaviour
 
 		_targetPredictions = new Dictionary<Square, List<ShapeRenderer>>();
 
-		var cascadingFlags = new bool[_level.Squares.Length];
+		var cascadingFlags = new bool[Level.Squares.Length];
 
-		for (var i = 0; i < _level.Squares.Length; i++)
+		for (var i = 0; i < Level.Squares.Length; i++)
 		{
-			cascadingFlags[i] = _level.Squares[i].Cascading;
+			cascadingFlags[i] = Level.Squares[i].Cascading;
 		}
 
 		InstantiatePredictionIndicator(cascadingFlags, Targets, true);
@@ -474,7 +474,7 @@ public class Square : MonoBehaviour
 
     public void Click(bool fromPlayer, bool extraDelay/*, bool turnOffCascading*/)
     {
-        _level.SquaresToggledLastClick.Clear();
+        Level.SquaresToggledLastClick.Clear();
 
         if (!SolutionSquare)
 		{
@@ -490,7 +490,7 @@ public class Square : MonoBehaviour
 
     private IEnumerator DelayedClick(bool fromPlayer, bool extraDelay/*, bool turnOffCascading*/)
     {
-        var animationTime = _level.SolutionSquares[0]._checkAndCrossPunchTime / 4f;
+        var animationTime = Level.SolutionSquares[0]._checkAndCrossPunchTime / 4f;
 
         /*if(extraDelay)
 		{
@@ -512,15 +512,15 @@ public class Square : MonoBehaviour
 
         var endClickSequence = InstantClick(fromPlayer);
 
-        LevelPanel.Instance.UpdateClicksCounter(true);
+		Level.LevelPanel.UpdateClicksCounter(true);
 
         if (fromPlayer && endClickSequence)
 		{
             yield return new WaitForSeconds(animationTime * 1.25f);
 
-            if (!_level.Squares.Any(x => x.Animating))
+            if (!Level.Squares.Any(x => x.Animating))
 			{
-                _level.CanClick = true;
+                Level.CanClick = true;
             }
         }
     }
@@ -533,7 +533,7 @@ public class Square : MonoBehaviour
         {
             target.Toggle(fromPlayer);
 
-            _level.TogglesThisClickSequence++;
+            Level.TogglesThisClickSequence++;
 
             if (target.Cascading && target != this)
             {
@@ -551,19 +551,19 @@ public class Square : MonoBehaviour
             }
         }
 
-        foreach (var square in _level.Squares)
+        foreach (var square in Level.Squares)
         {
             square.SetupPredictions(false);
         }
 
         if(fromPlayer)
 		{
-            _level.OnSquareClicked();
+            Level.OnSquareClicked();
         }
 
         if (endClickSequence)
         {
-            _level.EndClickSequence(fromPlayer);
+            Level.EndClickSequence(fromPlayer);
         }
 
         return endClickSequence;
@@ -643,7 +643,7 @@ public class Square : MonoBehaviour
         }
 
         var movement = Vector3.up;
-        var time = _level.SolutionSquares[0]._checkAndCrossPunchTime / 4f;
+        var time = Level.SolutionSquares[0]._checkAndCrossPunchTime / 4f;
 
         _cascadingIndicatorMove = _cascadingIndicator.transform.DOLocalMove(originalPosition + (movement * _targetIndicatorMoveDistance / 2f), time).SetEase(_targetIndicatorMoveCurve)
         .OnComplete(() =>
@@ -689,14 +689,14 @@ public class Square : MonoBehaviour
                 MatchUninteractableOverlayColorWithRectangle();
             }
 
-            if (!_level.SquaresToggledLastClick.Contains(this))
+            if (!Level.SquaresToggledLastClick.Contains(this))
             {
-                _level.SquaresToggledLastClick.Add(this);
+                Level.SquaresToggledLastClick.Add(this);
             }
 
-            var correct = Toggled == _level.SolutionSquares[Id].Toggled;
+            var correct = Toggled == Level.SolutionSquares[Id].Toggled;
 
-            _level.SolutionSquares[Id].UpdateCheckAndCross(correct, fromPlayer);
+            Level.SolutionSquares[Id].UpdateCheckAndCross(correct, fromPlayer);
         }
     }
 
@@ -1001,9 +1001,9 @@ public class Square : MonoBehaviour
     private void ChangeSortingOrderOfComponents(int factor)
     {
         var components = GetComponentsInChildren<ShapeRenderer>(true);
-        var wasToggledLastClick = _level.SquaresToggledLastClick.Contains(this) || (_referenceSquare != null && _level.SquaresToggledLastClick.Contains(_referenceSquare));
+        var wasToggledLastClick = Level.SquaresToggledLastClick.Contains(this) || (_referenceSquare != null && Level.SquaresToggledLastClick.Contains(_referenceSquare));
 
-        var trueFactor = (factor * Id) + (factor * (wasToggledLastClick ? 10 + (_level.TogglesThisClickSequence * 5) : 1));
+        var trueFactor = (factor * Id) + (factor * (wasToggledLastClick ? 10 + (Level.TogglesThisClickSequence * 5) : 1));
 
 		foreach (var component in components)
         {
