@@ -127,7 +127,7 @@ public class LevelPanel : MonoBehaviour
 			for (var i = 0; i < solutions.Count; i++)
 			{
 				var newSolutionClicksBox = Instantiate(_solutionClicksBoxTemplate, _solutionClicksBoxTemplate.transform.parent).GetComponentInChildren<SolutionClicksBox>();
-				newSolutionClicksBox.ClicksText.text = solutions[i].Sequence.Length.ToString();
+				newSolutionClicksBox.ClicksText.text = solutions[i].Sequence.Count.ToString();
 				newSolutionClicksBox.gameObject.SetActive(true);
 
 				solutions[i].SolutionClicksBox = newSolutionClicksBox;

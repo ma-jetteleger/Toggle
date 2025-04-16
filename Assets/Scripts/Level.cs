@@ -106,6 +106,7 @@ public class Level : MonoBehaviour
     [SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private bool _forceSingleSolution = false;
 	[SerializeField] [ShowIf(nameof(_solutionType), SolutionType.MultipleSolutions)] private CompletedSolutionsToNextLevelRestriction _completedSolutionsToNextLevelRestriction = CompletedSolutionsToNextLevelRestriction.AllSolutions;
 	[SerializeField] [ShowIf(nameof(_solutionType), SolutionType.MultipleSolutions)] private bool _forceMultipleSolution = false;
+	[SerializeField] private bool _unclickableToggledSquares = false;
 
 	[HorizontalLine(1)]
 
@@ -129,7 +130,8 @@ public class Level : MonoBehaviour
 	public bool CanClick { get; set; }
 	public int Quadrant { get; set; }
 
-	public int ClicksLeft => Solutions[0].Sequence.Length - Clicks;
+	public int ClicksLeft => Solutions[0].Sequence.Count - Clicks;
+	public bool UnclickableToggledSquares => _unclickableToggledSquares;
     public bool EmptyHistory => _squareHistory.Count == 1;
     public bool TopOfHistory => Clicks == _squareHistory.Count - 1;
     public bool BottomOfHistory => Clicks == 0;
@@ -248,7 +250,8 @@ public class Level : MonoBehaviour
 
             if (squareHovered != null)
             {
-                if(squareHovered.SolutionSquare || !squareHovered.Interactable || squareHovered.Level != this)
+                if(squareHovered.SolutionSquare || !squareHovered.Interactable || squareHovered.Level != this
+					|| (squareHovered.Toggled && _unclickableToggledSquares))
 				{
                     squareHovered = null;
 
@@ -399,7 +402,7 @@ public class Level : MonoBehaviour
 			Squares[i].SetupTargets(Squares);
 
 			firstHistorySnapshot[i].Toggled = Squares[i].Toggled;
-			firstHistorySnapshot[i].Interactable = true;
+			firstHistorySnapshot[i].Interactable = UnclickableToggledSquares ? !Squares[i].Toggled : true;
 			firstHistorySnapshot[i].Cascading = Squares[i].Cascading;
 		}
 
@@ -580,11 +583,25 @@ public class Level : MonoBehaviour
 			}
 			else
 			{
-				for (var i = 0; i < Squares.Length; i++)
+				var atLeastOneUntoggledSquare = _unclickableToggledSquares ? true : false;
+
+				var shuffledSquaresArray = new List<Square>(Squares).OrderBy(a => System.Guid.NewGuid()).ToArray();
+
+				for (var i = 0; i < shuffledSquaresArray.Length; i++)
 				{
+					if(!atLeastOneUntoggledSquare && i == shuffledSquaresArray.Length - 1)
+					{
+						break;
+					}
+
 					if (UnityEngine.Random.Range(0f, 1f) > 0.5f)
 					{
-						Squares[i].Toggle();
+						shuffledSquaresArray[i].Toggle();
+					}
+
+					if(!atLeastOneUntoggledSquare && !shuffledSquaresArray[i].Toggled)
+					{
+						atLeastOneUntoggledSquare = true;
 					}
 				}
 
@@ -888,7 +905,7 @@ public class Level : MonoBehaviour
 			firstHistorySnapshot[i] = new HistorySquare()
 			{
 				Toggled = square.Toggled,
-				Interactable = true,
+				Interactable = _unclickableToggledSquares ? !square.Toggled : true,
 				Cascading = square.Cascading
 			};
 
@@ -1002,7 +1019,7 @@ public class Level : MonoBehaviour
 				}
 			}
 
-			newSolution.Sequence = sequence.ToArray();
+			newSolution.Sequence = new List<int>(sequence);
 
 			Solutions.Add(newSolution);
 		}
@@ -1044,10 +1061,10 @@ public class Level : MonoBehaviour
 
 				mainSolution = new Solution()
 				{
-					Sequence = new int[] { indices.Length == 1
+					Sequence = new List<int>(new int[] { indices.Length == 1
 					? 0
 					: Squares.First(x => x.TargetScheme == Square.TargetingScheme.Self).PreviousSquare.Id
-				}
+				})
 				};
 
 				SolutionSquares[mainSolution.Sequence[0]].Click(false, false);
@@ -1066,21 +1083,51 @@ public class Level : MonoBehaviour
 			{
 				validSolutionSequence = false;
 
-				//_solutionSequence = new int[Random.Range(_minClicksForSolution, squares - _maxClicksBufferForSolution)];
-				mainSolution = new Solution
+				if(_unclickableToggledSquares)
 				{
-					Sequence = new int[indices.Length - _maxClicksBufferForSolution]
-				};
+					mainSolution = new Solution
+					{
+						Sequence = new List<int>()
+					};
 
-				var shuffledIndices = indices.OrderBy(a => System.Guid.NewGuid()).ToArray();
+					var lastToggledIndex = -1;
+					var maxSolutionSequenceLength = indices.Length - _maxClicksBufferForSolution;
 
-				for (var j = 0; j < mainSolution.Sequence.Length; j++)
+					for (var j = 0; j < maxSolutionSequenceLength; j++)
+					{
+						var untoggledSquares = SolutionSquares.Where(x => !x.Toggled && x.Id != lastToggledIndex);
+
+						if (untoggledSquares.Count() == 0)
+						{
+							break;
+						}
+
+						lastToggledIndex = untoggledSquares.OrderBy(a => System.Guid.NewGuid()).First().Id;
+
+						mainSolution.Sequence.Add(lastToggledIndex);
+
+						SolutionSquares[mainSolution.Sequence[j]].Click(false, false);
+					}
+				}
+				else
 				{
-					mainSolution.Sequence[j] = shuffledIndices[j];
+					mainSolution = new Solution
+					{
+						Sequence = new List<int>(new int[indices.Length - _maxClicksBufferForSolution])
+					};
 
-					SolutionSquares[mainSolution.Sequence[j]].Click(false, false);
+					var shuffledIndices = indices.OrderBy(a => System.Guid.NewGuid()).ToArray();
+
+					for (var j = 0; j < mainSolution.Sequence.Count; j++)
+					{
+						mainSolution.Sequence[j] = shuffledIndices[j];
+
+						SolutionSquares[mainSolution.Sequence[j]].Click(false, false);
+					}
 				}
 
+				//_solutionSequence = new int[Random.Range(_minClicksForSolution, squares - _maxClicksBufferForSolution)];
+				
 				for (var j = 0; j < Squares.Length; j++)
 				{
 					if (Squares[j].Toggled != SolutionSquares[j].Toggled)
@@ -1149,7 +1196,7 @@ public class Level : MonoBehaviour
 			array[i] = i;
 		}
 
-		for (var i = 1; i <= Solutions[0].Sequence.Length; i++)
+		for (var i = 1; i <= Solutions[0].Sequence.Count; i++)
 		{
 			// Should the order of clicks matter??? Right now it doesn't
 			// I expect that this will depend on what toggle features are implemented in the future 
@@ -1235,7 +1282,7 @@ public class Level : MonoBehaviour
 #endif
 
 		//Solutions = Solutions.OrderByDescending(x => x.Sequence.Length).ToList();
-		Solutions = Solutions.OrderBy(x => x.Sequence.Length).ToList();
+		Solutions = Solutions.OrderBy(x => x.Sequence.Count).ToList();
 
 #if UNITY_EDITOR
 		if (_printSolutions)
@@ -1496,7 +1543,7 @@ public class Level : MonoBehaviour
 			// and to avoid the complications of checking for exact
 			// solution sequences instead of simple numbers of clicks
 			//var sameLengthAsAnotherSolution = PotentialSolutions.Any(x => x.Sequence.Length == currentCombination.Count);
-			var sameLengthAsAnotherSolution = Solutions.Any(x => x.Sequence.Length == currentCombination.Count);
+			var sameLengthAsAnotherSolution = Solutions.Any(x => x.Sequence.Count == currentCombination.Count);
 
 			if (sameLengthAsAnotherSolution)
 			{
@@ -1524,7 +1571,7 @@ public class Level : MonoBehaviour
 			//PotentialSolutions.Add(new Solution
 			Solutions.Add(new Solution
 			{
-				Sequence = currentCombination.ToArray()
+				Sequence = new List<int>(currentCombination)
 			});
 
 			return;
@@ -1707,7 +1754,7 @@ public class Level : MonoBehaviour
 			newHistorySnapshot[i] = new HistorySquare()
 			{
 				Toggled = Squares[i].Toggled,
-				Interactable = Squares[i].Interactable,
+				Interactable = _unclickableToggledSquares ? !Squares[i].Toggled : true,
 				Cascading = Squares[i].Cascading
 			};
         }
@@ -1781,7 +1828,7 @@ public class Level : MonoBehaviour
 			{
 				if (solution.Solved)
 				{
-					if(Clicks == solution.Sequence.Length)
+					if(Clicks == solution.Sequence.Count)
 					{
 						solutionAlreadyFound = true;
 					}
@@ -1808,14 +1855,14 @@ public class Level : MonoBehaviour
 		{
 			if (Solutions[0].Solved)
 			{
-				if (Clicks == Solutions[0].Sequence.Length)
+				if (Clicks == Solutions[0].Sequence.Count)
 				{
 					solutionAlreadyFound = true;
 				}
 			}
 			else
 			{
-				Solutions[0].Solved = Clicks == Solutions[0].Sequence.Length && levelComplete;
+				Solutions[0].Solved = Clicks == Solutions[0].Sequence.Count && levelComplete;
 			}
 		}
         
@@ -1826,7 +1873,11 @@ public class Level : MonoBehaviour
 			{
 				var square = Squares[i];
 
-				square.Interactable = !levelComplete;
+				if(levelComplete)
+				{
+					square.Interactable = false;
+				}
+				//square.Interactable = !levelComplete;
 
 				if (square.Highlighted)
 				{

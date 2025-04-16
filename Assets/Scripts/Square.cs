@@ -63,11 +63,11 @@ public class Square : MonoBehaviour
         {
             _interactable = value;
 
-            if (_uninteractableOverlay.gameObject.activeSelf == _interactable)
+			_uninteractableOverlay.gameObject.SetActive(!_interactable);
+
+			if (_uninteractableOverlay.gameObject.activeSelf)
             {
                 MatchUninteractableOverlayColorWithRectangle();
-
-                _uninteractableOverlay.gameObject.SetActive(!_interactable);
             }
         }
     }
@@ -183,7 +183,7 @@ public class Square : MonoBehaviour
 
         SetCascading(false, false);
 
-        Interactable = true;
+        Interactable = Level.UnclickableToggledSquares ? !Toggled : true;
 
         _normalTargetIndicatorColor = _targetIndicators[0].GetComponentInChildren<SpriteRenderer>().color;
     }
@@ -674,21 +674,26 @@ public class Square : MonoBehaviour
             ? _toggledColor
             : _normalColor;
 
-        /*if(_targetIndicatorSprites != null)
+		if(Level.UnclickableToggledSquares && !SolutionSquare)
+		{
+			Interactable = !Toggled;
+		}
+
+		/*if(_targetIndicatorSprites != null)
 		{
             foreach (var targetIndicatorSprite in _targetIndicatorSprites)
             {
                 targetIndicatorSprite.color = Toggled ? _toggledTargetIndicatorColor : _normalTargetIndicatorColor;
             }
         }*/
-        
-        if (fromPlayer)
-		{
-            if (!Interactable && !SolutionSquare)
-            {
-                MatchUninteractableOverlayColorWithRectangle();
-            }
 
+		if (!Interactable && !SolutionSquare)
+		{
+			MatchUninteractableOverlayColorWithRectangle();
+		}
+
+		if (fromPlayer)
+		{
             if (!Level.SquaresToggledLastClick.Contains(this))
             {
                 Level.SquaresToggledLastClick.Add(this);
@@ -708,7 +713,12 @@ public class Square : MonoBehaviour
             ? _toggledColor
             : _normalColor;
 
-        if (!Interactable && !SolutionSquare)
+		if (Level.UnclickableToggledSquares && !SolutionSquare)
+		{
+			Interactable = !Toggled;
+		}
+
+		if (!Interactable && !SolutionSquare)
         {
             MatchUninteractableOverlayColorWithRectangle();
         }

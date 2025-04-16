@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Solution
 {
-    public int[] Sequence;
+    public List<int> Sequence;
     public bool Solved;
 	public SolutionClicksBox SolutionClicksBox;
 }
