@@ -72,7 +72,7 @@ public class LevelPanel : MonoBehaviour
 
 		_nextLevelButtonRectTransform = _nextLevelButton.GetComponent<RectTransform>();
 
-		_clicksCounterNormalPosition = _clicksCounterText.transform.position;
+		
 		_clicksCounterNormalColor = _clicksCounterText.color;
 
 		_nextLevelButtonNormalPosition = _nextLevelButtonRectTransform.position;
@@ -112,6 +112,8 @@ public class LevelPanel : MonoBehaviour
 		targetObject.position = worldPosition;
 
 		_level.Quadrant = _level.GetQuadrant(Camera.main.WorldToScreenPoint(_level.transform.position));
+
+		_clicksCounterNormalPosition = _clicksCounterText.transform.localPosition;
 	}
 
 	public void SetupSolutionBoxes(List<Solution> solutions)
@@ -265,7 +267,7 @@ public class LevelPanel : MonoBehaviour
 			_clicksCounterShakeFadeOut
 		).OnComplete(() =>
 		{
-			_clicksCounterText.transform.position = _clicksCounterNormalPosition;
+			_clicksCounterText.transform.localPosition = _clicksCounterNormalPosition;
 
 			_clicksCounterShake = null;
 		});
