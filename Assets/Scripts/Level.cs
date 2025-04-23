@@ -321,7 +321,11 @@ public class Level : MonoBehaviour
 					_lastSquareClickedDown.Click(true, false);
 
 					_lastSquareClickedDown.HideTargetPredictions();
-					//_lastSquareClickedDown.Interactable = false;
+
+					if(_solutionType == SolutionType.MultipleSolutions)
+					{
+						_lastSquareClickedDown.Interactable = false;
+					}
 
 					Clicks++;
 
