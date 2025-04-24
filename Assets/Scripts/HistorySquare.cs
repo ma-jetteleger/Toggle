@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class HistorySquare
 {
-    public bool Toggled;
+    public Square.PossibleToggleState ToggledState;
     public bool Interactable;
     public bool Cascading;
 }

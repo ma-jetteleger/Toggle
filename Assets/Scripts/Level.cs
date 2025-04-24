@@ -13,26 +13,26 @@ using System;
 [Serializable]
 public class ProgressionEntry
 {
-	public int Squares;							// Fixed int value, -1: random from inspector range
+	public int Squares;                         // Fixed int value, -1: random from inspector range
 	public int LeftRightTargets;                // At least the int value, -1: random including none
-	public int SelfLeftTargets;					// At least the int value, -1: random including none
+	public int SelfLeftTargets;                 // At least the int value, -1: random including none
 	public int SelfRightTargets;                // At least the int value, -1: random including none
 	public int SelfLeftRightTargets;            // At least the int value, -1: random including none
 	public int WrapAroundToggles;               // At least the int value, -1: random including none
 	public int CascadingToggles;                // Fixed int value, -1: random including none
-	public bool AdjacentCascadingToggles;		// Allowed or not 
-	// This is more complex than originally thought of
-	// as it only impacts gameplay/complexity if two adjacent 
-	// cascading squares actually interact with each other through
-	// their targeting schemes. I'll ignore the adjacent cascading 
-	// toggle issue for now and think back on it later. 
-	// (the issue is that "chained" cascading 
-	// toggles are more complex but also _maybe_ more interesting so
-	// it'd be nice if we were able to include them progressively 
-	// and control their introduction through the progression)
-	// I decided to include them in the progression but also chose
-	// to ignore the issue of "how many" to include and how
-	// progressively they are introduced
+	public bool AdjacentCascadingToggles;       // Allowed or not 
+												// This is more complex than originally thought of
+												// as it only impacts gameplay/complexity if two adjacent 
+												// cascading squares actually interact with each other through
+												// their targeting schemes. I'll ignore the adjacent cascading 
+												// toggle issue for now and think back on it later. 
+												// (the issue is that "chained" cascading 
+												// toggles are more complex but also _maybe_ more interesting so
+												// it'd be nice if we were able to include them progressively 
+												// and control their introduction through the progression)
+												// I decided to include them in the progression but also chose
+												// to ignore the issue of "how many" to include and how
+												// progressively they are introduced
 }
 
 public enum SolutionType
@@ -43,9 +43,9 @@ public enum SolutionType
 
 public enum ClicksCountToNextLevelRestriction
 {
-    HardRestriction,
-    SoftRestriction,
-    NoRestriction
+	HardRestriction,
+	SoftRestriction,
+	NoRestriction
 }
 
 public enum CompletedSolutionsToNextLevelRestriction
@@ -56,14 +56,14 @@ public enum CompletedSolutionsToNextLevelRestriction
 
 public class Level : MonoBehaviour
 {
-    [SerializeField] private LevelPanel _levelPanel = null;
-	
+	[SerializeField] private LevelPanel _levelPanel = null;
+
 	// Components
 	[SerializeField] private GameObject _squareTemplate = null;
-    [SerializeField] private GameObject _solutionSquareTemplate = null;
-    [SerializeField] private Rectangle _rectangle = null;
-    [SerializeField] private Rectangle _solutionRectangle = null;
-    [SerializeField] private Rectangle _levelCompletionFeedback = null;
+	[SerializeField] private GameObject _solutionSquareTemplate = null;
+	[SerializeField] private Rectangle _rectangle = null;
+	[SerializeField] private Rectangle _solutionRectangle = null;
+	[SerializeField] private Rectangle _levelCompletionFeedback = null;
 
 	[HorizontalLine(1)]
 
@@ -79,9 +79,9 @@ public class Level : MonoBehaviour
 	[SerializeField] private float _solutionSquaresDistance = 0f;
 	[SerializeField] private Color _trueLevelCompletionColor = Color.black;
 	[SerializeField] private float _levelCompletionTime = 0f;
-    [SerializeField] private AnimationCurve _levelCompletionCurve = null;
-    [SerializeField] private AnimationCurve _levelCompletionThicknessCurve = null;
-    [SerializeField] private AnimationCurve _levelCompletionAlphaCurve = null;
+	[SerializeField] private AnimationCurve _levelCompletionCurve = null;
+	[SerializeField] private AnimationCurve _levelCompletionThicknessCurve = null;
+	[SerializeField] private AnimationCurve _levelCompletionAlphaCurve = null;
 	[SerializeField] private Vector3 _solutionRectanglePunchScale = Vector3.zero;
 	[SerializeField] private float _solutionRectanglePunchTime = 0f;
 	[SerializeField] private int _solutionRectanglePunchVibrato = 0;
@@ -101,11 +101,12 @@ public class Level : MonoBehaviour
 	[SerializeField] [HideIf(nameof(_progression))] private int _selfLeftRightTargets = -1;
 	[SerializeField] [HideIf(nameof(_progression))] private int _cascadingToggles = -1;
 	[SerializeField] [HideIf(nameof(_progression))] private bool _adjacentCascadingToggles = false;
-    [SerializeField] private SolutionType _solutionType = SolutionType.SingleSolution;
-    [SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private ClicksCountToNextLevelRestriction _clicksCountRestriction = ClicksCountToNextLevelRestriction.HardRestriction;
-    [SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private bool _forceSingleSolution = false;
+	[SerializeField] private SolutionType _solutionType = SolutionType.SingleSolution;
+	[SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private ClicksCountToNextLevelRestriction _clicksCountRestriction = ClicksCountToNextLevelRestriction.HardRestriction;
+	[SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private bool _forceSingleSolution = false;
 	[SerializeField] [ShowIf(nameof(_solutionType), SolutionType.MultipleSolutions)] private CompletedSolutionsToNextLevelRestriction _completedSolutionsToNextLevelRestriction = CompletedSolutionsToNextLevelRestriction.AllSolutions;
 	[SerializeField] [ShowIf(nameof(_solutionType), SolutionType.MultipleSolutions)] private bool _forceMultipleSolution = false;
+	[SerializeField] private bool _binaryStateSquares = false;
 	[SerializeField] private bool _unclickableToggledSquares = false;
 
 	[HorizontalLine(1)]
@@ -121,7 +122,7 @@ public class Level : MonoBehaviour
 	[SerializeField] private bool _printSolutions = false;
 
 	public Square[] Squares { get; set; }
-    public Square[] SolutionSquares { get; set; }
+	public Square[] SolutionSquares { get; set; }
 	public List<Solution> Solutions { get; set; }
 	public int Clicks { get; set; }
 	public int TogglesThisClickSequence { get; set; }
@@ -132,29 +133,30 @@ public class Level : MonoBehaviour
 
 	public int ClicksLeft => Solutions[0].Sequence.Count - Clicks;
 	public bool UnclickableToggledSquares => _unclickableToggledSquares;
-    public bool EmptyHistory => _squareHistory.Count == 1;
-    public bool TopOfHistory => Clicks == _squareHistory.Count - 1;
-    public bool BottomOfHistory => Clicks == 0;
-    public SolutionType SolutionType => _solutionType;
-    public LevelPanel LevelPanel => _levelPanel;
-	
-	private string _levelsFileName => _solutionType == SolutionType.SingleSolution? _singleSolutionLevelsFile : _multiSolutionsLevelsFile;
-    private string _levelsFilePath => Application.persistentDataPath + "/" + _levelsFileName;
-	private ProgressionEntry _currentProgressionEntry => _progression 
-		? _progressionIndex <= _progressionEntries.Count - 1 
+	public bool EmptyHistory => _squareHistory.Count == 1;
+	public bool TopOfHistory => Clicks == _squareHistory.Count - 1;
+	public bool BottomOfHistory => Clicks == 0;
+	public SolutionType SolutionType => _solutionType;
+	public LevelPanel LevelPanel => _levelPanel;
+	public bool BinaryStateSquares => _binaryStateSquares;
+
+	private string _levelsFileName => _solutionType == SolutionType.SingleSolution ? _singleSolutionLevelsFile : _multiSolutionsLevelsFile;
+	private string _levelsFilePath => Application.persistentDataPath + "/" + _levelsFileName;
+	private ProgressionEntry _currentProgressionEntry => _progression
+		? _progressionIndex <= _progressionEntries.Count - 1
 			? _progressionEntries[_progressionIndex]
 			: _progressionEntries[_progressionEntries.Count - 1]
 		: _nonProgressionFakeProgressionEntry;
 
 	private Square _previousHoveredSquare;
-    private Rectangle _squareTemplateRectangle;
-    private Rectangle _solutionSquareTemplateRectangle;
-    private Square _lastSquareClickedDown;
-    private Vector2 _levelCompletionFeedbackFinalSize;
-    private Color _levelCompletionFeedbackBaseColor;
-    private int _progressionIndex;
-    //private int _progressionIndexBuffer;
-    private List<HistorySquare[]> _squareHistory;
+	private Rectangle _squareTemplateRectangle;
+	private Rectangle _solutionSquareTemplateRectangle;
+	private Square _lastSquareClickedDown;
+	private Vector2 _levelCompletionFeedbackFinalSize;
+	private Color _levelCompletionFeedbackBaseColor;
+	private int _progressionIndex;
+	//private int _progressionIndexBuffer;
+	private List<HistorySquare[]> _squareHistory;
 	private TestSquare[] _testSquares;
 	private Queue<string> _playedLevels;
 	//private List<string> _generatedLevels;
@@ -168,15 +170,15 @@ public class Level : MonoBehaviour
 	private Tweener _solutionRectangleScale;
 	private Tweener _levelRectangleScale;
 
-    private void Awake()
+	private void Awake()
 	{
-        _squareTemplateRectangle = _squareTemplate.GetComponent<Rectangle>();
-        _solutionSquareTemplateRectangle = _solutionSquareTemplate.GetComponent<Rectangle>();
+		_squareTemplateRectangle = _squareTemplate.GetComponent<Rectangle>();
+		_solutionSquareTemplateRectangle = _solutionSquareTemplate.GetComponent<Rectangle>();
 
-        _squareTemplate.SetActive(false);
-        _solutionSquareTemplate.SetActive(false);
+		_squareTemplate.SetActive(false);
+		_solutionSquareTemplate.SetActive(false);
 
-        _squareHistory = new List<HistorySquare[]>();
+		_squareHistory = new List<HistorySquare[]>();
 
 		_playedLevels = new Queue<string>();
 		//_generatedLevels = new List<string>();
@@ -188,10 +190,10 @@ public class Level : MonoBehaviour
 
 	private void Start()
 	{
-        _levelCompletionFeedbackFinalSize = new Vector2(Screen.width, Screen.height) / 50f;
-        _levelCompletionFeedback.Width = _levelCompletionFeedbackFinalSize.x / 100f;
-        _levelCompletionFeedback.Height = _levelCompletionFeedbackFinalSize.y / 100f;
-        _levelCompletionFeedbackBaseColor = _levelCompletionFeedback.Color;
+		_levelCompletionFeedbackFinalSize = new Vector2(Screen.width, Screen.height) / 50f;
+		_levelCompletionFeedback.Width = _levelCompletionFeedbackFinalSize.x / 100f;
+		_levelCompletionFeedback.Height = _levelCompletionFeedbackFinalSize.y / 100f;
+		_levelCompletionFeedbackBaseColor = _levelCompletionFeedback.Color;
 
 		LoadProgressionEntries();
 		GenerateLevel();
@@ -201,17 +203,17 @@ public class Level : MonoBehaviour
 		CanClick = true;
 	}
 
-    private void Update()
-    {
-        if(_lastSquareClickedDown == null && CanClick)
+	private void Update()
+	{
+		if (_lastSquareClickedDown == null && CanClick)
 		{
-			if(Input.GetKey(KeyCode.D))
+			if (Input.GetKey(KeyCode.D))
 			{
 				var mouseIsInQuadrant = GetQuadrant(Input.mousePosition) == Quadrant;
 
 				if (Input.GetKeyDown(KeyCode.Return) || (mouseIsInQuadrant && Input.GetKeyDown(KeyCode.N)))
 				{
-					if(_unclickableToggledSquares)
+					if (_unclickableToggledSquares)
 					{
 						_playedLevels.Enqueue(_levelCode);
 
@@ -220,7 +222,7 @@ public class Level : MonoBehaviour
 							_playedLevels.Dequeue();
 						}
 					}
-					
+
 					GenerateLevel();
 
 					return;
@@ -251,48 +253,48 @@ public class Level : MonoBehaviour
 
 			var squareHovered = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero).collider?.GetComponent<Square>();
 
-            if (squareHovered != null)
-            {
-                if(squareHovered.SolutionSquare || !squareHovered.Interactable || squareHovered.Level != this
-					|| (squareHovered.Toggled && _unclickableToggledSquares))
+			if (squareHovered != null)
+			{
+				if (squareHovered.SolutionSquare || !squareHovered.Interactable || squareHovered.Level != this
+					/*|| (squareHovered.Toggled && _unclickableToggledSquares)*/)
 				{
-                    squareHovered = null;
+					squareHovered = null;
 
-                }
-                else if (squareHovered != _previousHoveredSquare && !squareHovered.Highlighted)
-                {
-                    squareHovered.OnMouseOverEnter(true);
-                }
-            }
+				}
+				else if (squareHovered != _previousHoveredSquare && !squareHovered.Highlighted)
+				{
+					squareHovered.OnMouseOverEnter(true);
+				}
+			}
 
-            if (_previousHoveredSquare != null && _previousHoveredSquare.Highlighted && squareHovered != _previousHoveredSquare)
-            {
-                _previousHoveredSquare.OnMouseOverExit();
-            }
+			if (_previousHoveredSquare != null && _previousHoveredSquare.Highlighted && squareHovered != _previousHoveredSquare)
+			{
+				_previousHoveredSquare.OnMouseOverExit();
+			}
 
-            _previousHoveredSquare = squareHovered;
+			_previousHoveredSquare = squareHovered;
 
-            if (squareHovered != null)
-            {
-                if (Input.GetMouseButtonDown(0))
-                {
-                    squareHovered.OnMouseClickDown();
+			if (squareHovered != null)
+			{
+				if (Input.GetMouseButtonDown(0))
+				{
+					squareHovered.OnMouseClickDown();
 
-                    _lastSquareClickedDown = squareHovered;
-                }
-            }
-        }           
-        
-        if (Input.GetMouseButtonUp(0) && _lastSquareClickedDown != null)
-        {
-            var squareClickedUp = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero).collider?.GetComponent<Square>();
+					_lastSquareClickedDown = squareHovered;
+				}
+			}
+		}
 
-            var sameSquare = squareClickedUp != null && squareClickedUp == _lastSquareClickedDown;
+		if (Input.GetMouseButtonUp(0) && _lastSquareClickedDown != null)
+		{
+			var squareClickedUp = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero).collider?.GetComponent<Square>();
 
-            if(sameSquare)
+			var sameSquare = squareClickedUp != null && squareClickedUp == _lastSquareClickedDown;
+
+			if (sameSquare)
 			{
 				if (_solutionType == SolutionType.SingleSolution
-					&& _clicksCountRestriction == ClicksCountToNextLevelRestriction.HardRestriction 
+					&& _clicksCountRestriction == ClicksCountToNextLevelRestriction.HardRestriction
 					&& ClicksLeft <= 0)
 				{
 					_lastSquareClickedDown.Shake();
@@ -320,9 +322,10 @@ public class Level : MonoBehaviour
 
 					_lastSquareClickedDown.Click(true, false);
 
-					_lastSquareClickedDown.HideTargetPredictions();
+					//_lastSquareClickedDown.HideTargetPredictions();
+					//_lastSquareClickedDown.Interactable = false;
 
-					if(_solutionType == SolutionType.MultipleSolutions)
+					if (_solutionType == SolutionType.MultipleSolutions)
 					{
 						_lastSquareClickedDown.Interactable = false;
 					}
@@ -333,20 +336,20 @@ public class Level : MonoBehaviour
 				}
 			}
 
-			if(_lastSquareClickedDown != null)
+			if (_lastSquareClickedDown != null)
 			{
 				_lastSquareClickedDown.OnMouseClickUp();
 				_lastSquareClickedDown.OnMouseOverExit();
 
 				_lastSquareClickedDown = null;
 			}
-			
-			if(_previousHoveredSquare != null)
+
+			if (_previousHoveredSquare != null)
 			{
 				_previousHoveredSquare = null;
 			}
 		}
-    }
+	}
 
 	public int GetQuadrant(Vector2 screenPos)
 	{
@@ -366,7 +369,7 @@ public class Level : MonoBehaviour
 
 	public void EndClickSequence(bool fromPlayer)
 	{
-		if(!fromPlayer)
+		if (!fromPlayer)
 		{
 			return;
 		}
@@ -383,7 +386,7 @@ public class Level : MonoBehaviour
 		var splitLevelCode = levelCode.Split(';');
 		var splitSquaresCode = splitLevelCode[0].Split(',');
 
-		if(splitSquaresCode.Length != Squares.Length)
+		if (splitSquaresCode.Length != Squares.Length)
 		{
 			Debug.Log("Can't overwrite a level with a different amount of squares than in the level code");
 
@@ -399,7 +402,7 @@ public class Level : MonoBehaviour
 			var squareCodeTarget = (Square.TargetingScheme)int.Parse(splitSquaresCode[i][1].ToString());
 			var squareCodeCascading = splitSquaresCode[i].Length > 2 && splitSquaresCode[i][2] == 'c';
 
-			Squares[i].Overwrite(squareCodeToggle, squareCodeTarget, squareCodeCascading);
+			Squares[i].Overwrite(squareCodeToggle ? Square.PossibleToggleState.Two : Square.PossibleToggleState.Zero, squareCodeTarget, squareCodeCascading);
 		}
 
 		var firstHistorySnapshot = _squareHistory[0];
@@ -408,8 +411,8 @@ public class Level : MonoBehaviour
 		{
 			Squares[i].SetupTargets(Squares);
 
-			firstHistorySnapshot[i].Toggled = Squares[i].Toggled;
-			firstHistorySnapshot[i].Interactable = UnclickableToggledSquares ? !Squares[i].Toggled : true;
+			firstHistorySnapshot[i].ToggledState = Squares[i].ToggledState;
+			firstHistorySnapshot[i].Interactable = UnclickableToggledSquares ? Squares[i].ToggledState == Square.PossibleToggleState.Zero : true;
 			firstHistorySnapshot[i].Cascading = Squares[i].Cascading;
 		}
 
@@ -424,11 +427,11 @@ public class Level : MonoBehaviour
 		GenerateSolution(splitGoalCode, splitSolutionsCode);
 	}
 
-    public void GenerateLevel(string levelCode = null)
+	public void GenerateLevel(string levelCode = null)
 	{
 		StopAllCoroutines();
 
-		if(_levelCompleteHeightScale != null)
+		if (_levelCompleteHeightScale != null)
 		{
 			_levelCompleteHeightScale.Kill(true);
 			_levelCompleteHeightScale = null;
@@ -475,7 +478,7 @@ public class Level : MonoBehaviour
 			}
 		}
 
-		if(Solutions != null)
+		if (Solutions != null)
 		{
 			foreach (var solution in Solutions)
 			{
@@ -488,10 +491,7 @@ public class Level : MonoBehaviour
 			Solutions.Clear();
 		}
 
-		if (_unclickableToggledSquares)
-		{
-			_levelPanel.UpdateInvalidLevelX(false);
-		}
+		_levelPanel.UpdateInvalidLevelX(false);
 
 		var splitLevelCode = levelCode != null ? levelCode.Split(';') : null;
 		var splitSquaresCode = levelCode != null ? splitLevelCode[0].Split(',') : null;
@@ -524,7 +524,7 @@ public class Level : MonoBehaviour
 		SolutionSquares = new Square[squares];
 
 		for (var i = 0; i < squares; i++)
-		{ 
+		{
 			var newSquare = Instantiate(_squareTemplate, _squareTemplate.transform.parent).GetComponent<Square>();
 			newSquare.transform.localPosition = -(Vector3.right * (_squareTemplateRectangle.Width + _squaresDistance) * (squares - 1)) / 2f
 				+ Vector3.right * (_squareTemplateRectangle.Width + _squaresDistance) * i;
@@ -546,7 +546,7 @@ public class Level : MonoBehaviour
 			indices[i] = i;
 		}
 
-		if(splitSquaresCode != null)
+		if (splitSquaresCode != null)
 		{
 			for (var i = 0; i < Squares.Length; i++)
 			{
@@ -563,14 +563,14 @@ public class Level : MonoBehaviour
 		}
 		else
 		{
-			if(Squares.Length == 1)
+			if (Squares.Length == 1)
 			{
 				var square = Squares[0];
 
 				square.TargetScheme = Square.TargetingScheme.Self;
 				square.SetCascading(false, false);
 			}
-			else if(Squares.Length == 2)
+			else if (Squares.Length == 2)
 			{
 				var firstSquare = Squares[UnityEngine.Random.Range(0, 2)];
 				var otherSquare = firstSquare.PreviousSquare;
@@ -601,7 +601,7 @@ public class Level : MonoBehaviour
 
 				for (var i = 0; i < shuffledSquaresArray.Length; i++)
 				{
-					if(!atLeastOneUntoggledSquare && i == shuffledSquaresArray.Length - 1)
+					if (!atLeastOneUntoggledSquare && i == shuffledSquaresArray.Length - 1)
 					{
 						break;
 					}
@@ -611,7 +611,7 @@ public class Level : MonoBehaviour
 						shuffledSquaresArray[i].Toggle();
 					}
 
-					if(!atLeastOneUntoggledSquare && !shuffledSquaresArray[i].Toggled)
+					if (!atLeastOneUntoggledSquare && shuffledSquaresArray[i].ToggledState == Square.PossibleToggleState.Zero)
 					{
 						atLeastOneUntoggledSquare = true;
 					}
@@ -778,7 +778,7 @@ public class Level : MonoBehaviour
 					}
 				}
 
-				if(Squares.Length == 3 && Squares.All(x => x.TargetScheme == Square.TargetingScheme.Self))
+				if (Squares.Length == 3 && Squares.All(x => x.TargetScheme == Square.TargetingScheme.Self))
 				{
 					Debug.Log("Ended up generating a level with all three squares self targeting, correcting this");
 
@@ -916,15 +916,15 @@ public class Level : MonoBehaviour
 
 			firstHistorySnapshot[i] = new HistorySquare()
 			{
-				Toggled = square.Toggled,
-				Interactable = _unclickableToggledSquares ? !square.Toggled : true,
+				ToggledState = square.ToggledState,
+				Interactable = true,
 				Cascading = square.Cascading
 			};
 
 			SolutionSquares[i].Initialize(this, square);
 			SolutionSquares[i].TargetScheme = square.TargetScheme;
 			SolutionSquares[i].SetCascading(square.Cascading, false);
-			SolutionSquares[i].ToggleTo(square.Toggled);
+			SolutionSquares[i].ToggleTo(square.ToggledState);
 
 			_testSquares[i] = new TestSquare(square);
 
@@ -968,7 +968,7 @@ public class Level : MonoBehaviour
 
 		CheckLevelCompletion(false);
 
-		UpdateChecksAndCrosses();
+		//UpdateChecksAndCrosses();
 
 		_levelPanel.UpdateHistoryButtons(false);
 
@@ -1015,7 +1015,7 @@ public class Level : MonoBehaviour
 	{
 		Solutions = new List<Solution>();
 
-		foreach(var solutionstring in splitSolutionsCode)
+		foreach (var solutionstring in splitSolutionsCode)
 		{
 			var newSolution = new Solution();
 			var sequence = new List<int>();
@@ -1025,7 +1025,7 @@ public class Level : MonoBehaviour
 				var character = solutionstring[i];
 				var parsed = int.TryParse(character.ToString(), out int solutionInt);
 
-				if(parsed)
+				if (parsed)
 				{
 					sequence.Add(solutionInt);
 				}
@@ -1040,20 +1040,20 @@ public class Level : MonoBehaviour
 		{
 			var solutionSquare = SolutionSquares[i];
 
-			solutionSquare.ToggleTo(splitGoalCode[i] == "t");
+			solutionSquare.ToggleTo(splitGoalCode[i] == "t" ? Square.PossibleToggleState.Two : Square.PossibleToggleState.Zero);
 		}
 	}
 
 	private void GenerateSolution(int[] indices, int attempt)
 	{
-		if(attempt > 0)
+		if (attempt > 0)
 		{
 			foreach (var solutionSquare in SolutionSquares)
 			{
 				solutionSquare.Reinitialize();
 			}
 		}
-		
+
 		Solutions = new List<Solution>();
 
 		var validSolutionSequence = false;
@@ -1083,7 +1083,7 @@ public class Level : MonoBehaviour
 
 				for (var j = 0; j < Squares.Length; j++)
 				{
-					if (Squares[j].Toggled != SolutionSquares[j].Toggled)
+					if (Squares[j].ToggledState != SolutionSquares[j].ToggledState)
 					{
 						validSolutionSequence = true;
 
@@ -1095,7 +1095,7 @@ public class Level : MonoBehaviour
 			{
 				validSolutionSequence = false;
 
-				if(_unclickableToggledSquares)
+				if (_unclickableToggledSquares)
 				{
 					mainSolution = new Solution
 					{
@@ -1107,7 +1107,7 @@ public class Level : MonoBehaviour
 
 					for (var j = 0; j < maxSolutionSequenceLength; j++)
 					{
-						var untoggledSquares = SolutionSquares.Where(x => !x.Toggled && x.Id != lastToggledIndex);
+						var untoggledSquares = SolutionSquares.Where(x => x.ToggledState == Square.PossibleToggleState.Zero && x.Id != lastToggledIndex);
 
 						if (untoggledSquares.Count() == 0)
 						{
@@ -1128,6 +1128,15 @@ public class Level : MonoBehaviour
 						Sequence = new List<int>(new int[indices.Length - _maxClicksBufferForSolution])
 					};
 
+					/*if(!_binaryStateSquares)
+					{
+						var indicesTwice = new List<int>();
+						indicesTwice.AddRange(indices);
+						indicesTwice.AddRange(indices);
+
+						indices = indicesTwice.ToArray();
+					}*/
+
 					var shuffledIndices = indices.OrderBy(a => System.Guid.NewGuid()).ToArray();
 
 					for (var j = 0; j < mainSolution.Sequence.Count; j++)
@@ -1139,10 +1148,10 @@ public class Level : MonoBehaviour
 				}
 
 				//_solutionSequence = new int[Random.Range(_minClicksForSolution, squares - _maxClicksBufferForSolution)];
-				
+
 				for (var j = 0; j < Squares.Length; j++)
 				{
-					if (Squares[j].Toggled != SolutionSquares[j].Toggled)
+					if (Squares[j].ToggledState != SolutionSquares[j].ToggledState)
 					{
 						validSolutionSequence = true;
 
@@ -1152,7 +1161,7 @@ public class Level : MonoBehaviour
 					}
 				}
 			}
-			
+
 			var tentativeLevelCode = GetCurrentLevelCode();
 			var splitTentativeLevelCode = tentativeLevelCode.Split(';');
 
@@ -1176,7 +1185,7 @@ public class Level : MonoBehaviour
 				break;
 			}
 		}
-		
+
 		if (!validSolutionSequence)
 		{
 			Debug.Log("Couldn't generate a valid solution sequence, loading a prevalidated level from file");
@@ -1206,6 +1215,8 @@ public class Level : MonoBehaviour
 			else
 			{
 				Debug.Log($"Couldn't find a valid unplayed pregenerated level... What do we do here???");
+
+				_levelPanel.UpdateInvalidLevelX(true);
 			}
 		}
 
@@ -1303,7 +1314,7 @@ public class Level : MonoBehaviour
 			var lines = File.ReadAllLines(_levelsFilePath);
 			var save = true;
 
-			foreach(var line in lines)
+			foreach (var line in lines)
 			{
 				var splitLine = line.Split(';');
 				var splitLevelCode = _levelCode.Split(';');
@@ -1339,7 +1350,7 @@ public class Level : MonoBehaviour
 	[Button]
 	private void PrintSolutions()
 	{
-		if(Solutions == null)
+		if (Solutions == null)
 		{
 			Debug.Log("Printing solutions is only possible while playing");
 
@@ -1366,7 +1377,7 @@ public class Level : MonoBehaviour
 
 		var possibleLines = new List<string>();
 
-		foreach(var line in lines)
+		foreach (var line in lines)
 		{
 			/*if (_playedLevels.Any(x => x.Equals(line)))
 			{
@@ -1534,7 +1545,7 @@ public class Level : MonoBehaviour
 		{
 			var square = Squares[i];
 
-			levelLine += $"{(square.Toggled ? "t" : "f")}{(int)square.TargetScheme}{(square.Cascading ? "c" : string.Empty)}{(i < Squares.Length - 1 ? "," : string.Empty)}";
+			levelLine += $"{(square.ToggledState != Square.PossibleToggleState.Zero ? "t" : "f")}{(int)square.TargetScheme}{(square.Cascading ? "c" : string.Empty)}{(i < Squares.Length - 1 ? "," : string.Empty)}";
 		}
 
 		levelLine += ";";
@@ -1543,7 +1554,7 @@ public class Level : MonoBehaviour
 		{
 			var solutionSquare = SolutionSquares[i];
 
-			levelLine += $"{(solutionSquare.Toggled ? "t" : "f")}{(i < SolutionSquares.Length - 1 ? "," : string.Empty)}";
+			levelLine += $"{(solutionSquare.ToggledState != Square.PossibleToggleState.Zero ? "t" : "f")}{(i < SolutionSquares.Length - 1 ? "," : string.Empty)}";
 		}
 
 		levelLine += ";";
@@ -1567,7 +1578,7 @@ public class Level : MonoBehaviour
 
 	private void Combine(int[] array, List<int> currentCombination, int startIndex, int n)
 	{
-		if(_solutionType == SolutionType.SingleSolution && Solutions.Count > 1)
+		if (_solutionType == SolutionType.SingleSolution && Solutions.Count > 1)
 		{
 			return;
 		}
@@ -1577,7 +1588,7 @@ public class Level : MonoBehaviour
 			//var sameAsMainSolutionSequence = currentCombination.SequenceEqual(PotentialSolutions[0].Sequence.OrderBy(x => x));
 			var sameAsMainSolutionSequence = currentCombination.SequenceEqual(Solutions[0].Sequence.OrderBy(x => x));
 
-			if(sameAsMainSolutionSequence)
+			if (sameAsMainSolutionSequence)
 			{
 				return;
 			}
@@ -1606,7 +1617,7 @@ public class Level : MonoBehaviour
 
 			for (var i = 0; i < _testSquares.Length; i++)
 			{
-				if (_testSquares[i].Toggled != SolutionSquares[i].Toggled)
+				if (_testSquares[i].ToggledState != SolutionSquares[i].ToggledState)
 				{
 					return;
 				}
@@ -1615,7 +1626,7 @@ public class Level : MonoBehaviour
 			//PotentialSolutions.Add(new Solution
 			Solutions.Add(new Solution
 			{
-				Sequence = new List<int>(currentCombination)
+				Sequence = currentCombination.ToList()
 			});
 
 			return;
@@ -1701,7 +1712,7 @@ public class Level : MonoBehaviour
 	}*/
 
 	public void NextLevel()
-    {
+	{
 		/*if(_progressionIndexBuffer < 0)
 		{
 			_progressionIndexBuffer++;
@@ -1711,18 +1722,18 @@ public class Level : MonoBehaviour
 			return;
 		}*/
 
-        if (_solutionType == SolutionType.SingleSolution
-			&& _clicksCountRestriction == ClicksCountToNextLevelRestriction.SoftRestriction 
+		if (_solutionType == SolutionType.SingleSolution
+			&& _clicksCountRestriction == ClicksCountToNextLevelRestriction.SoftRestriction
 			&& ClicksLeft < 0)
-        {
-            _levelPanel.ShakeNextLevelButton();
-            _levelPanel.ShakeClicksCounter();
-        }
-        else
-        {
+		{
+			_levelPanel.ShakeNextLevelButton();
+			_levelPanel.ShakeClicksCounter();
+		}
+		else
+		{
 			GenerateLevel();
-        }
-    }
+		}
+	}
 
 	/*public void Previouslevel()
 	{
@@ -1731,7 +1742,7 @@ public class Level : MonoBehaviour
 		GenerateLevel(_generatedLevels[_progressionIndex + _progressionIndexBuffer]);
 	}*/
 
-	public void UpdateChecksAndCrosses()
+	/*public void UpdateChecksAndCrosses()
 	{
 		foreach (var square in Squares)
 		{
@@ -1739,93 +1750,93 @@ public class Level : MonoBehaviour
 
 			SolutionSquares[square.Id].UpdateCheckAndCross(correct, false);
 		}
-	}
+	}*/
 
-    public void ResetLevel()
+	public void ResetLevel()
 	{
-        LoadHistorySnapshot(0);
+		LoadHistorySnapshot(0);
 
 		CheckLevelCompletion(false);
 
-		UpdateChecksAndCrosses();
+		//UpdateChecksAndCrosses();
 
 		_levelPanel.UpdateHistoryButtons(false);
 	}
 
-    public void Undo()
+	public void Undo()
 	{
-        if(Clicks == 0)
+		if (Clicks == 0)
 		{
-            return;
-        }
+			return;
+		}
 
-        LoadHistorySnapshot(Clicks - 1);
+		LoadHistorySnapshot(Clicks - 1);
 
 		CheckLevelCompletion(false);
 
-		UpdateChecksAndCrosses();
+		//UpdateChecksAndCrosses();
 
 		_levelPanel.UpdateHistoryButtons(false);
 	}
 
-    public void Redo()
-    {
-        if (Clicks >= _squareHistory.Count - 1)
-        {
-            return;
-        }
-
-        LoadHistorySnapshot(Clicks + 1);
-
-		CheckLevelCompletion(false);
-
-		UpdateChecksAndCrosses();
-
-		_levelPanel.UpdateHistoryButtons(false);
-	}
-
-    private void AddNewHistorySnapshot()
+	public void Redo()
 	{
-        for(var i = _squareHistory.Count - 1; i >= Clicks; i--)
+		if (Clicks >= _squareHistory.Count - 1)
 		{
-            _squareHistory.RemoveAt(i); 
-        }
+			return;
+		}
 
-        var newHistorySnapshot = new HistorySquare[Squares.Length];
+		LoadHistorySnapshot(Clicks + 1);
 
-        for(var i = 0; i < Squares.Length; i++)
+		CheckLevelCompletion(false);
+
+		//UpdateChecksAndCrosses();
+
+		_levelPanel.UpdateHistoryButtons(false);
+	}
+
+	private void AddNewHistorySnapshot()
+	{
+		for (var i = _squareHistory.Count - 1; i >= Clicks; i--)
+		{
+			_squareHistory.RemoveAt(i);
+		}
+
+		var newHistorySnapshot = new HistorySquare[Squares.Length];
+
+		for (var i = 0; i < Squares.Length; i++)
 		{
 			newHistorySnapshot[i] = new HistorySquare()
 			{
-				Toggled = Squares[i].Toggled,
-				Interactable = _unclickableToggledSquares ? !Squares[i].Toggled : true,
+				ToggledState = Squares[i].ToggledState,
+				Interactable = Squares[i].Interactable,
 				Cascading = Squares[i].Cascading
 			};
-        }
+		}
 
-        _squareHistory.Add(newHistorySnapshot);
-    }
+		_squareHistory.Add(newHistorySnapshot);
+	}
 
-    private void LoadHistorySnapshot(int index)
+	private void LoadHistorySnapshot(int index)
 	{
-        Clicks = index;
+		Clicks = index;
 
-        var historySnapshot = _squareHistory[Clicks];
+		var historySnapshot = _squareHistory[Clicks];
 
-        for (var i = 0; i < Squares.Length; i++)
-        {
-            Squares[i].ToggleTo(historySnapshot[i].Toggled);
+		for (var i = 0; i < Squares.Length; i++)
+		{
+			Squares[i].ToggleTo(historySnapshot[i].ToggledState);
 			Squares[i].Interactable = historySnapshot[i].Interactable;
 			Squares[i].SetCascading(historySnapshot[i].Cascading, false);
 		}
 
-		foreach(var square in Squares)
+		foreach (var square in Squares)
 		{
 			square.SetupPredictions(false);
 		}
 
-        _levelPanel.UpdateClicksCounter(false);
-    }
+		_levelPanel.UpdateClicksCounter(false);
+	}
 
 	public bool GetLevelCompletion(bool fromClickedSquare)
 	{
@@ -1844,7 +1855,7 @@ public class Level : MonoBehaviour
 
 		for (var i = 0; i < Squares.Length; i++)
 		{
-			var correct = Squares[i].Toggled == SolutionSquares[i].Toggled;
+			var correct = Squares[i].ToggledState == SolutionSquares[i].ToggledState;
 
 			if (!correct && levelComplete)
 			{
@@ -1866,13 +1877,13 @@ public class Level : MonoBehaviour
 		var allSolutionsFound = true;
 		var solutionAlreadyFound = false;
 
-		if(_solutionType == SolutionType.MultipleSolutions)
+		if (_solutionType == SolutionType.MultipleSolutions)
 		{
 			foreach (var solution in Solutions)
 			{
 				if (solution.Solved)
 				{
-					if(Clicks == solution.Sequence.Count)
+					if (Clicks == solution.Sequence.Count)
 					{
 						solutionAlreadyFound = true;
 					}
@@ -1887,7 +1898,7 @@ public class Level : MonoBehaviour
 
 				solution.Solved = Clicks == solutionClicks && levelComplete;
 
-				if(!solution.Solved)
+				if (!solution.Solved)
 				{
 					allSolutionsFound = false;
 				}
@@ -1909,7 +1920,7 @@ public class Level : MonoBehaviour
 				Solutions[0].Solved = Clicks == Solutions[0].Sequence.Count && levelComplete;
 			}
 		}
-        
+
 		if (_solutionType == SolutionType.SingleSolution
 			&& (_clicksCountRestriction != ClicksCountToNextLevelRestriction.SoftRestriction || ClicksLeft >= 0))
 		{
@@ -1917,7 +1928,7 @@ public class Level : MonoBehaviour
 			{
 				var square = Squares[i];
 
-				if(levelComplete)
+				if (levelComplete)
 				{
 					square.Interactable = false;
 				}
@@ -1943,7 +1954,7 @@ public class Level : MonoBehaviour
 			&& _clicksCountRestriction == ClicksCountToNextLevelRestriction.SoftRestriction
 			&& ClicksLeft < 0)
 			{
-				_levelPanel.ShakeClicksCounter();
+				LevelPanel.ShakeClicksCounter();
 			}
 
 			yield return new WaitForSeconds(_levelCompleteSequenceDelays[0]);
@@ -1973,7 +1984,7 @@ public class Level : MonoBehaviour
 
 					_levelPanel.UpdateLevelsClearedText(_progressionIndex, true/*, true*/);
 
-					if(_unclickableToggledSquares)
+					if (_unclickableToggledSquares)
 					{
 						_playedLevels.Enqueue(_levelCode);
 
@@ -1995,19 +2006,19 @@ public class Level : MonoBehaviour
 		}
 		else
 		{
-			_levelPanel.UpdateNextLevelButton(_trulyCompleted || (levelComplete
+			LevelPanel.UpdateNextLevelButton(_trulyCompleted || (levelComplete
 				&& (_clicksCountRestriction == ClicksCountToNextLevelRestriction.NoRestriction
 					|| (_clicksCountRestriction == ClicksCountToNextLevelRestriction.SoftRestriction && ClicksLeft >= 0)
 					|| (_clicksCountRestriction == ClicksCountToNextLevelRestriction.HardRestriction && ClicksLeft >= 0)
 					)));
 		}
 	}
-	
+
 	private void LoadProgressionEntries()
 	{
 		var lines = Resources.Load<TextAsset>(_progressionFile.Split('.')[0]).text.Split('\n');
 
-		foreach(var line in lines)
+		foreach (var line in lines)
 		{
 			var splitLine = line.Split(';');
 
@@ -2027,7 +2038,7 @@ public class Level : MonoBehaviour
 		}
 	}
 
-    private void ShowLevelCompleteAnimation(bool trueCompletion)
+	private void ShowLevelCompleteAnimation(bool trueCompletion)
 	{
 		if (_levelRectangleScale != null)
 		{
@@ -2056,35 +2067,35 @@ public class Level : MonoBehaviour
 		}
 
 		_levelCompleteWidthScale = DOTween.To(() => levelCompletionFeedbackWidth, x =>
-        {
-            levelCompletionFeedbackWidth = x;
-
-            _levelCompletionFeedback.Width = levelCompletionFeedbackWidth;
-        },
-        _levelCompletionFeedbackFinalSize.x * (trueCompletion ? 1f : 0.8125f),
-        _levelCompletionTime).SetEase(_levelCompletionCurve).OnComplete(() =>
 		{
-            _levelCompletionFeedback.Width = _levelCompletionFeedbackFinalSize.x / 100f;
+			levelCompletionFeedbackWidth = x;
+
+			_levelCompletionFeedback.Width = levelCompletionFeedbackWidth;
+		},
+		_levelCompletionFeedbackFinalSize.x * (trueCompletion ? 1f : 0.8125f),
+		_levelCompletionTime).SetEase(_levelCompletionCurve).OnComplete(() =>
+		{
+			_levelCompletionFeedback.Width = _levelCompletionFeedbackFinalSize.x / 100f;
 
 			_levelCompleteWidthScale = null;
 
 		});
 
-		if(_levelCompleteHeightScale != null)
+		if (_levelCompleteHeightScale != null)
 		{
 			_levelCompleteHeightScale.Kill(true);
 		}
 
-        _levelCompleteHeightScale = DOTween.To(() => levelCompletionFeedbackHeight, x =>
-        {
-            levelCompletionFeedbackHeight = x;
+		_levelCompleteHeightScale = DOTween.To(() => levelCompletionFeedbackHeight, x =>
+		{
+			levelCompletionFeedbackHeight = x;
 
-            _levelCompletionFeedback.Height = levelCompletionFeedbackHeight;
-        },
-        _levelCompletionFeedbackFinalSize.y * (trueCompletion ? 1f : 0.8125f),
-        _levelCompletionTime).SetEase(_levelCompletionCurve).OnComplete(() =>
-        {
-            _levelCompletionFeedback.Height = _levelCompletionFeedbackFinalSize.y / 100f;
+			_levelCompletionFeedback.Height = levelCompletionFeedbackHeight;
+		},
+		_levelCompletionFeedbackFinalSize.y * (trueCompletion ? 1f : 0.8125f),
+		_levelCompletionTime).SetEase(_levelCompletionCurve).OnComplete(() =>
+		{
+			_levelCompletionFeedback.Height = _levelCompletionFeedbackFinalSize.y / 100f;
 
 			_levelCompleteHeightScale = null;
 
@@ -2100,23 +2111,23 @@ public class Level : MonoBehaviour
 		_levelCompletionFeedback.Color = trueCompletion ? _trueLevelCompletionColor : _levelCompletionFeedbackBaseColor;
 
 		_levelCompleteThicknessScale = DOTween.To(() => time, x =>
-        {
-            time = x;
+		{
+			time = x;
 
-            _levelCompletionFeedback.Thickness = levelCompletionFeedbackThicknessBaseValue 
+			_levelCompletionFeedback.Thickness = levelCompletionFeedbackThicknessBaseValue
 			* _levelCompletionThicknessCurve.Evaluate(time)
 			* (trueCompletion ? 1f : 0.375f);
 
-            var color = _levelCompletionFeedback.Color;
-            color.a = _levelCompletionAlphaCurve.Evaluate(time);
+			var color = _levelCompletionFeedback.Color;
+			color.a = _levelCompletionAlphaCurve.Evaluate(time);
 
-            _levelCompletionFeedback.Color = color;
-        },
-        1f,
-        _levelCompletionTime).SetEase(_levelCompletionCurve).OnComplete(() =>
-        {
-            _levelCompletionFeedback.Thickness = levelCompletionFeedbackThicknessBaseValue;
-            _levelCompletionFeedback.Color = _levelCompletionFeedbackBaseColor;
+			_levelCompletionFeedback.Color = color;
+		},
+		1f,
+		_levelCompletionTime).SetEase(_levelCompletionCurve).OnComplete(() =>
+		{
+			_levelCompletionFeedback.Thickness = levelCompletionFeedbackThicknessBaseValue;
+			_levelCompletionFeedback.Color = _levelCompletionFeedbackBaseColor;
 
 			_levelCompleteThicknessScale = null;
 		});
@@ -2158,7 +2169,7 @@ public class Level : MonoBehaviour
 
 		var newLines = new List<string>();
 
-		foreach(var line in lines)
+		foreach (var line in lines)
 		{
 			var squareCodes = line.Split(';')[0].Split(',');
 
@@ -2173,8 +2184,8 @@ public class Level : MonoBehaviour
 			{
 				var otherSplitLine = x.Split(';');
 
-				return splitLine[0].Equals(otherSplitLine[0], StringComparison.OrdinalIgnoreCase) 
-				&& splitLine[1].Equals(otherSplitLine[1], StringComparison.OrdinalIgnoreCase) 
+				return splitLine[0].Equals(otherSplitLine[0], StringComparison.OrdinalIgnoreCase)
+				&& splitLine[1].Equals(otherSplitLine[1], StringComparison.OrdinalIgnoreCase)
 				&& splitLine[2].Length == otherSplitLine[2].Length;
 			});
 

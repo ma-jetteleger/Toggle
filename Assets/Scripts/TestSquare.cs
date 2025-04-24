@@ -4,24 +4,28 @@ using UnityEngine;
 
 public class TestSquare
 {
-	public bool OriginalState;
-	public bool Toggled;
+	public Square.PossibleToggleState OriginalToggledState;
+	public Square.PossibleToggleState ToggledState;
 	public int[] TargetIds;
 	public bool Cascading;
 	public bool OriginalCascading;
 
+	private Square _referenceSquare;
+
 	public TestSquare(Square referenceSquare)
 	{
-		OriginalState = referenceSquare.Toggled;
-		Toggled = OriginalState;
+		_referenceSquare = referenceSquare;
 
-		Cascading = referenceSquare.Cascading;
+		OriginalToggledState = _referenceSquare.ToggledState;
+		ToggledState = OriginalToggledState;
+
+		Cascading = _referenceSquare.Cascading;
 		OriginalCascading = Cascading;
 	}
 
 	public void Reset()
 	{
-		Toggled = OriginalState;
+		ToggledState = OriginalToggledState;
 		Cascading = OriginalCascading;
 	}
 
@@ -40,9 +44,17 @@ public class TestSquare
 		foreach (var targetId in TargetIds)
 		{
 			var target = testSquares[targetId];
-			target.Toggled = !target.Toggled;
 
-			if(target.Cascading && target != this)
+			target.ToggledState = _referenceSquare.Level.BinaryStateSquares
+				? (Square.PossibleToggleState)(((int)target.ToggledState) + 2)
+				: (Square.PossibleToggleState)(((int)target.ToggledState) + 1);
+
+			if ((int)target.ToggledState >= System.Enum.GetNames(typeof(Square.PossibleToggleState)).Length)
+			{
+				target.ToggledState = Square.PossibleToggleState.Zero;
+			}
+
+			if (target.Cascading && target != this)
 			{
 				target.Cascading = false;
 				target.Click(testSquares);

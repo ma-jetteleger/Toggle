@@ -104,7 +104,10 @@ public class LevelPanel : MonoBehaviour
 	{
 		_invalidLevelX.SetActive(active);
 
-		UpdateNextLevelButton(true);
+		if (active)
+		{
+			UpdateNextLevelButton(true);
+		}
 	}
 
 	IEnumerator PositionAfterLayout()

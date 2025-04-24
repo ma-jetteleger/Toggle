@@ -20,17 +20,17 @@ public class PaletteManager : MonoBehaviour
 
 	private void Start()
 	{
-		for (var i = 0; i < _colorPalettes[0].Colors.Length; i++)
+		/*for (var i = 0; i < _colorPalettes[0].Colors.Length; i++)
 		{
 			if (_squareTemplate.ToggledColor == _colorPalettes[0].Colors[i])
 			{
 				_squareTemplate.ToggledColor = _colorPalettes[_activePaletteIndex].Colors[i];
 			}
 
-			/*if (_squareTemplate.ToggledTargetIndicatorColor == _colorPalettes[0].Colors[i])
+			if (_squareTemplate.ToggledTargetIndicatorColor == _colorPalettes[0].Colors[i])
 			{
 				_squareTemplate.ToggledTargetIndicatorColor = _colorPalettes[_activePaletteIndex].Colors[i];
-			}*/
+			}
 
 			if (_squareTemplate.ClickedOutlineColor == _colorPalettes[0].Colors[i])
 			{
@@ -183,7 +183,7 @@ public class PaletteManager : MonoBehaviour
 					break;
 				}
 			}
-		}
+		}*/
 	}
 
 	private bool AreColorsEqual(Color color1, Color color2)
