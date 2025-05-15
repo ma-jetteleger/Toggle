@@ -1338,8 +1338,14 @@ public class Level : MonoBehaviour
 		}
 #endif
 
-		//Solutions = Solutions.OrderByDescending(x => x.Sequence.Length).ToList();
-		Solutions = Solutions.OrderBy(x => x.Sequence.Count).ToList();
+		if(_unclickableToggledSquares)
+		{
+			Solutions = Solutions.OrderByDescending(x => x.Sequence.Count).ToList();
+		}
+		else
+		{
+			Solutions = Solutions.OrderBy(x => x.Sequence.Count).ToList();
+		}
 
 #if UNITY_EDITOR
 		if (_printSolutions)
