@@ -108,6 +108,7 @@ public class Level : MonoBehaviour
 	[SerializeField] [ShowIf(nameof(_solutionType), SolutionType.MultipleSolutions)] private bool _forceMultipleSolution = false;
 	[SerializeField] private bool _binaryStateSquares = false;
 	[SerializeField] private bool _unclickableToggledSquares = false;
+	[SerializeField] private bool _distanceToggles = false;
 
 	[HorizontalLine(1)]
 
@@ -139,6 +140,7 @@ public class Level : MonoBehaviour
 	public SolutionType SolutionType => _solutionType;
 	public LevelPanel LevelPanel => _levelPanel;
 	public bool BinaryStateSquares => _binaryStateSquares;
+	public bool DistanceToggles => _distanceToggles;
 
 	private string _levelsFileName => _solutionType == SolutionType.SingleSolution ? _singleSolutionLevelsFile : _multiSolutionsLevelsFile;
 	private string _levelsFilePath => Application.persistentDataPath + "/" + _levelsFileName;
@@ -213,7 +215,7 @@ public class Level : MonoBehaviour
 
 				if (Input.GetKeyDown(KeyCode.Return) || (mouseIsInQuadrant && Input.GetKeyDown(KeyCode.N)))
 				{
-					if (_unclickableToggledSquares)
+					/*if (_unclickableToggledSquares || _distanceToggles || _binaryStateSquares)
 					{
 						_playedLevels.Enqueue(_levelCode);
 
@@ -221,7 +223,7 @@ public class Level : MonoBehaviour
 						{
 							_playedLevels.Dequeue();
 						}
-					}
+					}*/
 
 					GenerateLevel();
 
@@ -917,7 +919,7 @@ public class Level : MonoBehaviour
 			firstHistorySnapshot[i] = new HistorySquare()
 			{
 				ToggledState = square.ToggledState,
-				Interactable = true,
+				Interactable = _unclickableToggledSquares ? Squares[i].ToggledState == Square.PossibleToggleState.Zero : true,
 				Cascading = square.Cascading
 			};
 
@@ -1190,9 +1192,9 @@ public class Level : MonoBehaviour
 		{
 			Debug.Log("Couldn't generate a valid solution sequence, loading a prevalidated level from file");
 
-			if (_unclickableToggledSquares)
+			if (_unclickableToggledSquares || _distanceToggles || _binaryStateSquares)
 			{
-				Debug.Log($"Loading prevalidated levels from file isn't supported for levels with unclickable toggled squares." +
+				Debug.Log($"Loading prevalidated levels from file isn't supported for non-regular levels. " +
 					$"Press D + Enter to try and generate a new random level");
 
 				_levelPanel.UpdateInvalidLevelX(true);
@@ -1271,9 +1273,9 @@ public class Level : MonoBehaviour
 				return;
 			}*/
 
-			if (_unclickableToggledSquares)
+			if (_unclickableToggledSquares || _distanceToggles || _binaryStateSquares)
 			{
-				Debug.Log($"Loading prevalidated levels from file isn't supported for levels with unclickable toggled squares." +
+				Debug.Log($"Loading prevalidated levels from file isn't supported for non-regular levels." +
 					$"settling for a random level");
 
 #if UNITY_EDITOR
@@ -1826,7 +1828,7 @@ public class Level : MonoBehaviour
 		for (var i = 0; i < Squares.Length; i++)
 		{
 			Squares[i].ToggleTo(historySnapshot[i].ToggledState);
-			Squares[i].Interactable = historySnapshot[i].Interactable;
+			Squares[i].Interactable = _unclickableToggledSquares ? Squares[i].ToggledState == Square.PossibleToggleState.Zero : historySnapshot[i].Interactable;
 			Squares[i].SetCascading(historySnapshot[i].Cascading, false);
 		}
 
@@ -1984,7 +1986,7 @@ public class Level : MonoBehaviour
 
 					_levelPanel.UpdateLevelsClearedText(_progressionIndex, true/*, true*/);
 
-					if (_unclickableToggledSquares)
+					/*if (_unclickableToggledSquares)
 					{
 						_playedLevels.Enqueue(_levelCode);
 
@@ -1992,7 +1994,7 @@ public class Level : MonoBehaviour
 						{
 							_playedLevels.Dequeue();
 						}
-					}
+					}*/
 				}
 			}
 		}

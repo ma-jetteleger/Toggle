@@ -34,6 +34,9 @@ public class Square : MonoBehaviour
     [SerializeField] private Disc _cascadingIndicator = null;
     [SerializeField] private GameObject _solutionCheck = null;
     [SerializeField] private GameObject _solutionCross = null;
+    [SerializeField] private GameObject _distanceTogglePlus1 = null;
+    [SerializeField] private GameObject _distanceTogglePlus2 = null;
+    [SerializeField] private GameObject _distanceTogglePlus3 = null;
 
     [SerializeField] private Color _clickedOutlineColor = Color.black;
     //[SerializeField] private Sprite[] _targetSchemeSprites = null;
@@ -165,6 +168,7 @@ public class Square : MonoBehaviour
     private SpriteRenderer[] _targetIndicatorSprites;
     private Vector3[] _targetIndicatorSpritesOriginalPosition;
     private Color _normalTargetIndicatorColor;
+    private int _distanceToggleFactor;
 
     public void Initialize(
         int id,
@@ -198,6 +202,50 @@ public class Square : MonoBehaviour
         Interactable = Level.UnclickableToggledSquares ? ToggledState == PossibleToggleState.Zero : true;
 
         _normalTargetIndicatorColor = _targetIndicators[0].GetComponentInChildren<SpriteRenderer>().color;
+
+        if(Level.DistanceToggles)
+        {
+            if(Random.Range(0f, 1f) > 0.5f)
+            {
+				if (Level.Squares.Length > 7)
+				{
+					_distanceToggleFactor = Random.Range(1, 4);
+				}
+				else if (Level.Squares.Length > 5)
+				{
+					_distanceToggleFactor = Random.Range(1, 3);
+				}
+                else if (Level.Squares.Length > 3)
+				{
+					_distanceToggleFactor = 1;
+				}
+			}
+
+            if(_distanceToggleFactor == 1 && !SolutionSquare)
+            {
+                _distanceTogglePlus1.SetActive(true);
+				_distanceTogglePlus2.SetActive(false);
+				_distanceTogglePlus3.SetActive(false);
+			}
+            else if(_distanceToggleFactor == 2 && !SolutionSquare)
+            {
+				_distanceTogglePlus2.SetActive(true);
+				_distanceTogglePlus1.SetActive(false);
+				_distanceTogglePlus3.SetActive(false);
+			}
+			else if (_distanceToggleFactor == 3 && !SolutionSquare)
+			{
+				_distanceTogglePlus3.SetActive(true);
+				_distanceTogglePlus1.SetActive(false);
+				_distanceTogglePlus2.SetActive(false);
+			}
+            else if (!SolutionSquare)
+            {
+                _distanceTogglePlus1.SetActive(false);
+                _distanceTogglePlus2.SetActive(false);
+                _distanceTogglePlus3.SetActive(false);
+			}
+		}
     }
 
     public void Initialize(Level level, Square referenceSquare)
@@ -223,7 +271,9 @@ public class Square : MonoBehaviour
             _solutionCross.transform.SetParent(transform.parent);
             _solutionCross.name = $"Cross({Id})";
         }
-    }
+
+        _distanceToggleFactor = referenceSquare._distanceToggleFactor;
+	}
 
     public void Overwrite(PossibleToggleState toggledState, TargetingScheme targetingScheme, bool cascading)
     {
@@ -277,6 +327,8 @@ public class Square : MonoBehaviour
     {
         Targets = new List<Square>();
 
+        var targetId = 0;
+
         switch (TargetScheme)
         {
             case TargetingScheme.Self:
@@ -287,27 +339,27 @@ public class Square : MonoBehaviour
 
             case TargetingScheme.Left:
 
-                if (Id > 0)
-                {
-                    Targets.Add(targetArray[Id - 1]);
-                }
-                else
-                {
-                    Targets.Add(targetArray[targetArray.Length - 1]);
-                }
+                targetId = Id - (1 + _distanceToggleFactor);
 
-                break;
+                if(targetId < 0)
+                {
+                    targetId = targetArray.Length + targetId;
+				}
+
+                Targets.Add(targetArray[targetId]);
+
+				break;
 
             case TargetingScheme.Right:
 
-                if (Id < targetArray.Length - 1)
-                {
-                    Targets.Add(targetArray[Id + 1]);
-                }
-                else
-                {
-                    Targets.Add(targetArray[0]);
-                }
+				targetId = Id + (1 + _distanceToggleFactor);
+
+				if (targetId > targetArray.Length - 1)
+				{
+					targetId = targetId - targetArray.Length;
+				}
+
+				Targets.Add(targetArray[targetId]);
 
                 break;
 
@@ -315,77 +367,92 @@ public class Square : MonoBehaviour
 
                 Targets.Add(this);
 
-                if (Id > 0)
-                {
-                    Targets.Add(targetArray[Id - 1]);
-                }
-                else
-                {
-                    Targets.Add(targetArray[targetArray.Length - 1]);
-                }
+				targetId = Id - (1 + _distanceToggleFactor);
 
-                break;
+				if (targetId < 0)
+				{
+					targetId = targetArray.Length + targetId;
+				}
+
+				if (!Targets.Contains(targetArray[targetId]))
+				{
+					Targets.Add(targetArray[targetId]);
+				}
+
+				break;
 
             case TargetingScheme.SelfRight:
 
                 Targets.Add(this);
 
-                if (Id < targetArray.Length - 1)
-                {
-                    Targets.Add(targetArray[Id + 1]);
-                }
-                else
-                {
-                    Targets.Add(targetArray[0]);
-                }
+				targetId = Id + (1 + _distanceToggleFactor);
 
-                break;
+				if (targetId > targetArray.Length - 1)
+				{
+					targetId = targetId - targetArray.Length;
+				}
+
+				if (!Targets.Contains(targetArray[targetId]))
+				{
+					Targets.Add(targetArray[targetId]);
+				}
+
+				break;
 
             case TargetingScheme.LeftRight:
 
-                if (Id > 0)
-                {
-                    Targets.Add(targetArray[Id - 1]);
-                }
-                else
-                {
-                    Targets.Add(targetArray[targetArray.Length - 1]);
-                }
+				targetId = Id - (1 + _distanceToggleFactor);
 
-                if (Id < targetArray.Length - 1)
-                {
-                    Targets.Add(targetArray[Id + 1]);
-                }
-                else
-                {
-                    Targets.Add(targetArray[0]);
-                }
+				if (targetId < 0)
+				{
+					targetId = targetArray.Length + targetId;
+				}
 
-                break;
+				Targets.Add(targetArray[targetId]);
+
+				targetId = Id + (1 + _distanceToggleFactor);
+
+				if (targetId > targetArray.Length - 1)
+				{
+					targetId = targetId - targetArray.Length;
+				}
+
+                if (!Targets.Contains(targetArray[targetId]))
+                {
+					Targets.Add(targetArray[targetId]);
+				}
+				
+				break;
 
             case TargetingScheme.SelfLeftRight:
 
                 Targets.Add(this);
 
-                if (Id > 0)
-                {
-                    Targets.Add(targetArray[Id - 1]);
-                }
-                else
-                {
-                    Targets.Add(targetArray[targetArray.Length - 1]);
-                }
+				targetId = Id - (1 + _distanceToggleFactor);
 
-                if (Id < targetArray.Length - 1)
-                {
-                    Targets.Add(targetArray[Id + 1]);
-                }
-                else
-                {
-                    Targets.Add(targetArray[0]);
-                }
+				if (targetId < 0)
+				{
+					targetId = targetArray.Length + targetId;
+				}
 
-                break;
+				if (!Targets.Contains(targetArray[targetId]))
+				{
+					Targets.Add(targetArray[targetId]);
+				}
+
+				targetId = Id + (1 + _distanceToggleFactor);
+
+				if (targetId > targetArray.Length - 1)
+				{
+					targetId = targetId - targetArray.Length;
+				}
+
+				if (!Targets.Contains(targetArray[targetId]))
+				{
+					Targets.Add(targetArray[targetId]);
+				}
+
+				break;
         }
     }
 
