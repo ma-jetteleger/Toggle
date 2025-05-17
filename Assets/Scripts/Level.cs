@@ -106,6 +106,10 @@ public class Level : MonoBehaviour
 	[SerializeField] [ShowIf(nameof(_solutionType), SolutionType.SingleSolution)] private bool _forceSingleSolution = false;
 	[SerializeField] [ShowIf(nameof(_solutionType), SolutionType.MultipleSolutions)] private CompletedSolutionsToNextLevelRestriction _completedSolutionsToNextLevelRestriction = CompletedSolutionsToNextLevelRestriction.AllSolutions;
 	[SerializeField] [ShowIf(nameof(_solutionType), SolutionType.MultipleSolutions)] private bool _forceMultipleSolution = false;
+
+	[HorizontalLine(1)]
+
+	// Experimental features
 	[SerializeField] private bool _binaryStateSquares = false;
 	[SerializeField] private bool _unclickableToggledSquares = false;
 	[SerializeField] private bool _distanceToggles = false;
@@ -118,8 +122,9 @@ public class Level : MonoBehaviour
 	[SerializeField] private string _multiSolutionsLevelsFile = string.Empty;
 	[SerializeField] private int _playedLevelQueueSize = 0;
 
-	// Debug
 	[HorizontalLine(1)]
+
+	// Debug
 	[SerializeField] private bool _printSolutions = false;
 
 	public Square[] Squares { get; set; }
@@ -1192,7 +1197,7 @@ public class Level : MonoBehaviour
 		{
 			Debug.Log("Couldn't generate a valid solution sequence, loading a prevalidated level from file");
 
-			if (_unclickableToggledSquares || _distanceToggles || _binaryStateSquares)
+			if (_unclickableToggledSquares || _distanceToggles || !_binaryStateSquares)
 			{
 				Debug.Log($"Loading prevalidated levels from file isn't supported for non-regular levels. " +
 					$"Press D + Enter to try and generate a new random level");
@@ -1273,7 +1278,7 @@ public class Level : MonoBehaviour
 				return;
 			}*/
 
-			if (_unclickableToggledSquares || _distanceToggles || _binaryStateSquares)
+			if (_unclickableToggledSquares || _distanceToggles || !_binaryStateSquares)
 			{
 				Debug.Log($"Loading prevalidated levels from file isn't supported for non-regular levels." +
 					$"settling for a random level");
