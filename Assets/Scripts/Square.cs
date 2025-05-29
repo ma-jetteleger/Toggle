@@ -30,13 +30,15 @@ public class Square : MonoBehaviour
     [SerializeField] private Rectangle _noMoreClicksOverlay = null;
     [SerializeField] private Rectangle _uninteractableOverlay = null;
     [SerializeField] private GameObject _targetPredictionTemplate = null;
+    [SerializeField] private GameObject _conditionalSection = null;
     [SerializeField] private GameObject[] _targetIndicators = null;
+    [SerializeField] private GameObject[] _conditionalTargetIndicators = null;
     [SerializeField] private Disc _cascadingIndicator = null;
-    [SerializeField] private GameObject _solutionCheck = null;
+	[SerializeField] private Disc _conditionalCascadingIndicator = null;
+	[SerializeField] private GameObject _solutionCheck = null;
     [SerializeField] private GameObject _solutionCross = null;
-    [SerializeField] private GameObject _distanceTogglePlus1 = null;
-    [SerializeField] private GameObject _distanceTogglePlus2 = null;
-    [SerializeField] private GameObject _distanceTogglePlus3 = null;
+    [SerializeField] private GameObject[] _distanceToggleIndicators = null;
+    [SerializeField] private GameObject[] _conditionalDistanceToggleIndicators = null;
 
     [SerializeField] private Color _clickedOutlineColor = Color.black;
     //[SerializeField] private Sprite[] _targetSchemeSprites = null;
@@ -162,13 +164,19 @@ public class Square : MonoBehaviour
     private float _uninteractableOverlayAlpha;
     private Square _referenceSquare;
     private bool _cascading;
+    private bool _untoggledCascading;
+    private bool _toggledCascading;
     private TargetingScheme _targetingScheme;
+    private TargetingScheme _untoggledTargetingScheme;
+    private TargetingScheme _toggledTargetingScheme;
     private bool _coloredTargetPrediction;
     private int _lastSortingOrderChangeFactor;
     private SpriteRenderer[] _targetIndicatorSprites;
     private Vector3[] _targetIndicatorSpritesOriginalPosition;
     private Color _normalTargetIndicatorColor;
     private int _distanceToggleFactor;
+    private int _untoggledDistanceToggleFactor;
+    private int _toggledDistanceToggleFactor;
 
     public void Initialize(
         int id,
@@ -203,7 +211,15 @@ public class Square : MonoBehaviour
 
         _normalTargetIndicatorColor = _targetIndicators[0].GetComponentInChildren<SpriteRenderer>().color;
 
-        if(Level.DistanceToggles)
+		if (Level.ConditionalToggles && _conditionalSection != null)
+        {
+			if (Random.Range(0f, 1f) > 0.5f)
+            {
+                _conditionalSection.SetActive(false);
+			}
+		}
+
+        if (Level.DistanceToggles && _distanceToggleIndicators != null)
         {
             if(Random.Range(0f, 1f) > 0.5f)
             {
@@ -223,27 +239,27 @@ public class Square : MonoBehaviour
 
             if(_distanceToggleFactor == 1 && !SolutionSquare)
             {
-                _distanceTogglePlus1.SetActive(true);
-				_distanceTogglePlus2.SetActive(false);
-				_distanceTogglePlus3.SetActive(false);
+                _distanceToggleIndicators[0].SetActive(true);
+				_distanceToggleIndicators[1].SetActive(false);
+				_distanceToggleIndicators[2].SetActive(false);
 			}
             else if(_distanceToggleFactor == 2 && !SolutionSquare)
             {
-				_distanceTogglePlus2.SetActive(true);
-				_distanceTogglePlus1.SetActive(false);
-				_distanceTogglePlus3.SetActive(false);
+				_distanceToggleIndicators[1].SetActive(true);
+				_distanceToggleIndicators[0].SetActive(false);
+				_distanceToggleIndicators[2].SetActive(false);
 			}
 			else if (_distanceToggleFactor == 3 && !SolutionSquare)
 			{
-				_distanceTogglePlus3.SetActive(true);
-				_distanceTogglePlus1.SetActive(false);
-				_distanceTogglePlus2.SetActive(false);
+				_distanceToggleIndicators[2].SetActive(true);
+				_distanceToggleIndicators[0].SetActive(false);
+				_distanceToggleIndicators[1].SetActive(false);
 			}
             else if (!SolutionSquare)
             {
-                _distanceTogglePlus1.SetActive(false);
-                _distanceTogglePlus2.SetActive(false);
-                _distanceTogglePlus3.SetActive(false);
+				_distanceToggleIndicators[0].SetActive(false);
+				_distanceToggleIndicators[1].SetActive(false);
+				_distanceToggleIndicators[2].SetActive(false);
 			}
 		}
     }

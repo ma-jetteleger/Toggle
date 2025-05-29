@@ -64,6 +64,7 @@ public class Level : MonoBehaviour
 	[SerializeField] private Rectangle _rectangle = null;
 	[SerializeField] private Rectangle _solutionRectangle = null;
 	[SerializeField] private Rectangle _levelCompletionFeedback = null;
+	[SerializeField] private SnapLineManager _snapLineManager = null;
 
 	[HorizontalLine(1)]
 
@@ -110,9 +111,16 @@ public class Level : MonoBehaviour
 	[HorizontalLine(1)]
 
 	// Experimental features
-	[SerializeField] private bool _binaryStateSquares = false;
-	[SerializeField] private bool _unclickableToggledSquares = false;
-	[SerializeField] private bool _distanceToggles = false;
+	[SerializeField] private bool _binaryStateSquares = false;			// done
+	[SerializeField] private bool _unclickableToggledSquares = false;	// done
+	[SerializeField] private bool _distanceToggles = false;				// done
+	[SerializeField] private bool _toggleThroughs = false;
+	[SerializeField] private bool _programmableClicks = false;			// in progress
+	[SerializeField] private bool _2dLevels = false;
+	[SerializeField] private bool _conditionalToggles = false;          // in progress
+	[SerializeField] private bool _flippingToggles = false;
+	[SerializeField] private bool _disablingToggles = false;
+	[SerializeField] private bool _swappingToggles = false;
 
 	[HorizontalLine(1)]
 
@@ -146,6 +154,7 @@ public class Level : MonoBehaviour
 	public LevelPanel LevelPanel => _levelPanel;
 	public bool BinaryStateSquares => _binaryStateSquares;
 	public bool DistanceToggles => _distanceToggles;
+	public bool ConditionalToggles => _conditionalToggles;
 
 	private string _levelsFileName => _solutionType == SolutionType.SingleSolution ? _singleSolutionLevelsFile : _multiSolutionsLevelsFile;
 	private string _levelsFilePath => Application.persistentDataPath + "/" + _levelsFileName;
@@ -1016,6 +1025,11 @@ public class Level : MonoBehaviour
 		{
 			Debug.Log("We're good");
 		}*/
+
+		if(_programmableClicks && _snapLineManager != null)
+		{
+			_snapLineManager.Initialize(this);
+		}
 	}
 
 	private void GenerateSolution(string[] splitGoalCode, string[] splitSolutionsCode)
@@ -1135,14 +1149,14 @@ public class Level : MonoBehaviour
 						Sequence = new List<int>(new int[indices.Length - _maxClicksBufferForSolution])
 					};
 
-					/*if(!_binaryStateSquares)
+					if(!_binaryStateSquares)
 					{
 						var indicesTwice = new List<int>();
 						indicesTwice.AddRange(indices);
 						indicesTwice.AddRange(indices);
 
 						indices = indicesTwice.ToArray();
-					}*/
+					}
 
 					var shuffledIndices = indices.OrderBy(a => System.Guid.NewGuid()).ToArray();
 

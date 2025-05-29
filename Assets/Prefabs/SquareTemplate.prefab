@@ -139,11 +139,15 @@ MonoBehaviour:
   _uninteractableOverlay: {fileID: 0}
   _targetPredictionTemplate: {fileID: 0}
   _targetIndicators: []
+  _conditionalTargetIndicators: []
   _cascadingIndicator: {fileID: 0}
+  _conditionalCascadingIndicator: {fileID: 0}
   _solutionCheck: {fileID: 0}
   _solutionCross: {fileID: 0}
+  _distanceToggleIndicators: []
   _clickedOutlineColor: {r: 0, g: 0, b: 0, a: 1}
-  _toggledColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
+  _toggled1Color: {r: 0, g: 0, b: 0, a: 1}
+  _toggled2Color: {r: 0, g: 0, b: 0, a: 1}
   _shakeGradient:
     serializedVersion: 2
     key0: {r: 1, g: 1, b: 1, a: 1}

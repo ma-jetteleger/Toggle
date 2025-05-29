@@ -4683,6 +4683,7 @@ MonoBehaviour:
   _rectangle: {fileID: 692212901}
   _solutionRectangle: {fileID: 773931495}
   _levelCompletionFeedback: {fileID: 463101731}
+  _snapLineManager: {fileID: 0}
   _squaresRange: {x: 3, y: 9}
   _maxClicksBufferForSolution: 1
   _solutionGenerationAttempts: 99
@@ -4806,6 +4807,13 @@ MonoBehaviour:
   _binaryStateSquares: 0
   _unclickableToggledSquares: 1
   _distanceToggles: 1
+  _toggleThroughs: 0
+  _programmableClicks: 0
+  _2dLevels: 0
+  _conditionalToggles: 0
+  _flippingToggles: 0
+  _disablingToggles: 0
+  _swappingToggles: 0
   _saveLevelsToFile: 1
   _singleSolutionLevelsFile: SingleSolutionLevels.txt
   _multiSolutionsLevelsFile: MultiSolutionsLevels.txt
@@ -12953,6 +12961,22 @@ PrefabInstance:
       propertyPath: _targetSchemeSprites.Array.data[6]
       value: 
       objectReference: {fileID: 21300000, guid: 89519b0443f67ae4493fc99d5c94e82a, type: 3}
+    - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
+      propertyPath: _distanceToggleIndicators.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
+      propertyPath: _distanceToggleIndicators.Array.data[0]
+      value: 
+      objectReference: {fileID: 1541128505}
+    - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
+      propertyPath: _distanceToggleIndicators.Array.data[1]
+      value: 
+      objectReference: {fileID: 738224360}
+    - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
+      propertyPath: _distanceToggleIndicators.Array.data[2]
+      value: 
+      objectReference: {fileID: 549615980}
     - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
       propertyPath: _targetIndicatorMoveCurve.m_Curve.Array.size
       value: 2
