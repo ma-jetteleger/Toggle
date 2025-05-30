@@ -13495,7 +13495,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 92.685, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 104}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1886011239
@@ -14710,7 +14710,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 44.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 104}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2071864913
@@ -16408,6 +16408,10 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
+      propertyPath: _conditionalCascadingIndicator
+      value: 
+      objectReference: {fileID: 4663676}
+    - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
       propertyPath: _toggledTargetIndicatorColor.b
       value: 1
       objectReference: {fileID: 0}
@@ -16480,6 +16484,10 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
+      propertyPath: _conditionalTargetIndicators.Array.size
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
       propertyPath: _distanceToggleIndicators.Array.data[0]
       value: 
       objectReference: {fileID: 537180670}
@@ -16492,6 +16500,34 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1672206705}
     - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
+      propertyPath: _conditionalTargetIndicators.Array.data[0]
+      value: 
+      objectReference: {fileID: 199910530}
+    - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
+      propertyPath: _conditionalTargetIndicators.Array.data[1]
+      value: 
+      objectReference: {fileID: 989404904}
+    - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
+      propertyPath: _conditionalTargetIndicators.Array.data[2]
+      value: 
+      objectReference: {fileID: 1844243931}
+    - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
+      propertyPath: _conditionalTargetIndicators.Array.data[3]
+      value: 
+      objectReference: {fileID: 550562240}
+    - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
+      propertyPath: _conditionalTargetIndicators.Array.data[4]
+      value: 
+      objectReference: {fileID: 1983723607}
+    - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
+      propertyPath: _conditionalTargetIndicators.Array.data[5]
+      value: 
+      objectReference: {fileID: 245206865}
+    - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
+      propertyPath: _conditionalTargetIndicators.Array.data[6]
+      value: 
+      objectReference: {fileID: 147279590}
+    - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
       propertyPath: _targetIndicatorMoveCurve.m_Curve.Array.size
       value: 2
       objectReference: {fileID: 0}
@@ -16500,9 +16536,25 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
+      propertyPath: _conditionalDistanceToggleIndicators.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
       propertyPath: _targetIndicatorMoveCurveDown.m_Curve.Array.size
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
+      propertyPath: _conditionalDistanceToggleIndicators.Array.data[0]
+      value: 
+      objectReference: {fileID: 537180670}
+    - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
+      propertyPath: _conditionalDistanceToggleIndicators.Array.data[1]
+      value: 
+      objectReference: {fileID: 1650699298}
+    - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
+      propertyPath: _conditionalDistanceToggleIndicators.Array.data[2]
+      value: 
+      objectReference: {fileID: 1672206705}
     - target: {fileID: 1695576152193803695, guid: 5b779dbd0a580c8438a186cfcd3b74b9, type: 3}
       propertyPath: _targetIndicatorMoveCurve.m_Curve.Array.data[1].time
       value: 1

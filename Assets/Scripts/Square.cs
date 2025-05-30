@@ -4,9 +4,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using System.Linq;
+using NaughtyAttributes;
 
 public class Square : MonoBehaviour
 {
+    public class ToggleProperties
+    {
+		public bool Cascading;
+		public TargetingScheme TargetingScheme;
+		public int DistanceToggleFactor;
+	}
+
     public enum PossibleToggleState
     {
         Zero,
@@ -26,7 +34,9 @@ public class Square : MonoBehaviour
         SelfLeftRight
     }
 
-    [SerializeField] private GameObject _outline = null;
+
+    // Components
+	[SerializeField] private GameObject _outline = null;
     [SerializeField] private Rectangle _noMoreClicksOverlay = null;
     [SerializeField] private Rectangle _uninteractableOverlay = null;
     [SerializeField] private GameObject _targetPredictionTemplate = null;
@@ -40,7 +50,10 @@ public class Square : MonoBehaviour
     [SerializeField] private GameObject[] _distanceToggleIndicators = null;
     [SerializeField] private GameObject[] _conditionalDistanceToggleIndicators = null;
 
-    [SerializeField] private Color _clickedOutlineColor = Color.black;
+	[HorizontalLine(1)]
+
+	// Animation/visual parameters
+	[SerializeField] private Color _clickedOutlineColor = Color.black;
     //[SerializeField] private Sprite[] _targetSchemeSprites = null;
     [SerializeField] private Color _toggled1Color = Color.black;
     [SerializeField] private Color _toggled2Color = Color.black;
@@ -136,12 +149,15 @@ public class Square : MonoBehaviour
     public Square PreviousSquare => Level.Squares[Id > 0 ? Id - 1 : Level.Squares.Length - 1];
     public Square NextSquare => Level.Squares[Id < Level.Squares.Length - 1 ? Id + 1 : 0];
     public bool Animating => _punch != null || _referenceSquarePunch != null || _leftArrowMove != null || _rightArrowMove != null || _diamondMove != null || _cascadingIndicatorMove != null;
+    public bool Conditional => ConditionalToggleProperties != null;
 
     public Level Level { get; set; }
     public PossibleToggleState ToggledState { get; set; }
     public bool Highlighted { get; set; }
+	public Dictionary<PossibleToggleState, ToggleProperties> ConditionalToggleProperties { get; set; }
+	public int DistanceToggleFactor { get; set; }
 
-    public List<Square> Targets { get; set; }
+	public List<Square> Targets { get; set; }
     public int Id { get; set; }
 
     private bool _interactable;
@@ -164,19 +180,12 @@ public class Square : MonoBehaviour
     private float _uninteractableOverlayAlpha;
     private Square _referenceSquare;
     private bool _cascading;
-    private bool _untoggledCascading;
-    private bool _toggledCascading;
     private TargetingScheme _targetingScheme;
-    private TargetingScheme _untoggledTargetingScheme;
-    private TargetingScheme _toggledTargetingScheme;
-    private bool _coloredTargetPrediction;
-    private int _lastSortingOrderChangeFactor;
-    private SpriteRenderer[] _targetIndicatorSprites;
-    private Vector3[] _targetIndicatorSpritesOriginalPosition;
-    private Color _normalTargetIndicatorColor;
-    private int _distanceToggleFactor;
-    private int _untoggledDistanceToggleFactor;
-    private int _toggledDistanceToggleFactor;
+	private bool _coloredTargetPrediction;
+	private int _lastSortingOrderChangeFactor;
+	private SpriteRenderer[] _targetIndicatorSprites;
+	private Vector3[] _targetIndicatorSpritesOriginalPosition;
+	private Color _normalTargetIndicatorColor;
 
     public void Initialize(
         int id,
@@ -211,58 +220,21 @@ public class Square : MonoBehaviour
 
         _normalTargetIndicatorColor = _targetIndicators[0].GetComponentInChildren<SpriteRenderer>().color;
 
-		if (Level.ConditionalToggles && _conditionalSection != null)
+        if (Level.ConditionalToggles && _conditionalSection != null)
         {
-			if (Random.Range(0f, 1f) > 0.5f)
+            if (Random.Range(0f, 1f) > 0.5f)
             {
                 _conditionalSection.SetActive(false);
-			}
-		}
+            }
 
-        if (Level.DistanceToggles && _distanceToggleIndicators != null)
-        {
-            if(Random.Range(0f, 1f) > 0.5f)
+            if (_conditionalSection.activeSelf)
             {
-				if (Level.Squares.Length > 7)
-				{
-					_distanceToggleFactor = Random.Range(1, 4);
-				}
-				else if (Level.Squares.Length > 5)
-				{
-					_distanceToggleFactor = Random.Range(1, 3);
-				}
-                else if (Level.Squares.Length > 3)
-				{
-					_distanceToggleFactor = 1;
-				}
-			}
+                ConditionalToggleProperties = new Dictionary<PossibleToggleState, ToggleProperties>();
+            }
+        }
 
-            if(_distanceToggleFactor == 1 && !SolutionSquare)
-            {
-                _distanceToggleIndicators[0].SetActive(true);
-				_distanceToggleIndicators[1].SetActive(false);
-				_distanceToggleIndicators[2].SetActive(false);
-			}
-            else if(_distanceToggleFactor == 2 && !SolutionSquare)
-            {
-				_distanceToggleIndicators[1].SetActive(true);
-				_distanceToggleIndicators[0].SetActive(false);
-				_distanceToggleIndicators[2].SetActive(false);
-			}
-			else if (_distanceToggleFactor == 3 && !SolutionSquare)
-			{
-				_distanceToggleIndicators[2].SetActive(true);
-				_distanceToggleIndicators[0].SetActive(false);
-				_distanceToggleIndicators[1].SetActive(false);
-			}
-            else if (!SolutionSquare)
-            {
-				_distanceToggleIndicators[0].SetActive(false);
-				_distanceToggleIndicators[1].SetActive(false);
-				_distanceToggleIndicators[2].SetActive(false);
-			}
-		}
-    }
+        SetupDistanceToggles();
+	}
 
     public void Initialize(Level level, Square referenceSquare)
     {
@@ -288,7 +260,7 @@ public class Square : MonoBehaviour
             _solutionCross.name = $"Cross({Id})";
         }
 
-        _distanceToggleFactor = referenceSquare._distanceToggleFactor;
+        DistanceToggleFactor = referenceSquare.DistanceToggleFactor;
 	}
 
     public void Overwrite(PossibleToggleState toggledState, TargetingScheme targetingScheme, bool cascading)
@@ -339,6 +311,53 @@ public class Square : MonoBehaviour
         _outlineRectangle.Color = _normalOutlineColor;
     }
 
+    public void SetupDistanceToggles()
+    {
+		if (Level.DistanceToggles && _distanceToggleIndicators != null)
+		{
+			if (Random.Range(0f, 1f) > 0.5f)
+			{
+				if (Level.Squares.Length > 7)
+				{
+					DistanceToggleFactor = Random.Range(1, 4);
+				}
+				else if (Level.Squares.Length > 5)
+				{
+					DistanceToggleFactor = Random.Range(1, 3);
+				}
+				else if (Level.Squares.Length > 3)
+				{
+					DistanceToggleFactor = 1;
+				}
+			}
+
+			if (DistanceToggleFactor == 1 && !SolutionSquare)
+			{
+				_distanceToggleIndicators[0].SetActive(true);
+				_distanceToggleIndicators[1].SetActive(false);
+				_distanceToggleIndicators[2].SetActive(false);
+			}
+			else if (DistanceToggleFactor == 2 && !SolutionSquare)
+			{
+				_distanceToggleIndicators[1].SetActive(true);
+				_distanceToggleIndicators[0].SetActive(false);
+				_distanceToggleIndicators[2].SetActive(false);
+			}
+			else if (DistanceToggleFactor == 3 && !SolutionSquare)
+			{
+				_distanceToggleIndicators[2].SetActive(true);
+				_distanceToggleIndicators[0].SetActive(false);
+				_distanceToggleIndicators[1].SetActive(false);
+			}
+			else if (!SolutionSquare)
+			{
+				_distanceToggleIndicators[0].SetActive(false);
+				_distanceToggleIndicators[1].SetActive(false);
+				_distanceToggleIndicators[2].SetActive(false);
+			}
+		}
+	}
+
     public void SetupTargets(Square[] targetArray)
     {
         Targets = new List<Square>();
@@ -355,7 +374,7 @@ public class Square : MonoBehaviour
 
             case TargetingScheme.Left:
 
-                targetId = Id - (1 + _distanceToggleFactor);
+                targetId = Id - (1 + DistanceToggleFactor);
 
                 if(targetId < 0)
                 {
@@ -368,7 +387,7 @@ public class Square : MonoBehaviour
 
             case TargetingScheme.Right:
 
-				targetId = Id + (1 + _distanceToggleFactor);
+				targetId = Id + (1 + DistanceToggleFactor);
 
 				if (targetId > targetArray.Length - 1)
 				{
@@ -383,7 +402,7 @@ public class Square : MonoBehaviour
 
                 Targets.Add(this);
 
-				targetId = Id - (1 + _distanceToggleFactor);
+				targetId = Id - (1 + DistanceToggleFactor);
 
 				if (targetId < 0)
 				{
@@ -401,7 +420,7 @@ public class Square : MonoBehaviour
 
                 Targets.Add(this);
 
-				targetId = Id + (1 + _distanceToggleFactor);
+				targetId = Id + (1 + DistanceToggleFactor);
 
 				if (targetId > targetArray.Length - 1)
 				{
@@ -417,7 +436,7 @@ public class Square : MonoBehaviour
 
             case TargetingScheme.LeftRight:
 
-				targetId = Id - (1 + _distanceToggleFactor);
+				targetId = Id - (1 + DistanceToggleFactor);
 
 				if (targetId < 0)
 				{
@@ -426,7 +445,7 @@ public class Square : MonoBehaviour
 
 				Targets.Add(targetArray[targetId]);
 
-				targetId = Id + (1 + _distanceToggleFactor);
+				targetId = Id + (1 + DistanceToggleFactor);
 
 				if (targetId > targetArray.Length - 1)
 				{
@@ -444,7 +463,7 @@ public class Square : MonoBehaviour
 
                 Targets.Add(this);
 
-				targetId = Id - (1 + _distanceToggleFactor);
+				targetId = Id - (1 + DistanceToggleFactor);
 
 				if (targetId < 0)
 				{
@@ -456,7 +475,7 @@ public class Square : MonoBehaviour
 					Targets.Add(targetArray[targetId]);
 				}
 
-				targetId = Id + (1 + _distanceToggleFactor);
+				targetId = Id + (1 + DistanceToggleFactor);
 
 				if (targetId > targetArray.Length - 1)
 				{
@@ -517,6 +536,42 @@ public class Square : MonoBehaviour
 
         InstantiatePredictionIndicator(cascadingFlags, Targets, true);
     }
+
+    public void SetupConditionalPreview()
+    {
+        foreach(var conditionalToggleProperty in ConditionalToggleProperties)
+        {
+            if(conditionalToggleProperty.Key == ToggledState)
+            {
+
+            }
+        }
+
+		if (DistanceToggleFactor == 1 && !SolutionSquare)
+		{
+			_distanceToggleIndicators[0].SetActive(true);
+			_distanceToggleIndicators[1].SetActive(false);
+			_distanceToggleIndicators[2].SetActive(false);
+		}
+		else if (DistanceToggleFactor == 2 && !SolutionSquare)
+		{
+			_distanceToggleIndicators[1].SetActive(true);
+			_distanceToggleIndicators[0].SetActive(false);
+			_distanceToggleIndicators[2].SetActive(false);
+		}
+		else if (DistanceToggleFactor == 3 && !SolutionSquare)
+		{
+			_distanceToggleIndicators[2].SetActive(true);
+			_distanceToggleIndicators[0].SetActive(false);
+			_distanceToggleIndicators[1].SetActive(false);
+		}
+		else if (!SolutionSquare)
+		{
+			_distanceToggleIndicators[0].SetActive(false);
+			_distanceToggleIndicators[1].SetActive(false);
+			_distanceToggleIndicators[2].SetActive(false);
+		}
+	}
 
     private void InstantiatePredictionIndicator(bool[] cascadingFlags, List<Square> targets, bool originalClick)
     {
@@ -720,6 +775,16 @@ public class Square : MonoBehaviour
                 //_cascadingIndicator.gameObject.SetActive(_cascading);
             }
         }
+    }
+
+    public void SetupDistanceToggleFactor()
+    {
+
+    }
+
+    public void SetTargetScheme()
+    {
+
     }
 
     public void AnimateCascadingIndicator()

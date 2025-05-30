@@ -622,6 +622,26 @@ public class Level : MonoBehaviour
 						break;
 					}
 
+					if(BinaryStateSquares)
+					{
+						if (UnityEngine.Random.Range(0f, 1f) > 0.5f)
+						{
+							shuffledSquaresArray[i].Toggle();
+						}
+					}
+					else
+					{
+						if (UnityEngine.Random.Range(0f, 1f) > 0.66f)
+						{
+							shuffledSquaresArray[i].Toggle();
+							shuffledSquaresArray[i].Toggle();
+						}
+						else if (UnityEngine.Random.Range(0f, 1f) > 0.33f)
+						{
+							shuffledSquaresArray[i].Toggle();
+						}
+					}
+
 					if (UnityEngine.Random.Range(0f, 1f) > 0.5f)
 					{
 						shuffledSquaresArray[i].Toggle();
@@ -792,6 +812,64 @@ public class Level : MonoBehaviour
 					{
 						orderedTargetingSchemes.Remove(shuffledSquare.TargetScheme);
 					}
+
+					if(shuffledSquare.Conditional)
+					{
+						var zeroToggleProperties = (Square.ToggleProperties)null;
+						var oneToggleProperties = (Square.ToggleProperties)null;
+						var twoToggleProperties = (Square.ToggleProperties)null;
+
+						var copiedToggleProperties = new Square.ToggleProperties()
+						{
+							Cascading = shuffledSquare.Cascading,
+							TargetingScheme = shuffledSquare.TargetScheme,
+							DistanceToggleFactor = shuffledSquare.DistanceToggleFactor
+						};
+
+						var newToggleProperties = new Square.ToggleProperties()
+						{
+							Cascading = UnityEngine.Random.Range(0f, 1f) > 0.5f,
+							TargetingScheme = possibleTargetingSchemes[UnityEngine.Random.Range(0, possibleTargetingSchemes.Count)]
+						};
+
+						if (DistanceToggles)
+						{
+							if (UnityEngine.Random.Range(0f, 1f) > 0.5f)
+							{
+								if (Squares.Length > 7)
+								{
+									newToggleProperties.DistanceToggleFactor = UnityEngine.Random.Range(1, 4);
+								}
+								else if (Squares.Length > 5)
+								{
+									newToggleProperties.DistanceToggleFactor = UnityEngine.Random.Range(1, 3);
+								}
+								else if (Squares.Length > 3)
+								{
+									newToggleProperties.DistanceToggleFactor = 1;
+								}
+							}
+						}
+
+						if (shuffledSquare.ToggledState == Square.PossibleToggleState.Zero)
+						{
+							zeroToggleProperties = copiedToggleProperties;
+							oneToggleProperties = newToggleProperties;
+						}
+						else
+						{
+							zeroToggleProperties = newToggleProperties;
+							oneToggleProperties = copiedToggleProperties;
+						}
+
+						twoToggleProperties = oneToggleProperties;
+
+						shuffledSquare.ConditionalToggleProperties.Add(Square.PossibleToggleState.Zero, zeroToggleProperties);
+						shuffledSquare.ConditionalToggleProperties.Add(Square.PossibleToggleState.One, oneToggleProperties);
+						shuffledSquare.ConditionalToggleProperties.Add(Square.PossibleToggleState.Two, twoToggleProperties);
+
+						shuffledSquare.SetupConditionalPreview();
+					}
 				}
 
 				if (Squares.Length == 3 && Squares.All(x => x.TargetScheme == Square.TargetingScheme.Self))
@@ -956,6 +1034,11 @@ public class Level : MonoBehaviour
 		for (var i = 0; i < Squares.Length; i++)
 		{
 			Squares[i].SetupPredictions(true);
+		}
+
+		for (var i = 0; i < Squares.Length; i++)
+		{
+			Squares[i].SetupConditionals();
 		}
 
 		_squareHistory.Add(firstHistorySnapshot);
@@ -1149,14 +1232,14 @@ public class Level : MonoBehaviour
 						Sequence = new List<int>(new int[indices.Length - _maxClicksBufferForSolution])
 					};
 
-					if(!_binaryStateSquares)
+					/*if(!_binaryStateSquares)
 					{
 						var indicesTwice = new List<int>();
 						indicesTwice.AddRange(indices);
 						indicesTwice.AddRange(indices);
 
 						indices = indicesTwice.ToArray();
-					}
+					}*/
 
 					var shuffledIndices = indices.OrderBy(a => System.Guid.NewGuid()).ToArray();
 
